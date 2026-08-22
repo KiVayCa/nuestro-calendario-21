@@ -1,13 +1,21 @@
 <!doctype html>
 <html lang="es">
+
 <head>
+
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<meta
+  name="viewport"
+  content="width=device-width,initial-scale=1"
+>
+
 <title>Nuestro Calendario #21</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
+
 :root{
   --rose:#e64d78;
   --soft:#fde8ee;
@@ -15,6 +23,8 @@
   --muted:#8e747c;
   --card:#fff;
   --line:#efdee4;
+  --green:#27845b;
+  --danger:#c83c55;
 }
 
 *{
@@ -84,6 +94,10 @@ body{
   font-weight:700;
 }
 
+.btn:hover{
+  filter:brightness(.98);
+}
+
 .btn:disabled{
   opacity:.55;
   cursor:not-allowed;
@@ -92,6 +106,16 @@ body{
 .primary{
   background:var(--rose);
   color:white;
+}
+
+.danger{
+  background:#fde1e5;
+  color:var(--danger);
+}
+
+.success{
+  background:#e3f5eb;
+  color:var(--green);
 }
 
 .linkBtn{
@@ -115,8 +139,13 @@ body{
   padding:16px;
 }
 
+
+/* =====================================================
+   PORTADA
+===================================================== */
+
 .hero{
-  height:350px;
+  height:300px;
   border-radius:24px;
   overflow:hidden;
   position:relative;
@@ -128,9 +157,19 @@ body{
   content:"";
   position:absolute;
   inset:0;
+
   background:
-    linear-gradient(90deg,#24131db8,#24131d18),
-    url('pareja.jpeg') center 48%/cover;
+    linear-gradient(
+      90deg,
+      #24131dc8,
+      #24131d25
+    ),
+    url('pareja.jpeg')
+    center center/
+    cover
+    no-repeat;
+
+  transform:scale(1.01);
 }
 
 .heroText{
@@ -144,13 +183,18 @@ body{
 }
 
 .heroText h1{
-  font:italic 65px Georgia,serif;
+  font:italic 58px Georgia,serif;
   margin:0 0 8px;
 }
 
 .heroText p{
   margin:0;
 }
+
+
+/* =====================================================
+   CONTADORES
+===================================================== */
 
 .cards{
   display:grid;
@@ -192,6 +236,11 @@ body{
   background:linear-gradient(100deg,#f7b1c2,#ffdfe7);
 }
 
+
+/* =====================================================
+   CALENDARIO
+===================================================== */
+
 .workspace{
   display:grid;
   grid-template-columns:minmax(0,1fr) 310px;
@@ -232,16 +281,20 @@ body{
 }
 
 .day{
-  height:105px;
+  min-height:105px;
   border:1px solid #f0e4e8;
   margin:-1px 0 0 -1px;
   padding:8px;
   cursor:pointer;
   background:#fff;
+  transition:.15s;
+  position:relative;
 }
 
 .day:hover{
   background:#fff8fa;
+  transform:translateY(-1px);
+  z-index:1;
 }
 
 .today{
@@ -262,12 +315,27 @@ body{
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
+  cursor:pointer;
 }
+
+.event:hover{
+  background:#ffcbd8;
+}
+
+
+/* =====================================================
+   PROXIMO PLAN
+===================================================== */
 
 .next{
   border:1px solid var(--line);
   border-radius:14px;
   overflow:hidden;
+  cursor:pointer;
+}
+
+.next:hover{
+  box-shadow:0 8px 25px #562c3915;
 }
 
 .nextTop{
@@ -298,6 +366,11 @@ body{
   line-height:1.6;
 }
 
+
+/* =====================================================
+   MODALES
+===================================================== */
+
 .modal{
   position:fixed;
   inset:0;
@@ -305,14 +378,22 @@ body{
   display:none;
   place-items:center;
   padding:16px;
-  z-index:5;
+  z-index:20;
+  overflow-y:auto;
 }
 
 .modalBox{
   background:#fffaf9;
-  width:min(500px,100%);
+  width:min(520px,100%);
+  max-height:90vh;
+  overflow-y:auto;
   padding:24px;
   border-radius:20px;
+  box-shadow:0 20px 70px #35182240;
+}
+
+.modalBox h2{
+  margin-top:0;
 }
 
 .field{
@@ -333,10 +414,20 @@ body{
   padding:10px;
   border:1px solid var(--line);
   border-radius:9px;
+  font:inherit;
+  outline:none;
+}
+
+.field input:focus,
+.field textarea:focus,
+.field select:focus{
+  border-color:var(--rose);
+  box-shadow:0 0 0 3px #e64d7815;
 }
 
 .field textarea{
   min-height:80px;
+  resize:vertical;
 }
 
 .modalBtns{
@@ -344,7 +435,123 @@ body{
   justify-content:end;
   gap:8px;
   margin-top:15px;
+  flex-wrap:wrap;
 }
+
+
+/* =====================================================
+   DETALLE DEL PLAN
+===================================================== */
+
+.detailHeader{
+  text-align:center;
+  margin-bottom:20px;
+}
+
+.detailIcon{
+  width:75px;
+  height:75px;
+  margin:auto;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:#ffe3ea;
+  font-size:35px;
+}
+
+.detailTitle{
+  font:italic 30px Georgia,serif;
+  margin:12px 0 5px;
+}
+
+.detailDate{
+  color:var(--rose);
+  font-weight:800;
+}
+
+.detailRow{
+  display:flex;
+  gap:12px;
+  padding:11px 0;
+  border-bottom:1px solid #f1e3e7;
+}
+
+.detailRow:last-child{
+  border-bottom:0;
+}
+
+.detailEmoji{
+  width:30px;
+  font-size:18px;
+}
+
+.detailContent{
+  flex:1;
+}
+
+.detailLabel{
+  font-size:11px;
+  color:var(--muted);
+  font-weight:800;
+  text-transform:uppercase;
+  margin-bottom:2px;
+}
+
+.detailValue{
+  line-height:1.5;
+}
+
+.completedBadge{
+  display:inline-block;
+  margin-top:12px;
+  padding:6px 10px;
+  border-radius:20px;
+  background:#e3f5eb;
+  color:#27845b;
+  font-size:12px;
+  font-weight:800;
+}
+
+
+/* =====================================================
+   PLANES DEL MISMO DIA
+===================================================== */
+
+.planList{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.planOption{
+  width:100%;
+  text-align:left;
+  border:1px solid var(--line);
+  background:#fff;
+  border-radius:12px;
+  padding:12px;
+  cursor:pointer;
+}
+
+.planOption:hover{
+  background:#fff0f4;
+  border-color:#e9b6c4;
+}
+
+.planOptionTitle{
+  font-weight:800;
+}
+
+.planOptionMeta{
+  font-size:12px;
+  color:var(--muted);
+  margin-top:3px;
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
 
 @media(max-width:800px){
 
@@ -356,16 +563,27 @@ body{
     grid-template-columns:1fr;
   }
 
+  .hero{
+    height:240px;
+  }
+
+  .heroText{
+    padding:22px;
+  }
+
   .heroText h1{
-    font-size:45px;
+    font-size:40px;
   }
 
   .day{
-    height:72px;
+    min-height:72px;
+    padding:6px;
   }
 
   .event{
-    display:none;
+    display:block;
+    font-size:9px;
+    padding:3px;
   }
 
   .toolbar{
@@ -373,9 +591,21 @@ body{
     flex-direction:column;
   }
 
+  .toolbar h2{
+    order:-1;
+  }
+
+  .week div{
+    font-size:9px;
+    padding:7px 2px;
+  }
+
 }
+
 </style>
+
 </head>
+
 
 <body>
 
@@ -450,7 +680,7 @@ body{
 
 
 <!-- =====================================================
-     UNIRSE AL CALENDARIO
+     UNIRSE
 ===================================================== -->
 
 <div id="join" class="center hidden">
@@ -506,6 +736,7 @@ body{
   class="app hidden"
 >
 
+
 <section class="hero">
 
   <div class="heroText">
@@ -534,7 +765,9 @@ body{
 </section>
 
 
-<!-- CONTADORES -->
+<!-- =====================================================
+     CONTADORES
+===================================================== -->
 
 <section class="cards">
 
@@ -595,7 +828,9 @@ body{
 </section>
 
 
-<!-- CALENDARIO -->
+<!-- =====================================================
+     CALENDARIO
+===================================================== -->
 
 <section class="workspace">
 
@@ -661,7 +896,9 @@ body{
   </div>
 
 
-  <!-- PRÓXIMO PLAN -->
+  <!-- =====================================================
+       PROXIMO PLAN
+  ===================================================== -->
 
   <aside class="card">
 
@@ -674,18 +911,7 @@ body{
     <div
       class="next"
       id="next"
-    >
-
-      <div class="nextTop">
-        ♡
-      </div>
-
-      <div class="nextBody">
-        Todavía no hay planes.
-        Agreguen el primero ❤️
-      </div>
-
-    </div>
+    ></div>
 
 
     <h2
@@ -699,9 +925,11 @@ body{
 
 
     <div class="note">
+
       “No se trata de contar los días,
       se trata de hacer que los días cuenten.”
       ♡
+
     </div>
 
 
@@ -721,7 +949,7 @@ body{
 
 
 <!-- =====================================================
-     MODAL AGREGAR PLAN
+     MODAL AGREGAR / EDITAR
 ===================================================== -->
 
 <div
@@ -731,9 +959,7 @@ body{
 
   <div class="modalBox">
 
-    <h2
-      style="font:26px Georgia,serif"
-    >
+    <h2 id="modalTitle">
       Agregar un plan ♡
     </h2>
 
@@ -769,6 +995,20 @@ body{
     <div class="field">
 
       <label>
+        Hora
+      </label>
+
+      <input
+        id="time"
+        type="time"
+      >
+
+    </div>
+
+
+    <div class="field">
+
+      <label>
         Categoría
       </label>
 
@@ -790,6 +1030,10 @@ body{
           💜 Aniversario
         </option>
 
+        <option value="compras">
+          🛍 Compras
+        </option>
+
         <option value="otro">
           ☆ Otro
         </option>
@@ -802,13 +1046,65 @@ body{
     <div class="field">
 
       <label>
+        Lugar
+      </label>
+
+      <input
+        id="location"
+        placeholder="Ej. Centro comercial..."
+      >
+
+    </div>
+
+
+    <div class="field">
+
+      <label>
+        Presupuesto
+      </label>
+
+      <input
+        id="budget"
+        type="number"
+        min="0"
+        step="1000"
+        placeholder="Ej. 100000"
+      >
+
+    </div>
+
+
+    <div class="field">
+
+      <label>
         Nota
       </label>
 
       <textarea
-        id="note"
+        id="noteInput"
         placeholder="Detalles del plan..."
       ></textarea>
+
+    </div>
+
+
+    <div class="field">
+
+      <label>
+        Estado
+      </label>
+
+      <select id="completed">
+
+        <option value="false">
+          Pendiente ❤️
+        </option>
+
+        <option value="true">
+          Completado 💕
+        </option>
+
+      </select>
 
     </div>
 
@@ -836,7 +1132,128 @@ body{
 </div>
 
 
+<!-- =====================================================
+     MODAL LISTA DE PLANES
+===================================================== -->
+
+<div
+  id="plansModal"
+  class="modal"
+>
+
+  <div class="modalBox">
+
+    <h2
+      style="font:26px Georgia,serif"
+    >
+      Planes de este día ♡
+    </h2>
+
+    <p
+      id="plansModalDate"
+      class="status"
+    ></p>
+
+    <div
+      id="plansList"
+      class="planList"
+    ></div>
+
+    <div class="modalBtns">
+
+      <button
+        class="btn"
+        onclick="closePlansModal()"
+      >
+        Cerrar
+      </button>
+
+      <button
+        class="btn primary"
+        id="addFromDayBtn"
+      >
+        + Agregar otro
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- =====================================================
+     MODAL DETALLE
+===================================================== -->
+
+<div
+  id="detailModal"
+  class="modal"
+>
+
+  <div class="modalBox">
+
+    <div class="detailHeader">
+
+      <div
+        class="detailIcon"
+        id="detailIcon"
+      >
+        ♡
+      </div>
+
+      <div
+        class="detailTitle"
+        id="detailTitle"
+      ></div>
+
+      <div
+        class="detailDate"
+        id="detailDate"
+      ></div>
+
+      <div
+        id="detailCompleted"
+      ></div>
+
+    </div>
+
+
+    <div id="detailRows"></div>
+
+
+    <div class="modalBtns">
+
+      <button
+        class="btn"
+        onclick="closeDetailModal()"
+      >
+        Cerrar
+      </button>
+
+      <button
+        class="btn danger"
+        onclick="deleteCurrentPlan()"
+      >
+        Eliminar
+      </button>
+
+      <button
+        class="btn primary"
+        onclick="editCurrentPlan()"
+      >
+        Editar ✏️
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
 <script>
+
 
 /* =====================================================
    SUPABASE
@@ -865,10 +1282,20 @@ const allowed = [
 
 
 let sb = null;
+
 let user = null;
+
 let couple = null;
+
 let plans = [];
+
 let view = new Date();
+
+let currentPlan = null;
+
+let currentDay = null;
+
+let realtimeChannel = null;
 
 
 const $ = id =>
@@ -879,10 +1306,7 @@ document.getElementById(id);
    MENSAJES
 ===================================================== */
 
-function setMsg(
-  text,
-  ok=false
-){
+function setMsg(text,ok=false){
 
   $('loginMsg').textContent =
     text;
@@ -974,19 +1398,16 @@ function counters(){
 
 
   $('together').innerHTML =
-
     togetherDays +
     ' <small>días juntos</small>';
 
 
   $('dating').innerHTML =
-
     datingDays +
     ' <small>días de novios</small>';
 
 
   $('story').textContent =
-
     togetherDays +
     ' días de historia';
 
@@ -1002,7 +1423,7 @@ setInterval(
 
 
 /* =====================================================
-   LOGIN CON CORREO Y CONTRASEÑA
+   LOGIN
 ===================================================== */
 
 async function login(){
@@ -1317,13 +1738,18 @@ async function forgotPassword(){
     );
 
 
-   if(error){
-  console.error(error);
-  setMsg(
-    'No pudimos enviar el correo de recuperación.'
-  );
-  return;
-}
+    if(error){
+
+      console.error(error);
+
+      setMsg(
+        'No pudimos enviar el correo de recuperación.'
+      );
+
+      return;
+
+    }
+
 
     setMsg(
       'Te enviamos un correo para recuperar tu contraseña ❤️',
@@ -1373,17 +1799,6 @@ async function init(){
       );
 
 
-    /*
-      IMPORTANTE:
-
-      NO usamos getSession() para entrar
-      automáticamente.
-
-      Cada vez que se abre la página,
-      primero se muestra el login.
-    */
-
-
     $('login')
       .classList
       .remove('hidden');
@@ -1396,11 +1811,6 @@ async function init(){
       .classList
       .add('hidden');
 
-
-    /*
-      Escuchamos únicamente nuevos
-      inicios de sesión.
-    */
 
     sb.auth.onAuthStateChange(
 
@@ -1437,6 +1847,17 @@ async function init(){
           couple = null;
 
           plans = [];
+
+          if(realtimeChannel){
+
+            await sb
+              .removeChannel(
+                realtimeChannel
+              );
+
+            realtimeChannel = null;
+
+          }
 
 
           $('app')
@@ -1542,10 +1963,6 @@ async function setup(){
   }
 
 
-  /*
-    YA PERTENECE A UNA PAREJA
-  */
-
   if(mem){
 
     couple = {
@@ -1562,10 +1979,6 @@ async function setup(){
 
   }
 
-
-  /*
-    NICOLÁS CREA EL CALENDARIO
-  */
 
   if(
     user.email ===
@@ -1679,10 +2092,6 @@ async function setup(){
   }
 
 
-  /*
-    ANA NECESITA UNIRSE
-  */
-
   $('login')
     .classList
     .add('hidden');
@@ -1793,47 +2202,51 @@ async function showApp(){
   await loadPlans();
 
 
-  /*
-    ACTUALIZACIÓN EN TIEMPO REAL
+  if(realtimeChannel){
 
-    Si Nicolás agrega un plan,
-    Ana lo ve automáticamente.
+    await sb
+      .removeChannel(
+        realtimeChannel
+      );
 
-    Si Ana agrega uno,
-    Nicolás también lo ve.
-  */
+  }
 
-  sb
 
-    .channel('plans-live')
+  realtimeChannel =
+    sb
 
-    .on(
-
-      'postgres_changes',
-
-      {
-
-        event:'*',
-
-        schema:'public',
-
-        table:'plans',
-
-        filter:
-        'couple_id=eq.' +
+      .channel(
+        'plans-live-' +
         couple.id
+      )
 
-      },
+      .on(
 
-      ()=>{
+        'postgres_changes',
 
-        loadPlans();
+        {
 
-      }
+          event:'*',
 
-    )
+          schema:'public',
 
-    .subscribe();
+          table:'plans',
+
+          filter:
+          'couple_id=eq.' +
+          couple.id
+
+        },
+
+        ()=>{
+
+          loadPlans();
+
+        }
+
+      )
+
+      .subscribe();
 
 }
 
@@ -1929,6 +2342,155 @@ function escapeHtml(value){
 
 
 /* =====================================================
+   ICONO CATEGORIA
+===================================================== */
+
+function categoryIcon(category){
+
+  if(category === 'viaje')
+    return '✈️';
+
+  if(category === 'paseo')
+    return '🏍️';
+
+  if(category === 'aniversario')
+    return '💜';
+
+  if(category === 'compras')
+    return '🛍️';
+
+  if(category === 'otro')
+    return '⭐';
+
+  return '♡';
+
+}
+
+
+/* =====================================================
+   NOMBRE CATEGORIA
+===================================================== */
+
+function categoryName(category){
+
+  const names = {
+
+    cita:'Cita',
+
+    paseo:'Paseo',
+
+    viaje:'Viaje',
+
+    aniversario:'Aniversario',
+
+    compras:'Compras',
+
+    otro:'Otro'
+
+  };
+
+  return names[category] ||
+    'Cita';
+
+}
+
+
+/* =====================================================
+   FORMATO FECHA
+===================================================== */
+
+function formatDate(date){
+
+  if(!date)
+    return '';
+
+  return new Date(
+    date +
+    'T12:00:00'
+  ).toLocaleDateString(
+
+    'es-CO',
+
+    {
+
+      weekday:'long',
+
+      day:'numeric',
+
+      month:'long',
+
+      year:'numeric'
+
+    }
+
+  );
+
+}
+
+
+/* =====================================================
+   FORMATO HORA
+===================================================== */
+
+function formatTime(time){
+
+  if(!time)
+    return '';
+
+  const parts =
+    time.split(':');
+
+  let hour =
+    parseInt(parts[0],10);
+
+  const minute =
+    parts[1] || '00';
+
+  const suffix =
+    hour >= 12
+    ? 'p. m.'
+    : 'a. m.';
+
+  hour =
+    hour % 12 || 12;
+
+  return (
+    hour +
+    ':' +
+    minute +
+    ' ' +
+    suffix
+  );
+
+}
+
+
+/* =====================================================
+   FORMATO DINERO
+===================================================== */
+
+function formatMoney(value){
+
+  if(
+    value === null ||
+    value === undefined ||
+    value === ''
+  )
+    return '';
+
+  return new Intl.NumberFormat(
+    'es-CO',
+    {
+      style:'currency',
+      currency:'COP',
+      maximumFractionDigits:0
+    }
+  ).format(value);
+
+}
+
+
+/* =====================================================
    RENDER CALENDARIO
 ===================================================== */
 
@@ -2009,9 +2571,7 @@ function render(){
           : ''
         }"
 
-        onclick="
-          openModal('${k}')
-        "
+        onclick="handleDayClick('${k}')"
       >
 
         <b>
@@ -2023,7 +2583,11 @@ function render(){
             .map(
               p =>
 
-              `<div class="event">
+              `<div
+                class="event"
+                onclick="event.stopPropagation();openPlanDetail('${p.id}')"
+              >
+                ${categoryIcon(p.category)}
                 ${escapeHtml(p.title)}
               </div>`
 
@@ -2042,44 +2606,98 @@ function render(){
     html;
 
 
-  /*
-    BUSCAR PRÓXIMO PLAN
-  */
+  renderNextPlan();
+
+}
+
+
+/* =====================================================
+   CLICK DIA
+===================================================== */
+
+function handleDayClick(date){
+
+  const dayPlans =
+    plans.filter(
+      p =>
+      p.plan_date === date
+    );
+
+
+  if(dayPlans.length === 0){
+
+    openModal(date);
+
+    return;
+
+  }
+
+
+  if(dayPlans.length === 1){
+
+    openPlanDetail(
+      dayPlans[0].id
+    );
+
+    return;
+
+  }
+
+
+  openPlansModal(
+    date
+  );
+
+}
+
+
+/* =====================================================
+   PROXIMO PLAN
+===================================================== */
+
+function renderNextPlan(){
+
+  const todayDate =
+    iso(new Date());
+
 
   const next =
     plans
 
       .filter(
         p =>
-
-        new Date(
-          p.plan_date +
-          'T23:59:00'
-        ) >= new Date()
-
+        p.plan_date >= todayDate
       )
 
       .sort(
-        (a,b) =>
+        (a,b) => {
 
-        a.plan_date
-          .localeCompare(
-            b.plan_date
-          )
+          const dateCompare =
+            a.plan_date.localeCompare(
+              b.plan_date
+            );
+
+          if(dateCompare !== 0)
+            return dateCompare;
+
+          return (
+            (a.plan_time || '')
+              .localeCompare(
+                b.plan_time || ''
+              )
+          );
+
+        }
 
       )[0];
 
 
   if(next){
 
-    let icon =
-      next.category === 'viaje'
-      ? '✈'
-      : next.category === 'paseo'
-      ? '🏍'
-      : next.category === 'aniversario'
-      ? '💜'
-      : '♡';
+    const icon =
+      categoryIcon(
+        next.category
+      );
 
 
     $('next').innerHTML = `
@@ -2092,18 +2710,21 @@ function render(){
 
         <div class="nextDate">
 
-          ${
-            new Date(
-              next.plan_date +
-              'T12:00:00'
-            ).toLocaleDateString(
-              'es-CO',
-              {
-                weekday:'long',
-                day:'numeric',
-                month:'long'
-              }
+          ${escapeHtml(
+            formatDate(
+              next.plan_date
             )
+          )}
+
+          ${
+            next.plan_time
+            ? ' · ' +
+              escapeHtml(
+                formatTime(
+                  next.plan_time
+                )
+              )
+            : ''
           }
 
         </div>
@@ -2115,15 +2736,25 @@ function render(){
         </b>
 
         <div>
+
           ${escapeHtml(
             next.note ||
             'Un nuevo recuerdo para los dos.'
           )}
+
         </div>
 
       </div>
 
     `;
+
+
+    $('next').onclick =
+      () =>
+        openPlanDetail(
+          next.id
+        );
+
 
   }else{
 
@@ -2139,6 +2770,10 @@ function render(){
       </div>
 
     `;
+
+    $('next').onclick =
+      () =>
+        openModal();
 
   }
 
@@ -2171,10 +2806,14 @@ function today(){
 
 
 /* =====================================================
-   MODAL
+   ABRIR MODAL AGREGAR
 ===================================================== */
 
 function openModal(d){
+
+  $('modalTitle').textContent =
+    'Agregar un plan ♡';
+
 
   $('modal').style.display =
     'grid';
@@ -2188,13 +2827,29 @@ function openModal(d){
   $('title').value =
     '';
 
-
-  $('note').value =
+  $('time').value =
     '';
-
 
   $('cat').value =
     'cita';
+
+  $('location').value =
+    '';
+
+  $('budget').value =
+    '';
+
+  $('noteInput').value =
+    '';
+
+  $('completed').value =
+    'false';
+
+
+  $('modal')
+    .dataset
+    .editingId =
+    '';
 
 
   setTimeout(
@@ -2205,6 +2860,75 @@ function openModal(d){
 
 }
 
+
+/* =====================================================
+   ABRIR EDITAR
+===================================================== */
+
+function openEditModal(plan){
+
+  $('modalTitle').textContent =
+    'Editar plan ✏️';
+
+
+  $('modal').style.display =
+    'grid';
+
+
+  $('date').value =
+    plan.plan_date || '';
+
+
+  $('title').value =
+    plan.title || '';
+
+
+  $('time').value =
+    plan.plan_time
+    ? plan.plan_time.slice(0,5)
+    : '';
+
+
+  $('cat').value =
+    plan.category || 'cita';
+
+
+  $('location').value =
+    plan.location || '';
+
+
+  $('budget').value =
+    plan.budget ?? '';
+
+
+  $('noteInput').value =
+    plan.note || '';
+
+
+  $('completed').value =
+    plan.completed
+    ? 'true'
+    : 'false';
+
+
+  $('modal')
+    .dataset
+    .editingId =
+    plan.id;
+
+
+  setTimeout(
+    () =>
+      $('title').focus(),
+    50
+  );
+
+}
+
+
+/* =====================================================
+   CERRAR MODAL
+===================================================== */
 
 function closeModal(){
 
@@ -2251,36 +2975,106 @@ async function savePlan(){
   }
 
 
-  const {
-    error
-  } =
-  await sb
+  const editingId =
+    $('modal')
+      .dataset
+      .editingId;
 
-    .from('plans')
 
-    .insert({
+  const planData = {
 
-      couple_id:
-      couple.id,
-
-      title:
+    title:
       title,
 
-      plan_date:
+    plan_date:
       $('date').value,
 
-      category:
+    plan_time:
+      $('time').value ||
+      null,
+
+    category:
       $('cat').value,
 
-      note:
-      $('note')
+    location:
+      $('location')
         .value
-        .trim(),
+        .trim() ||
+      null,
 
-      created_by:
-      user.id
+    note:
+      $('noteInput')
+        .value
+        .trim() ||
+      null,
 
-    });
+    budget:
+      $('budget').value
+      ? Number(
+          $('budget').value
+        )
+      : null,
+
+    completed:
+      $('completed').value ===
+      'true'
+
+  };
+
+
+  let error;
+
+
+  if(editingId){
+
+    const result =
+      await sb
+
+        .from('plans')
+
+        .update(
+          planData
+        )
+
+        .eq(
+          'id',
+          editingId
+        )
+
+        .eq(
+          'couple_id',
+          couple.id
+        );
+
+
+    error =
+      result.error;
+
+
+  }else{
+
+    const result =
+      await sb
+
+        .from('plans')
+
+        .insert({
+
+          couple_id:
+          couple.id,
+
+          ...planData,
+
+          created_by:
+          user.id
+
+        });
+
+
+    error =
+      result.error;
+
+  }
 
 
   if(error){
@@ -2305,7 +3099,433 @@ async function savePlan(){
 
 
 /* =====================================================
-   CERRAR SESIÓN
+   MODAL LISTA DE PLANES
+===================================================== */
+
+function openPlansModal(date){
+
+  currentDay =
+    date;
+
+
+  const dayPlans =
+    plans.filter(
+      p =>
+      p.plan_date === date
+    );
+
+
+  $('plansModalDate').textContent =
+    formatDate(date);
+
+
+  $('plansList').innerHTML =
+
+    dayPlans
+      .map(
+        p => `
+
+          <button
+            class="planOption"
+            onclick="openPlanDetail('${p.id}')"
+          >
+
+            <div class="planOptionTitle">
+
+              ${categoryIcon(
+                p.category
+              )}
+
+              ${escapeHtml(
+                p.title
+              )}
+
+            </div>
+
+            <div class="planOptionMeta">
+
+              ${categoryName(
+                p.category
+              )}
+
+              ${
+                p.plan_time
+                ? ' · ' +
+                  escapeHtml(
+                    formatTime(
+                      p.plan_time
+                    )
+                  )
+                : ''
+              }
+
+              ${
+                p.completed
+                ? ' · ✓ Completado'
+                : ''
+              }
+
+            </div>
+
+          </button>
+
+        `
+      )
+      .join('');
+
+
+  $('addFromDayBtn').onclick =
+    () => {
+
+      closePlansModal();
+
+      openModal(
+        currentDay
+      );
+
+    };
+
+
+  $('plansModal').style.display =
+    'grid';
+
+}
+
+
+/* =====================================================
+   CERRAR LISTA
+===================================================== */
+
+function closePlansModal(){
+
+  $('plansModal').style.display =
+    'none';
+
+}
+
+
+/* =====================================================
+   ABRIR DETALLE
+===================================================== */
+
+function openPlanDetail(id){
+
+  const plan =
+    plans.find(
+      p =>
+      p.id === id
+    );
+
+
+  if(!plan)
+    return;
+
+
+  currentPlan =
+    plan;
+
+
+  closePlansModal();
+
+
+  $('detailIcon').textContent =
+    categoryIcon(
+      plan.category
+    );
+
+
+  $('detailTitle').textContent =
+    plan.title;
+
+
+  $('detailDate').textContent =
+    formatDate(
+      plan.plan_date
+    );
+
+
+  $('detailCompleted').innerHTML =
+    plan.completed
+    ? '<span class="completedBadge">✓ Plan completado ❤️</span>'
+    : '';
+
+
+  let rows = '';
+
+
+  rows += `
+
+    <div class="detailRow">
+
+      <div class="detailEmoji">
+        🏷️
+      </div>
+
+      <div class="detailContent">
+
+        <div class="detailLabel">
+          Categoría
+        </div>
+
+        <div class="detailValue">
+          ${escapeHtml(
+            categoryName(
+              plan.category
+            )
+          )}
+        </div>
+
+      </div>
+
+    </div>
+
+  `;
+
+
+  if(plan.plan_time){
+
+    rows += `
+
+      <div class="detailRow">
+
+        <div class="detailEmoji">
+          🕐
+        </div>
+
+        <div class="detailContent">
+
+          <div class="detailLabel">
+            Hora
+          </div>
+
+          <div class="detailValue">
+            ${escapeHtml(
+              formatTime(
+                plan.plan_time
+              )
+            )}
+          </div>
+
+        </div>
+
+      </div>
+
+    `;
+
+  }
+
+
+  if(plan.location){
+
+    rows += `
+
+      <div class="detailRow">
+
+        <div class="detailEmoji">
+          📍
+        </div>
+
+        <div class="detailContent">
+
+          <div class="detailLabel">
+            Lugar
+          </div>
+
+          <div class="detailValue">
+            ${escapeHtml(
+              plan.location
+            )}
+          </div>
+
+        </div>
+
+      </div>
+
+    `;
+
+  }
+
+
+  if(plan.budget !== null &&
+     plan.budget !== undefined){
+
+    rows += `
+
+      <div class="detailRow">
+
+        <div class="detailEmoji">
+          💰
+        </div>
+
+        <div class="detailContent">
+
+          <div class="detailLabel">
+            Presupuesto
+          </div>
+
+          <div class="detailValue">
+            ${escapeHtml(
+              formatMoney(
+                plan.budget
+              )
+            )}
+          </div>
+
+        </div>
+
+      </div>
+
+    `;
+
+  }
+
+
+  if(plan.note){
+
+    rows += `
+
+      <div class="detailRow">
+
+        <div class="detailEmoji">
+          💌
+        </div>
+
+        <div class="detailContent">
+
+          <div class="detailLabel">
+            Nota
+          </div>
+
+          <div class="detailValue">
+            ${escapeHtml(
+              plan.note
+            )}
+          </div>
+
+        </div>
+
+      </div>
+
+    `;
+
+  }
+
+
+  $('detailRows').innerHTML =
+    rows;
+
+
+  $('detailModal').style.display =
+    'grid';
+
+}
+
+
+/* =====================================================
+   CERRAR DETALLE
+===================================================== */
+
+function closeDetailModal(){
+
+  $('detailModal').style.display =
+    'none';
+
+  currentPlan =
+    null;
+
+}
+
+
+/* =====================================================
+   EDITAR PLAN
+===================================================== */
+
+function editCurrentPlan(){
+
+  if(!currentPlan)
+    return;
+
+
+  const plan =
+    currentPlan;
+
+
+  closeDetailModal();
+
+  openEditModal(
+    plan
+  );
+
+}
+
+
+/* =====================================================
+   ELIMINAR PLAN
+===================================================== */
+
+async function deleteCurrentPlan(){
+
+  if(!currentPlan)
+    return;
+
+
+  const confirmed =
+    confirm(
+
+      '¿Seguro que quieres eliminar "' +
+      currentPlan.title +
+      '"? ❤️'
+
+    );
+
+
+  if(!confirmed)
+    return;
+
+
+  const {
+    error
+  } =
+  await sb
+
+    .from('plans')
+
+    .delete()
+
+    .eq(
+      'id',
+      currentPlan.id
+    )
+
+    .eq(
+      'couple_id',
+      couple.id
+    );
+
+
+  if(error){
+
+    console.error(error);
+
+    alert(
+      'No pudimos eliminar el plan: ' +
+      error.message
+    );
+
+    return;
+
+  }
+
+
+  closeDetailModal();
+
+  await loadPlans();
+
+}
+
+
+/* =====================================================
+   CERRAR SESION
 ===================================================== */
 
 async function logout(){
@@ -2346,7 +3566,9 @@ $('forgotBtn')
 
 $('password')
   .addEventListener(
+
     'keydown',
+
     event => {
 
       if(
@@ -2354,6 +3576,65 @@ $('password')
       ){
 
         login();
+
+      }
+
+    }
+
+  );
+
+
+/* =====================================================
+   CERRAR MODALES AL TOCAR FONDO
+===================================================== */
+
+$('modal')
+  .addEventListener(
+    'click',
+    event => {
+
+      if(
+        event.target ===
+        $('modal')
+      ){
+
+        closeModal();
+
+      }
+
+    }
+  );
+
+
+$('plansModal')
+  .addEventListener(
+    'click',
+    event => {
+
+      if(
+        event.target ===
+        $('plansModal')
+      ){
+
+        closePlansModal();
+
+      }
+
+    }
+  );
+
+
+$('detailModal')
+  .addEventListener(
+    'click',
+    event => {
+
+      if(
+        event.target ===
+        $('detailModal')
+      ){
+
+        closeDetailModal();
 
       }
 
@@ -2373,4 +3654,5 @@ window.addEventListener(
 </script>
 
 </body>
+
 </html>
