@@ -17,4 +17,4 @@ function render(){month.textContent=months[view.getMonth()]+' '+view.getFullYear
 function move(n){view.setMonth(view.getMonth()+n);render()}function today(){view=new Date();render()}function openModal(d){modal.style.display='grid';date.value=d||iso(view);title.value='';note.value='';setTimeout(()=>title.focus(),50)}function closeModal(){modal.style.display='none'}
 async function savePlan(){if(!title.value.trim())return;let {error}=await sb.from('plans').insert({couple_id:couple.id,title:title.value.trim(),plan_date:date.value,category:cat.value,note:note.value.trim(),created_by:user.id});if(error)alert(error.message);else closeModal()}
 async function logout(){await sb.auth.signOut();location.reload()}sb.auth.onAuthStateChange((_e,s)=>{if(s&&!user){user=s.user;setup()}});init();
-</script></body></html>
+</script></body></html >
