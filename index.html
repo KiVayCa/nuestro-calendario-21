@@ -1315,18 +1315,17 @@ async function forgotPassword(){
     );
 
 
-    if(error){
+   if(error){
 
-      console.error(error);
+  console.error('ERROR RECUPERACIÓN:', error);
 
-      setMsg(
-        'No pudimos enviar el correo de recuperación.'
-      );
+  setMsg(
+    'Error: ' + error.message
+  );
 
-      return;
+  return;
 
-    }
-
+}
 
     setMsg(
       'Te enviamos un correo para recuperar tu contraseña ❤️',
