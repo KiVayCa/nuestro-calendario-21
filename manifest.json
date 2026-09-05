@@ -1,0 +1,10 @@
+{
+  "name": "Nuestro Calendario #21",
+  "short_name": "Calendario #21",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fff8fb",
+  "theme_color": "#c96888",
+  "description": "Nuestro espacio privado para planes, recuerdos, sueños y momentos.",
+  "icons": []
+}
