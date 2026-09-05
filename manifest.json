@@ -4,20 +4,20 @@
   "start_url": "/",
   "display": "standalone",
   "background_color": "#fff8fb",
-  "theme_color": "#c96888",
+  "theme_color": "#e13a67",
   "description": "Nuestro espacio privado para planes, recuerdos, sueños y momentos.",
   "icons": [
     {
       "src": "icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ]
 }
