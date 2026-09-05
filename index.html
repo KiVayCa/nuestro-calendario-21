@@ -713,6 +713,93 @@ body[data-theme="night"] .advTab:hover,body[data-theme="night"] .advTab.active{b
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}
 
 .item-highlight{animation:itemHighlight 1.8s ease both;} @keyframes itemHighlight{0%{transform:scale(1);box-shadow:0 0 0 0 rgba(230,77,120,0)}30%{transform:scale(1.015);box-shadow:0 0 0 5px rgba(230,77,120,.18)}100%{transform:scale(1);box-shadow:0 0 0 0 rgba(230,77,120,0)}}
+
+/* =====================================================
+   TEMA: SUPERFICIES Y CONTRASTE COMPLETO
+===================================================== */
+body[data-theme] .card,
+body[data-theme] .workspace .card,
+body[data-theme] .next,
+body[data-theme] .homeStat,
+body[data-theme] .homeNext,
+body[data-theme] .note,
+body[data-theme] .settingsCard,
+body[data-theme] .advCard,
+body[data-theme] .advItem,
+body[data-theme] .advEmpty,
+body[data-theme] .planOption,
+body[data-theme] .modalBox{
+  background:var(--surface) !important;
+  color:var(--ink);
+  border-color:var(--line);
+}
+body[data-theme] .homeStat strong,
+body[data-theme] .homeStat span,
+body[data-theme] .homeNextTitle,
+body[data-theme] .homeNextMeta,
+body[data-theme] .advCard h3,
+body[data-theme] .advCard p,
+body[data-theme] .advItemTitle,
+body[data-theme] .advMeta,
+body[data-theme] .settingsCard h3,
+body[data-theme] .settingsCard p{
+  color:var(--ink) !important;
+}
+body[data-theme] .homeStat span,
+body[data-theme] .homeNextMeta,
+body[data-theme] .advMeta,
+body[data-theme] .settingsCard p,
+body[data-theme] .advCard p{
+  opacity:.78;
+}
+body[data-theme] .workspace .week div{
+  background:var(--soft) !important;
+  color:var(--rose) !important;
+  border-color:var(--line);
+}
+body[data-theme] .workspace .day{
+  background:var(--surface) !important;
+  color:var(--ink) !important;
+  border-color:var(--line) !important;
+}
+body[data-theme] .workspace .muted{
+  background:color-mix(in srgb,var(--surface) 72%,#000) !important;
+  color:var(--muted) !important;
+}
+body[data-theme] .workspace .event{
+  color:var(--ink) !important;
+}
+body[data-theme="night"] .card,
+body[data-theme="midnight"] .card,
+body[data-theme="charcoal"] .card,
+body[data-theme="night"] .next,
+body[data-theme="midnight"] .next,
+body[data-theme="charcoal"] .next,
+body[data-theme="night"] .homeStat,
+body[data-theme="midnight"] .homeStat,
+body[data-theme="charcoal"] .homeStat,
+body[data-theme="night"] .homeNext,
+body[data-theme="midnight"] .homeNext,
+body[data-theme="charcoal"] .homeNext{
+  box-shadow:0 16px 45px rgba(0,0,0,.24);
+}
+body[data-theme="night"] .homeNext,
+body[data-theme="midnight"] .homeNext,
+body[data-theme="charcoal"] .homeNext{
+  background:var(--surface) !important;
+}
+body[data-theme="night"] .nextTop,
+body[data-theme="midnight"] .nextTop,
+body[data-theme="charcoal"] .nextTop{
+  background:linear-gradient(135deg,var(--ink),var(--rose)) !important;
+}
+body[data-theme] .themeChoice{
+  background:var(--surface) !important;
+  color:var(--ink) !important;
+  border-color:var(--line);
+}
+body[data-theme] .themeChoice .advMeta{color:var(--muted) !important;}
+
 </style>
 
 </head>
@@ -3610,13 +3697,19 @@ async function deleteCurrentPlan(){
 ===================================================== */
 
 async function logout(){
+  // Cerrar cualquier modal/panel antes de cerrar la sesión para que
+  // nunca quede un cuadro flotante sobre la pantalla de inicio de sesión.
+  closeProfilePanel();
+  closeAdvModal();
+  closeModal();
+  closePlansModal();
+  closeDetailModal();
+
+  document.querySelectorAll('.modal.show').forEach(m=>m.classList.remove('show'));
 
   if(sb){
-
     await sb.auth.signOut();
-
   }
-
 }
 
 
@@ -3810,6 +3903,7 @@ async function advLoadAll(){
   renderAdvanced();
 }
 let coupleSettings={theme:'romance',accent_color:'#e64d78',background_color:'#fff7fa',home_photo_path:null,logo_photo_path:null};
+let settingsDraft=null;
 async function loadCoupleSettings(){
   const {data}=await sb.from('couple_settings').select('*').eq('couple_id',couple.id).maybeSingle();
   if(data) coupleSettings={...coupleSettings,...data};
@@ -3854,11 +3948,12 @@ async function renderSettingsPhotoPreviews(){
   await applyHomePhoto();
 }
 function renderAdvSettings(){
+ if(!settingsDraft) settingsDraft={theme:coupleSettings.theme||'romance',accent_color:coupleSettings.accent_color||'#e64d78',background_color:coupleSettings.background_color||'#fff7fa'};
  const themes=[['romance','🌹 Romance','#e64d78','#fff7fa'],['night','🌙 Noche','#d78aa7','#1d151b'],['lavender','🌸 Lavanda','#9a78c7','#f7f3ff'],['sunset','🌅 Atardecer','#d96b48','#fff6ef'],['ocean','🌊 Océano','#4b8fb4','#f1fbff'],['cherry','🍒 Cereza','#d7265e','#ffe3eb'],['emerald','🌿 Esmeralda','#2f8f73','#e0f4ec'],['coffee','☕ Café','#a56a43','#f3e3d5'],['sakura','🌸 Sakura','#e58cab','#ffe9f1'],['royal','👑 Royal','#7255b5','#ece5fb'],['forest','🌲 Bosque','#557a55','#e4efe2'],['wine','🍷 Vino','#9d3d58','#f4dfe6'],['sky','☁️ Cielo','#4c8ec4','#e3f1fb'],['mint','🍃 Menta','#4a9b88','#dff4ee'],['peach','🍑 Durazno','#e58b62','#ffeadf'],['gold','✨ Dorado','#b48a2d','#f8efd2'],['plum','🪻 Ciruela','#8d4f91','#f1e3f1'],['midnight','🌌 Medianoche','#8ca8ff','#252c47'],['charcoal','🖤 Carbón','#d9a7b8','#34343a'],['blush','🌷 Blush','#c95f87','#f7dce7'],['ice','🧊 Hielo','#639eb7','#e2f3f8'],['rosewood','🌹 Rosewood','#a74d62','#f1dfe4'],['aurora','🌌 Aurora','#65a6a4','#dff1ee']];
- const active=coupleSettings.theme||'romance';
+ const active=settingsDraft.theme||coupleSettings.theme||'romance';
  return advHeader('Configuración','Hagan que Nuestro Calendario #21 se sienta todavía más de ustedes.','💾 Guardar','saveSettingsFromUI()')+`<div class="settingsGrid">
  <div class="settingsCard"><h3>🎨 Tema de la aplicación</h3><p>Elige el estilo general. Se guarda para los dos.</p><div class="themeChoices">${themes.map(t=>`<button type="button" class="themeChoice ${active===t[0]?'active':''}" onclick="selectTheme('${t[0]}')"><div class="themeSwatch" style="background:linear-gradient(135deg,${t[2]},${t[3]})"></div><b>${t[1]}</b><div class="advMeta">${t[0]==='romance'?'Romántico y cálido':t[0]==='night'?'Elegante y nocturno':t[0]==='lavender'?'Suave y delicado':t[0]==='sunset'?'Cálido y alegre':'Fresco y tranquilo'}</div></button>`).join('')}</div>
- <div class="colorRow"><input id="settingsAccent" type="color" value="${esc(coupleSettings.accent_color||'#e64d78')}" onchange="previewAccent(this.value)"><div><b>Color principal</b><div class="advMeta">Personaliza botones, detalles y acentos.</div></div></div></div>
+ <div class="colorRow"><input id="settingsAccent" type="color" value="${esc(settingsDraft.accent_color||coupleSettings.accent_color||'#e64d78')}" onchange="previewAccent(this.value)"><div><b>Color principal</b><div class="advMeta">Personaliza botones, detalles y acentos.</div></div></div></div>
  <div class="settingsCard"><h3>📸 Fotos de la aplicación</h3><p>Pueden reemplazar la foto principal sin modificar el código.</p>
  <div class="photoSetting"><img id="settingsHomePreview" class="photoPreview" src="pareja.jpeg" alt="Portada"><div><b>Foto de portada</b><div class="advMeta">Es la imagen grande de Inicio.</div><input id="settingsHomePhoto" type="file" accept="image/*" style="margin-top:10px" onchange="uploadCouplePhoto('settingsHomePhoto','home_photo_path')"></div></div>
  <div class="photoSetting"><img id="settingsLogoPreview" class="photoPreview" src="pareja.jpeg" alt="Foto secundaria"><div><b>Foto secundaria</b><div class="advMeta">Podremos usarla en tarjetas, perfil y futuras pantallas.</div><input id="settingsLogoPhoto" type="file" accept="image/*" style="margin-top:10px" onchange="uploadCouplePhoto('settingsLogoPhoto','logo_photo_path')"></div></div>
@@ -3867,9 +3962,21 @@ function renderAdvSettings(){
  <div class="settingsCard"><h3>💡 Próximamente</h3><p>Desde aquí también podremos controlar notificaciones, sonidos, vibración, animaciones, privacidad y preferencias individuales cuando pasemos a la app móvil.</p></div>
  </div><div id="settingsSaveMsg" class="settingsNote hidden"></div>`;
 }
-async function selectTheme(theme){coupleSettings.theme=theme;applyCoupleSettings();await saveCoupleSettings({theme});renderAdvanced();}
-function previewAccent(v){coupleSettings.accent_color=v;document.body.style.setProperty('--rose',v);document.documentElement.style.setProperty('--rose',v);}
-async function saveSettingsFromUI(){const accent=$('settingsAccent')?.value||coupleSettings.accent_color||'#e64d78';coupleSettings.accent_color=accent;const ok=await saveCoupleSettings({theme:coupleSettings.theme||'romance',accent_color:accent,background_color:coupleSettings.background_color||'#fff7fa'});if(ok){await renderSettingsPhotoPreviews();renderAdvanced();alert('✅ Configuración guardada para los dos ❤️');}}
+function selectTheme(theme){
+ if(!settingsDraft) settingsDraft={theme:coupleSettings.theme||'romance',accent_color:coupleSettings.accent_color||'#e64d78',background_color:coupleSettings.background_color||'#fff7fa'};
+ settingsDraft.theme=theme;
+ document.querySelectorAll('.themeChoice').forEach(b=>b.classList.toggle('active',b.querySelector('b')?.parentElement===b && b.getAttribute('onclick')?.includes(`'${theme}'`)));
+}
+function previewAccent(v){
+ if(!settingsDraft) settingsDraft={theme:coupleSettings.theme||'romance',accent_color:coupleSettings.accent_color||'#e64d78',background_color:coupleSettings.background_color||'#fff7fa'};
+ settingsDraft.accent_color=v;
+}
+async function saveSettingsFromUI(){
+ const accent=$('settingsAccent')?.value||settingsDraft?.accent_color||coupleSettings.accent_color||'#e64d78';
+ const theme=settingsDraft?.theme||coupleSettings.theme||'romance';
+ const ok=await saveCoupleSettings({theme,accent_color:accent,background_color:settingsDraft?.background_color||coupleSettings.background_color||'#fff7fa'});
+ if(ok){settingsDraft=null;await renderSettingsPhotoPreviews();renderAdvanced();alert('✅ Configuración guardada para los dos ❤️');}
+}
 async function useDefaultCouplePhoto(){if(coupleSettings.home_photo_path){await sb.storage.from('couple-media').remove([coupleSettings.home_photo_path]);}await saveCoupleSettings({home_photo_path:null});await renderSettingsPhotoPreviews();renderAdvanced();}
 function openAdvModal(title,body){$('advModalTitle').textContent=title;$('advModalBody').innerHTML=body;$('advModal').classList.add('show');}
 function closeAdvModal(){$('advModal').classList.remove('show');}
