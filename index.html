@@ -324,6 +324,9 @@ body{
   background:#ffcbd8;
 }
 
+.event.advanced-event{background:#f3e8ff;border:1px solid #ead8f7;}
+.event.advanced-event:hover{background:#ead8f7;}
+
 
 /* =====================================================
    PROXIMO PLAN
@@ -698,6 +701,7 @@ body[data-theme="night"] .advTab:hover,body[data-theme="night"] .advTab.active{b
 @media(min-width:801px){.modal{padding:28px}.modalBox{max-height:calc(100vh - 56px)}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}
 
+.item-highlight{animation:itemHighlight 1.8s ease both;} @keyframes itemHighlight{0%{transform:scale(1);box-shadow:0 0 0 0 rgba(230,77,120,0)}30%{transform:scale(1.015);box-shadow:0 0 0 5px rgba(230,77,120,.18)}100%{transform:scale(1);box-shadow:0 0 0 0 rgba(230,77,120,0)}}
 </style>
 
 </head>
@@ -2706,7 +2710,7 @@ function render(){
       iso(d);
 
 
-    const events = getPlanOccurrencesForRange(k,k);
+    const events = getCalendarEventsForRange(k,k);
 
 
     html += `
@@ -2734,16 +2738,15 @@ function render(){
         ${
           events
             .map(
-              p =>
+              ev =>
 
               `<div
-                class="event"
-                onclick="event.stopPropagation();openPlanDetail('${p.id}')"
+                class="event ${ev.source!=='plan'?'advanced-event':''}"
+                onclick="event.stopPropagation();openCalendarEvent('${ev.source}','${ev.id}')"
+                title="${escapeHtml(ev.title)}"
               >
-                ${categoryIcon(p.category)}
-                ${escapeHtml(p.title)}
+                ${escapeHtml(ev.icon || '♡')} ${escapeHtml(ev.title)}
               </div>`
-
             )
             .join('')
         }
@@ -2769,34 +2772,10 @@ function render(){
 ===================================================== */
 
 function handleDayClick(date){
-
-  const dayPlans = getPlanOccurrencesForRange(date,date);
-
-
-  if(dayPlans.length === 0){
-
-    openModal(date);
-
-    return;
-
-  }
-
-
-  if(dayPlans.length === 1){
-
-    openPlanDetail(
-      dayPlans[0].id
-    );
-
-    return;
-
-  }
-
-
-  openPlansModal(
-    date
-  );
-
+  const dayEvents=getCalendarEventsForRange(date,date);
+  if(dayEvents.length===0){openModal(date);return;}
+  if(dayEvents.length===1){openCalendarEvent(dayEvents[0].source,dayEvents[0].id);return;}
+  openPlansModal(date);
 }
 
 
@@ -2852,6 +2831,53 @@ function getUpcomingPlanOccurrences(daysAhead=730){
  return arr.filter(x=>{const d=parseDateOnly(x._occurrenceDate);if(x._occurrenceDate===todayKey&&x.plan_time){const [h,m]=x.plan_time.split(':').map(Number);d.setHours(h,m||0,0,0);}return d>=now;});
 }
 function getNextUpcomingPlan(){return getUpcomingPlanOccurrences(730).find(x=>!x.completed)||null;}
+
+/* =====================================================
+   EVENTOS AVANZADOS EN EL CALENDARIO PRINCIPAL
+===================================================== */
+function getImportantDateOccurrencesForRange(startKey,endKey){
+  const start=parseDateOnly(startKey),end=parseDateOnly(endKey),out=[];
+  for(const item of (advCache.dates||[])){
+    if(!item.event_date) continue;
+    const base=parseDateOnly(item.event_date);
+    const type=item.recurrence_type || (item.recurring?'yearly':'none');
+    const interval=Math.max(1,Number(item.recurrence_interval||1));
+    if(type==='none'){
+      if(item.event_date>=startKey&&item.event_date<=endKey) out.push({source:'date',id:item.id,date:item.event_date,title:item.title,icon:'📅',category:item.category});
+    }else if(type==='monthly'){
+      let months=(start.getFullYear()-base.getFullYear())*12+start.getMonth()-base.getMonth();
+      let d=addMonthsSafe(base,Math.max(0,Math.floor(months/interval)*interval));
+      if(d<start)d=addMonthsSafe(d,interval);
+      for(;d<=end;d=addMonthsSafe(d,interval)){if(d>=base)out.push({source:'date',id:item.id,date:dateKeyLocal(d),title:item.title,icon:'📅',category:item.category});}
+    }else if(type==='yearly'){
+      let y=Math.max(base.getFullYear(),start.getFullYear());
+      while((y-base.getFullYear())%interval!==0)y++;
+      for(;y<=end.getFullYear();y+=interval){const d=new Date(y,base.getMonth(),base.getDate());if(d>=start&&d<=end&&d>=base)out.push({source:'date',id:item.id,date:dateKeyLocal(d),title:item.title,icon:'📅',category:item.category});}
+    }
+  }
+  return out;
+}
+function getAdvancedCalendarEventsForRange(startKey,endKey){
+  const out=getImportantDateOccurrencesForRange(startKey,endKey);
+  const add=(source,id,date,title,icon,category)=>{if(date&&date>=startKey&&date<=endKey)out.push({source,id,date,title,icon,category});};
+  for(const x of (advCache.memories||[]))add('memory',x.id,x.memory_date,x.title,'📸',x.category);
+  for(const x of (advCache.dreams||[]))add('dream',x.id,x.target_date,x.title,'✨',x.category);
+  for(const x of (advCache.challenges||[])){add('challenge',x.id,x.start_date,x.title,'🎯',x.category);if(x.end_date&&x.end_date!==x.start_date)add('challenge',x.id+'-end',x.end_date,x.title+' · Fin','🏁',x.category);}
+  for(const x of (advCache.goals||[]))add('goal',x.id,x.target_date,x.title,'💰',x.category);
+  for(const x of (advCache.places||[]))add('place',x.id,x.visit_date,x.name,'📍',x.category);
+  for(const x of (advCache.letters||[])){if(x.unlock_at){const d=new Date(x.unlock_at);if(!Number.isNaN(d.getTime()))add('letter',x.id,dateKeyLocal(d),x.title,'💌',x.category);}}
+  return out;
+}
+function getCalendarEventsForRange(startKey,endKey){
+  const plansForRange=getPlanOccurrencesForRange(startKey,endKey).map(p=>({source:'plan',id:p.id,date:p._occurrenceDate,title:p.title,icon:categoryIcon(p.category),category:p.category,time:p.plan_time,completed:p.completed}));
+  return [...plansForRange,...getAdvancedCalendarEventsForRange(startKey,endKey)].sort((a,b)=>(a.date+' '+(a.time||'')+' '+a.title).localeCompare(b.date+' '+(b.time||'')+' '+b.title));
+}
+function openCalendarEvent(source,id){
+  if(source==='plan'){openPlanDetail(id);return;}
+  const tabMap={date:'dates',memory:'memories',letter:'letters',dream:'dreams',challenge:'challenges',goal:'goals',place:'places'};
+  const tab=tabMap[source];
+  if(tab){showAdvancedTab(tab);setTimeout(()=>{const el=document.querySelector('[data-advanced-id="'+id+'"]');if(el){el.classList.add('item-highlight');el.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>el.classList.remove('item-highlight'),1800);}},180);}
+}
 
 /* =====================================================
    CAMBIAR MES
@@ -3195,11 +3221,7 @@ function openPlansModal(date){
     date;
 
 
-  const dayPlans =
-    plans.filter(
-      p =>
-      p.plan_date === date
-    );
+  const dayPlans = getCalendarEventsForRange(date,date);
 
 
   $('plansModalDate').textContent =
@@ -3210,52 +3232,11 @@ function openPlansModal(date){
 
     dayPlans
       .map(
-        p => `
-
-          <button
-            class="planOption"
-            onclick="openPlanDetail('${p.id}')"
-          >
-
-            <div class="planOptionTitle">
-
-              ${categoryIcon(
-                p.category
-              )}
-
-              ${escapeHtml(
-                p.title
-              )}
-
-            </div>
-
-            <div class="planOptionMeta">
-
-              ${categoryName(
-                p.category
-              )}
-
-              ${
-                p.plan_time
-                ? ' · ' +
-                  escapeHtml(
-                    formatTime(
-                      p.plan_time
-                    )
-                  )
-                : ''
-              }
-
-              ${
-                p.completed
-                ? ' · ✓ Completado'
-                : ''
-              }
-
-            </div>
-
+        ev => `
+          <button class="planOption" onclick="openCalendarEvent('${ev.source}','${ev.id}')">
+            <div class="planOptionTitle">${escapeHtml(ev.icon || '♡')} ${escapeHtml(ev.title)}</div>
+            <div class="planOptionMeta">${ev.source==='plan'?categoryName(ev.category):'Fecha especial'}${ev.time?' · '+escapeHtml(formatTime(ev.time)):''}${ev.completed?' · ✓ Completado':''}</div>
           </button>
-
         `
       )
       .join('');
@@ -3777,14 +3758,14 @@ function renderAdvHome(){
 }
 
 function renderAdvStory(){const arr=[{date:'2026-01-21',title:'Comenzó nuestra historia',description:'El día que empezó todo. ❤️',category:'inicio'}, {date:'2026-04-21',title:'Nos hicimos novios',description:'Un nuevo capítulo juntos. 💍',category:'amor'},...advCache.memories.map(x=>({date:x.memory_date,title:x.title,description:x.description,category:x.category}))].sort((a,b)=>a.date.localeCompare(b.date)); return advHeader('Nuestra historia','Una línea de tiempo que irá creciendo con cada recuerdo.','📸 Añadir recuerdo','openMemoryForm()')+`<div class="advList">${arr.map((x,i)=>`<div class="advItem"><div><div class="advItemTitle">${i===0?'❤️ ':''}${esc(x.title)}</div><div class="advMeta">${dateES(x.date)} · ${esc(x.category||'momento')}</div><p>${esc(x.description||'')}</p></div></div>`).join('')}</div>`;}
-function renderAdvMemories(){return advHeader('Nuestros recuerdos','Fotos, historias y pequeños momentos que merecen quedarse.','📸 Nuevo recuerdo','openMemoryForm()')+`<div class="advList">${advCache.memories.length?advCache.memories.map(x=>`<div class="advItem"><div>${x.photo_url?`<img class="advPhoto" src="${esc(x.photo_url)}" alt="">`:''}<div class="advItemTitle">${x.favorite?'❤️ ':''}${esc(x.title)}</div><div class="advMeta">${dateES(x.memory_date)} · ${esc(x.category)}${x.location?' · 📍 '+esc(x.location):''}</div><p>${esc(x.description||'')}</p></div><div class="advActions"><button class="btn" onclick="toggleFavorite('memories','${x.id}',${!x.favorite})">${x.favorite?'💔 Quitar favorito':'❤️ Favorito'}</button><button class="btn" onclick="deleteAdvanced('memories','${x.id}')">🗑️</button></div></div>`).join(''):`<div class="advEmpty">📸 Todavía no hay recuerdos. El primero puede ser uno muy especial.</div>`}</div>`;}
-function renderAdvLetters(){return advHeader('Cartas para nosotros','Escribe hoy algo que quizá quieras que el otro lea mañana.','💌 Nueva carta','openLetterForm()')+`<div class="advList">${advCache.letters.length?advCache.letters.map(x=>{const locked=x.unlock_at&&new Date(x.unlock_at)>new Date();return `<div class="advItem"><div><div class="advItemTitle">${locked?'🔒 ': '💌 '}${esc(x.title)}</div><div class="advMeta">${x.category} · ${locked?'Se desbloquea '+new Date(x.unlock_at).toLocaleString('es-CO'):'Disponible'}</div><p>${locked?'Esta carta está guardada para el futuro. ❤️':esc(x.content)}</p></div><div class="advActions">${!locked&&x.opened_at?'✓ Leída':''}<button class="btn" onclick="deleteAdvanced('letters','${x.id}')">🗑️</button></div></div>`}).join(''):`<div class="advEmpty">💌 Escriban su primera carta. Puede ser para hoy, para un aniversario o para un día difícil.</div>`}</div>`;}
-function renderAdvDreams(){return advHeader('Nuestra lista de sueños','Todo lo que quieren vivir, conocer y conseguir juntos.','✨ Nuevo sueño','openDreamForm()')+`<div class="advList">${advCache.dreams.length?advCache.dreams.map(x=>`<div class="advItem"><div style="flex:1"><div class="advItemTitle">${x.status==='cumplido'?'✅ ':x.status==='planeando'?'🟡 ':'✨ '}${esc(x.title)}</div><div class="advMeta">${esc(x.category)}${x.target_date?' · '+dateES(x.target_date):''}${x.budget?' · '+money(x.budget):''}</div><p>${esc(x.description||'')}</p></div><div class="advActions"><select class="btn" onchange="setDreamStatus('${x.id}',this.value)"><option value="pendiente" ${x.status==='pendiente'?'selected':''}>Pendiente</option><option value="planeando" ${x.status==='planeando'?'selected':''}>Planeando</option><option value="cumplido" ${x.status==='cumplido'?'selected':''}>Cumplido</option></select><button class="btn" onclick="deleteAdvanced('dreams','${x.id}')">🗑️</button></div></div>`).join(''):`<div class="advEmpty">✨ ¿Qué quieren hacer algún día? Empiecen su lista.</div>`}</div>`;}
-function renderAdvChallenges(){return advHeader('Retos de pareja','Pequeños desafíos para convertir días normales en recuerdos.','🎯 Nuevo reto','openChallengeForm()')+`<div class="advList">${advCache.challenges.length?advCache.challenges.map(x=>`<div class="advItem"><div><div class="advItemTitle">${x.completed?'🏆 ':'🎯 '}${esc(x.title)}</div><div class="advMeta">${x.start_date?dateES(x.start_date):''}${x.end_date?' → '+dateES(x.end_date):''} · ${x.points} puntos</div><p>${esc(x.description||'')}</p></div><div class="advActions"><button class="btn" onclick="toggleChallenge('${x.id}',${!x.completed})">${x.completed?'↩️ Reabrir':'✓ Completar'}</button><button class="btn" onclick="deleteAdvanced('challenges','${x.id}')">🗑️</button></div></div>`).join(''):`<div class="advEmpty">🎯 Creen un reto para este mes: una cita diferente, una foto, cocinar juntos...</div>`}</div>`;}
+function renderAdvMemories(){return advHeader('Nuestros recuerdos','Fotos, historias y pequeños momentos que merecen quedarse.','📸 Nuevo recuerdo','openMemoryForm()')+`<div class="advList">${advCache.memories.length?advCache.memories.map(x=>`<div class="advItem" data-advanced-id="${x.id}"><div>${x.photo_url?`<img class="advPhoto" src="${esc(x.photo_url)}" alt="">`:''}<div class="advItemTitle">${x.favorite?'❤️ ':''}${esc(x.title)}</div><div class="advMeta">${dateES(x.memory_date)} · ${esc(x.category)}${x.location?' · 📍 '+esc(x.location):''}</div><p>${esc(x.description||'')}</p></div><div class="advActions"><button class="btn" onclick="toggleFavorite('memories','${x.id}',${!x.favorite})">${x.favorite?'💔 Quitar favorito':'❤️ Favorito'}</button><button class="btn" onclick="deleteAdvanced('memories','${x.id}')">🗑️</button></div></div>`).join(''):`<div class="advEmpty">📸 Todavía no hay recuerdos. El primero puede ser uno muy especial.</div>`}</div>`;}
+function renderAdvLetters(){return advHeader('Cartas para nosotros','Escribe hoy algo que quizá quieras que el otro lea mañana.','💌 Nueva carta','openLetterForm()')+`<div class="advList">${advCache.letters.length?advCache.letters.map(x=>{const locked=x.unlock_at&&new Date(x.unlock_at)>new Date();return `<div class="advItem" data-advanced-id="${x.id}"><div><div class="advItemTitle">${locked?'🔒 ': '💌 '}${esc(x.title)}</div><div class="advMeta">${x.category} · ${locked?'Se desbloquea '+new Date(x.unlock_at).toLocaleString('es-CO'):'Disponible'}</div><p>${locked?'Esta carta está guardada para el futuro. ❤️':esc(x.content)}</p></div><div class="advActions">${!locked&&x.opened_at?'✓ Leída':''}<button class="btn" onclick="deleteAdvanced('letters','${x.id}')">🗑️</button></div></div>`}).join(''):`<div class="advEmpty">💌 Escriban su primera carta. Puede ser para hoy, para un aniversario o para un día difícil.</div>`}</div>`;}
+function renderAdvDreams(){return advHeader('Nuestra lista de sueños','Todo lo que quieren vivir, conocer y conseguir juntos.','✨ Nuevo sueño','openDreamForm()')+`<div class="advList">${advCache.dreams.length?advCache.dreams.map(x=>`<div class="advItem" data-advanced-id="${x.id}"><div style="flex:1"><div class="advItemTitle">${x.status==='cumplido'?'✅ ':x.status==='planeando'?'🟡 ':'✨ '}${esc(x.title)}</div><div class="advMeta">${esc(x.category)}${x.target_date?' · '+dateES(x.target_date):''}${x.budget?' · '+money(x.budget):''}</div><p>${esc(x.description||'')}</p></div><div class="advActions"><select class="btn" onchange="setDreamStatus('${x.id}',this.value)"><option value="pendiente" ${x.status==='pendiente'?'selected':''}>Pendiente</option><option value="planeando" ${x.status==='planeando'?'selected':''}>Planeando</option><option value="cumplido" ${x.status==='cumplido'?'selected':''}>Cumplido</option></select><button class="btn" onclick="deleteAdvanced('dreams','${x.id}')">🗑️</button></div></div>`).join(''):`<div class="advEmpty">✨ ¿Qué quieren hacer algún día? Empiecen su lista.</div>`}</div>`;}
+function renderAdvChallenges(){return advHeader('Retos de pareja','Pequeños desafíos para convertir días normales en recuerdos.','🎯 Nuevo reto','openChallengeForm()')+`<div class="advList">${advCache.challenges.length?advCache.challenges.map(x=>`<div class="advItem" data-advanced-id="${x.id}"><div><div class="advItemTitle">${x.completed?'🏆 ':'🎯 '}${esc(x.title)}</div><div class="advMeta">${x.start_date?dateES(x.start_date):''}${x.end_date?' → '+dateES(x.end_date):''} · ${x.points} puntos</div><p>${esc(x.description||'')}</p></div><div class="advActions"><button class="btn" onclick="toggleChallenge('${x.id}',${!x.completed})">${x.completed?'↩️ Reabrir':'✓ Completar'}</button><button class="btn" onclick="deleteAdvanced('challenges','${x.id}')">🗑️</button></div></div>`).join(''):`<div class="advEmpty">🎯 Creen un reto para este mes: una cita diferente, una foto, cocinar juntos...</div>`}</div>`;}
 function renderAdvIdeas(){return advHeader('¿Qué hacemos hoy?','Pulsen el botón y dejen que el azar elija una idea.','🎲 Sorpréndenos','randomIdea()')+`<div id="randomIdeaBox" class="advCard" style="margin-top:18px;text-align:center"><h3>🎲 ¿Qué hacemos hoy?</h3><p>La próxima actividad puede estar a un clic.</p></div><div class="advList">${advCache.ideas.length?advCache.ideas.map(x=>`<div class="advItem"><div><div class="advItemTitle">🎲 ${esc(x.title)}</div><div class="advMeta">${esc(x.category)}${x.estimated_budget?' · '+money(x.estimated_budget):''}</div><p>${esc(x.description||'')}</p></div><div class="advActions"><button class="btn" onclick="deleteAdvanced('ideas','${x.id}')">🗑️</button></div></div>`).join(''):`<div class="advEmpty">Agreguen sus propias ideas para tener un botón de “sorpréndenos” realmente de ustedes.</div>`}</div>`;}
-function renderAdvDates(){return advHeader('Fechas importantes','Aniversarios, cumpleaños y días que no quieren olvidar.','📅 Nueva fecha','openDateForm()')+`<div class="advList">${advCache.dates.length?advCache.dates.map(x=>`<div class="advItem"><div><div class="advItemTitle">📅 ${esc(x.title)}</div><div class="advMeta">${dateES(x.event_date)} · ${esc(x.category)}${x.recurring?' · 🔁 Recurrente':''}</div><p>${esc(x.description||'')}</p></div><div class="advActions"><button class="btn" onclick="deleteAdvanced('dates','${x.id}')">🗑️</button></div></div>`).join(''):`<div class="advEmpty">📅 Guarden aquí las fechas que hacen especial su historia.</div>`}</div>`;}
-function renderAdvGoals(){return advHeader('Nuestras metas','Metas de ahorro, viajes, proyectos y cualquier cosa que quieran construir juntos.','💰 Nueva meta','openGoalForm()')+`<div class="advList">${advCache.goals.length?advCache.goals.map(x=>{const pct=x.target_amount?Math.min(100,Math.round(Number(x.current_amount||0)/Number(x.target_amount)*100)):0;return `<div class="advItem"><div style="flex:1"><div class="advItemTitle">${x.completed?'✅ ':'💰 '}${esc(x.title)}</div><div class="advMeta">${x.target_amount?money(x.current_amount)+' / '+money(x.target_amount):'Sin monto objetivo'}${x.target_date?' · '+dateES(x.target_date):''}</div>${x.target_amount?`<div class="progress"><span style="width:${pct}%"></span></div><div class="advMeta">${pct}% completado</div>`:''}<p>${esc(x.description||'')}</p></div><div class="advActions"><button class="btn" onclick="advanceGoal('${x.id}')">＋ Aportar</button><button class="btn" onclick="toggleGoal('${x.id}',${!x.completed})">${x.completed?'↩️':'✓'}</button><button class="btn" onclick="deleteAdvanced('goals','${x.id}')">🗑️</button></div></div>`}).join(''):`<div class="advEmpty">💰 Pongan una meta en común y vean cómo crece.</div>`}</div>`;}
-function renderAdvPlaces(){return advHeader('Nuestros lugares','Los puntos del mapa que guardan una historia.','📍 Nuevo lugar','openPlaceForm()')+`<div class="advList">${advCache.places.length?advCache.places.map(x=>`<div class="advItem"><div><div class="advItemTitle">📍 ${esc(x.name)}</div><div class="advMeta">${esc(x.category)}${x.visit_date?' · '+dateES(x.visit_date):''}${x.address?' · '+esc(x.address):''}</div><p>${esc(x.description||'')}</p>${x.latitude&&x.longitude?`<a class="btn" style="display:inline-block;text-decoration:none" target="_blank" href="https://www.google.com/maps/search/?api=1&query=${x.latitude},${x.longitude}">🗺️ Abrir mapa</a>`:''}</div><div class="advActions"><button class="btn" onclick="deleteAdvanced('places','${x.id}')">🗑️</button></div></div>`).join(''):`<div class="advEmpty">📍 Guarden aquí los lugares que algún día querrán volver a visitar.</div>`}</div>`;}
+function renderAdvDates(){return advHeader('Fechas importantes','Aniversarios, cumpleaños y días que no quieren olvidar.','📅 Nueva fecha','openDateForm()')+`<div class="advList">${advCache.dates.length?advCache.dates.map(x=>`<div class="advItem" data-advanced-id="${x.id}"><div><div class="advItemTitle">📅 ${esc(x.title)}</div><div class="advMeta">${dateES(x.event_date)} · ${esc(x.category)}${x.recurrence_type==='monthly'?' · 🔁 Cada mes':x.recurrence_type==='yearly'||x.recurring?' · 🔁 Cada año':''}</div><p>${esc(x.description||'')}</p></div><div class="advActions"><button class="btn" onclick="deleteAdvanced('dates','${x.id}')">🗑️</button></div></div>`).join(''):`<div class="advEmpty">📅 Guarden aquí las fechas que hacen especial su historia.</div>`}</div>`;}
+function renderAdvGoals(){return advHeader('Nuestras metas','Metas de ahorro, viajes, proyectos y cualquier cosa que quieran construir juntos.','💰 Nueva meta','openGoalForm()')+`<div class="advList">${advCache.goals.length?advCache.goals.map(x=>{const pct=x.target_amount?Math.min(100,Math.round(Number(x.current_amount||0)/Number(x.target_amount)*100)):0;return `<div class="advItem" data-advanced-id="${x.id}"><div style="flex:1"><div class="advItemTitle">${x.completed?'✅ ':'💰 '}${esc(x.title)}</div><div class="advMeta">${x.target_amount?money(x.current_amount)+' / '+money(x.target_amount):'Sin monto objetivo'}${x.target_date?' · '+dateES(x.target_date):''}</div>${x.target_amount?`<div class="progress"><span style="width:${pct}%"></span></div><div class="advMeta">${pct}% completado</div>`:''}<p>${esc(x.description||'')}</p></div><div class="advActions"><button class="btn" onclick="advanceGoal('${x.id}')">＋ Aportar</button><button class="btn" onclick="toggleGoal('${x.id}',${!x.completed})">${x.completed?'↩️':'✓'}</button><button class="btn" onclick="deleteAdvanced('goals','${x.id}')">🗑️</button></div></div>`}).join(''):`<div class="advEmpty">💰 Pongan una meta en común y vean cómo crece.</div>`}</div>`;}
+function renderAdvPlaces(){return advHeader('Nuestros lugares','Los puntos del mapa que guardan una historia.','📍 Nuevo lugar','openPlaceForm()')+`<div class="advList">${advCache.places.length?advCache.places.map(x=>`<div class="advItem" data-advanced-id="${x.id}"><div><div class="advItemTitle">📍 ${esc(x.name)}</div><div class="advMeta">${esc(x.category)}${x.visit_date?' · '+dateES(x.visit_date):''}${x.address?' · '+esc(x.address):''}</div><p>${esc(x.description||'')}</p>${x.latitude&&x.longitude?`<a class="btn" style="display:inline-block;text-decoration:none" target="_blank" href="https://www.google.com/maps/search/?api=1&query=${x.latitude},${x.longitude}">🗺️ Abrir mapa</a>`:''}</div><div class="advActions"><button class="btn" onclick="deleteAdvanced('places','${x.id}')">🗑️</button></div></div>`).join(''):`<div class="advEmpty">📍 Guarden aquí los lugares que algún día querrán volver a visitar.</div>`}</div>`;}
 function renderAdvAchievements(){const daysTogether=Math.floor((Date.now()-new Date('2026-01-21T00:00:00'))/86400000);const milestones=[['❤️','Empezó nuestra historia',true],['💍','Nos hicimos novios',true],['🌱','10 planes',plans.length>=10],['📸','10 recuerdos',advCache.memories.length>=10],['✨','Primer sueño cumplido',advCache.dreams.some(x=>x.status==='cumplido')],['🎯','Primer reto completado',advCache.challenges.some(x=>x.completed)],['💰','Primera meta cumplida',advCache.goals.some(x=>x.completed)],['📍','Primer lugar guardado',advCache.places.length>0],['🔥','100 días juntos',daysTogether>=100],['🏆','365 días juntos',daysTogether>=365]];return advHeader('Nuestros logros','Pequeños hitos que muestran cuánto han construido.','🎯 Ver retos','showAdvancedTab(\'challenges\')')+`<div class="advGrid">${milestones.map(x=>`<div class="advCard" style="opacity:${x[2]?1:.45}"><div style="font-size:38px">${x[0]}</div><h3>${x[1]}</h3><p>${x[2]?'Desbloqueado ❤️':'Todavía por vivir...'}</p></div>`).join('')}</div>`;}
 function renderAdvPrivate(){return advHeader('Mi rincón privado','Estas notas solo las puede ver la persona que las creó.','🔐 Nueva nota','openPrivateForm()')+`<div class="advList">${advCache.privateNotes.length?advCache.privateNotes.map(x=>`<div class="advItem"><div><div class="advItemTitle">🔐 ${esc(x.title)}</div><p>${esc(x.content)}</p></div><div class="advActions"><button class="btn" onclick="deleteAdvanced('privateNotes','${x.id}')">🗑️</button></div></div>`).join(''):`<div class="advEmpty">🔐 Un espacio solo para ti. La otra persona no puede leer estas notas.</div>`}</div>`;}
 async function advLoadAll(){
@@ -3876,8 +3857,8 @@ function openDreamForm(){openAdvModal('Nuevo sueño ✨',formShell(input('title'
 async function saveDream(){const title=$('adv_title').value.trim();if(!title)return alert('Escribe el sueño ❤️');const {error}=await sb.from('dreams').insert({couple_id:couple.id,created_by:user.id,title,description:$('adv_description').value,category:$('adv_category').value,target_date:$('adv_target_date').value||null,budget:$('adv_budget').value||null});if(error)return alert(error.message);closeAdvModal();await advLoadAll();}
 function openChallengeForm(){openAdvModal('Nuevo reto 🎯',formShell(input('title','Nombre del reto')+textarea('description','Descripción','¿Qué tienen que hacer?')+`<div class="advFormGrid">${input('start_date','Desde','date')}${input('end_date','Hasta','date')}</div>`+input('points','Puntos','number','value="10" min="1"'),`saveChallenge()`));}
 async function saveChallenge(){const title=$('adv_title').value.trim();if(!title)return alert('Escribe el nombre del reto');const {error}=await sb.from('challenges').insert({couple_id:couple.id,created_by:user.id,title,description:$('adv_description').value,start_date:$('adv_start_date').value||null,end_date:$('adv_end_date').value||null,points:Number($('adv_points').value||10)});if(error)return alert(error.message);closeAdvModal();await advLoadAll();}
-function openDateForm(){openAdvModal('Nueva fecha importante 📅',formShell(input('title','Nombre')+`<div class="advFormGrid">${input('event_date','Fecha','date')}${select('category','Categoría',[['especial','Especial'],['aniversario','Aniversario'],['cumpleanos','Cumpleaños'],['viaje','Viaje'],['familia','Familia']])}</div>`+textarea('description','Descripción')+`<div class="field"><label><input id="adv_recurring" type="checkbox" style="width:auto"> Se repite cada año</label></div>`, `saveDate()`));}
-async function saveDate(){const title=$('adv_title').value.trim();if(!title)return alert('Escribe el nombre');const {error}=await sb.from('important_dates').insert({couple_id:couple.id,created_by:user.id,title,event_date:$('adv_event_date').value,category:$('adv_category').value,description:$('adv_description').value,recurring:$('adv_recurring').checked});if(error)return alert(error.message);closeAdvModal();await advLoadAll();}
+function openDateForm(){openAdvModal('Nueva fecha importante 📅',formShell(input('title','Nombre')+`<div class="advFormGrid">${input('event_date','Fecha','date')}${select('category','Categoría',[['especial','Especial'],['aniversario','Aniversario'],['cumpleanos','Cumpleaños'],['viaje','Viaje'],['familia','Familia']])}</div>`+textarea('description','Descripción')+select('recurrence_type','Repetición',[['none','No se repite'],['monthly','Cada mes'],['yearly','Cada año']])+input('recurrence_interval','Cada cuántos periodos','number','min="1" max="12" value="1"'),`saveDate()`));}
+async function saveDate(){const title=$('adv_title').value.trim(),eventDate=$('adv_event_date').value,recurrenceType=$('adv_recurrence_type').value||'none',recurrenceInterval=Math.max(1,Number($('adv_recurrence_interval').value||1));if(!title)return alert('Escribe el nombre');if(!eventDate)return alert('Selecciona una fecha');const {error}=await sb.from('important_dates').insert({couple_id:couple.id,created_by:user.id,title,event_date:eventDate,category:$('adv_category').value,description:$('adv_description').value,recurring:recurrenceType!=='none',recurrence_type:recurrenceType,recurrence_interval:recurrenceInterval});if(error)return alert(error.message);closeAdvModal();await advLoadAll();render();}
 function openGoalForm(){openAdvModal('Nueva meta 💰',formShell(input('title','Meta')+textarea('description','Descripción')+`<div class="advFormGrid">${input('target_amount','Monto objetivo','number','min="0"')}${input('target_date','Fecha objetivo','date')}</div>`,`saveGoal()`));}
 async function saveGoal(){const title=$('adv_title').value.trim();if(!title)return alert('Escribe la meta');const {error}=await sb.from('goals').insert({couple_id:couple.id,created_by:user.id,title,description:$('adv_description').value,target_amount:$('adv_target_amount').value||null,target_date:$('adv_target_date').value||null});if(error)return alert(error.message);closeAdvModal();await advLoadAll();}
 function openPlaceForm(){openAdvModal('Nuevo lugar 📍',formShell(input('title','Nombre del lugar')+textarea('description','Qué significa para ustedes')+`<div class="advFormGrid">${input('address','Dirección')}${input('visit_date','Fecha','date')}</div>`+`<div class="advFormGrid">${input('latitude','Latitud','number','step="any"')}${input('longitude','Longitud','number','step="any"')}</div>`+select('category','Categoría',[['especial','Especial'],['cita','Cita'],['viaje','Viaje'],['restaurante','Restaurante'],['hogar','Hogar']]),`savePlace()`));}
