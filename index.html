@@ -384,6 +384,11 @@ body{
   overflow-y:auto;
 }
 
+/* Los modales avanzados se abren con la clase .show */
+.modal.show{
+  display:grid !important;
+}
+
 .modalBox{
   background:#fffaf9;
   width:min(520px,100%);
@@ -3938,6 +3943,10 @@ Object.assign(window,{showAdvancedTab,openQuickCreate,openMemoryForm,openLetterF
 ===================================================== */
 
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(()=>{});
+
+window.addEventListener('error', e => {
+  console.error('Nuestro Calendario #21:', e.error || e.message);
+});
 
 window.addEventListener(
   'load',
