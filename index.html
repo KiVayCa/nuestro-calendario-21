@@ -609,7 +609,9 @@ body{
    FUNCIONES AVANZADAS
 ===================================================== */
 .advanced{margin:26px auto 50px;max-width:1200px;padding:0 14px}
-body.app-ready .cards{display:none}body.app-ready .hero{display:none}.workspace.tab-hidden{display:none!important}.advanced.calendar-mode #advancedContent{display:none}
+body.app-ready .cards{display:none}body.app-ready .hero{display:none}.workspace.tab-hidden{display:none!important}.advanced.calendar-mode #advancedContent{display:none}.appTabHidden{display:none!important}.advanced.app-navigation{margin-top:18px}.advancedNav{position:sticky;top:0;z-index:30;background:rgba(255,248,251,.94);backdrop-filter:blur(12px);border:1px solid #f0dce4;border-radius:18px;padding:10px;box-shadow:0 8px 28px rgba(80,30,50,.08);justify-content:center;flex-wrap:wrap}.advancedNav .advTab{white-space:nowrap}.homeIntro{margin:0 0 18px}.homeWelcome{min-height:560px}.homeStats{grid-template-columns:repeat(4,1fr)}
+@media(max-width:800px){.advancedNav{justify-content:flex-start;flex-wrap:nowrap;overflow-x:auto}.homeStats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.homeWelcome{min-height:520px}.homeWelcome h2{font-size:38px}.homeStats{grid-template-columns:1fr 1fr}.homeStat strong{font-size:22px}}
 .homeWelcome{position:relative;overflow:hidden;min-height:430px;border-radius:30px;background:#28151d url('pareja.jpeg') center/cover no-repeat;box-shadow:0 22px 65px rgba(70,25,45,.18);display:flex;align-items:flex-end}.homeWelcome:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(30,10,18,.04),rgba(30,10,18,.80))}.homeWelcomeContent{position:relative;z-index:1;padding:34px;color:white;max-width:760px}.homeWelcome h2{font:italic 52px Georgia,serif;margin:0 0 8px;line-height:1.05}.homeWelcome p{font-size:16px;line-height:1.6;margin:8px 0;max-width:680px;color:#fff5f8}.homePill{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);backdrop-filter:blur(8px);border-radius:999px;padding:9px 13px;margin-bottom:12px;font-weight:800}.homeStats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px}.homeStat{background:rgba(255,255,255,.94);border:1px solid rgba(255,120,160,.16);border-radius:20px;padding:17px;box-shadow:0 10px 28px rgba(70,30,50,.07)}.homeStat strong{display:block;font-size:28px;color:#8d4764}.homeStat span{font-size:12px;color:#846773}.homeNext{display:flex;gap:16px;align-items:center;margin-top:18px;background:linear-gradient(135deg,#fff,#fff2f6);border:1px solid #f0dce4;border-radius:22px;padding:18px}.homeNextIcon{width:66px;height:66px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(135deg,#381923,#c56f8a);font-size:30px;color:#fff;flex:none}.homeNextTitle{font:700 24px Georgia,serif;color:#653449}.homeNextMeta{font-size:13px;color:#8a6b77;margin-top:4px}.advTab{transition:.18s}.advTab.active{box-shadow:0 8px 24px rgba(141,71,100,.14);border-color:#eab8c7}.recurrenceBox{background:linear-gradient(135deg,#fff1f5,#fff);border:1px solid #f0d5df;border-radius:16px;padding:14px;margin-top:10px}.recurrenceDays{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}.dayCheck{position:relative}.dayCheck input{position:absolute;opacity:0}.dayCheck span{display:block;padding:8px 10px;border-radius:999px;background:#f8e8ed;color:#7b4055;font-size:12px;font-weight:800;cursor:pointer}.dayCheck input:checked+span{background:#e64d78;color:white}.seriesBadge{display:inline-flex;align-items:center;gap:5px;padding:5px 9px;border-radius:999px;background:#f5e0e7;color:#7b4055;font-size:11px;font-weight:800;margin-top:7px}
 @media(max-width:850px){.homeStats{grid-template-columns:1fr 1fr}.homeWelcome{min-height:380px}.homeWelcome h2{font-size:40px}}
 
@@ -759,6 +761,25 @@ body.app-ready .cards{display:none}body.app-ready .hero{display:none}.workspace.
   class="app hidden"
 >
 
+
+<section class="advanced" id="advancedArea">
+  <div class="advancedNav" id="advancedNav">
+    <button class="advTab active" onclick="showAdvancedTab('home')">🏠 Inicio</button>
+    <button class="advTab" onclick="showAdvancedTab('calendar')">🗓️ Calendario</button>
+    <button class="advTab" onclick="showAdvancedTab('story')">📖 Historia</button>
+    <button class="advTab" onclick="showAdvancedTab('memories')">📸 Recuerdos</button>
+    <button class="advTab" onclick="showAdvancedTab('letters')">💌 Cartas</button>
+    <button class="advTab" onclick="showAdvancedTab('dreams')">✨ Sueños</button>
+    <button class="advTab" onclick="showAdvancedTab('challenges')">🎯 Retos</button>
+    <button class="advTab" onclick="showAdvancedTab('ideas')">🎲 ¿Qué hacemos?</button>
+    <button class="advTab" onclick="showAdvancedTab('dates')">📅 Fechas</button>
+    <button class="advTab" onclick="showAdvancedTab('goals')">💰 Metas</button>
+    <button class="advTab" onclick="showAdvancedTab('places')">📍 Lugares</button>
+    <button class="advTab" onclick="showAdvancedTab('achievements')">🏆 Logros</button>
+    <button class="advTab" onclick="showAdvancedTab('private')">🔐 Privado</button>
+  </div>
+  <div id="advancedContent"></div>
+</section>
 
 <section class="hero">
 
@@ -972,24 +993,7 @@ body.app-ready .cards{display:none}body.app-ready .hero{display:none}.workspace.
 <!-- =====================================================
      CENTRO DE NUESTRA HISTORIA — FUNCIONES AVANZADAS
 ===================================================== -->
-<section class="advanced" id="advancedArea">
-  <div class="advancedNav" id="advancedNav">
-    <button class="advTab active" onclick="showAdvancedTab('home')">🏠 Inicio</button>
-    <button class="advTab" onclick="showAdvancedTab('calendar')">🗓️ Calendario</button>
-    <button class="advTab" onclick="showAdvancedTab('story')">📖 Historia</button>
-    <button class="advTab" onclick="showAdvancedTab('memories')">📸 Recuerdos</button>
-    <button class="advTab" onclick="showAdvancedTab('letters')">💌 Cartas</button>
-    <button class="advTab" onclick="showAdvancedTab('dreams')">✨ Sueños</button>
-    <button class="advTab" onclick="showAdvancedTab('challenges')">🎯 Retos</button>
-    <button class="advTab" onclick="showAdvancedTab('ideas')">🎲 ¿Qué hacemos?</button>
-    <button class="advTab" onclick="showAdvancedTab('dates')">📅 Fechas</button>
-    <button class="advTab" onclick="showAdvancedTab('goals')">💰 Metas</button>
-    <button class="advTab" onclick="showAdvancedTab('places')">📍 Lugares</button>
-    <button class="advTab" onclick="showAdvancedTab('achievements')">🏆 Logros</button>
-    <button class="advTab" onclick="showAdvancedTab('private')">🔐 Privado</button>
-  </div>
-  <div id="advancedContent"></div>
-</section>
+
 
 <div id="advModal" class="modal">
   <div class="modalBox" style="max-width:720px">
@@ -2323,6 +2327,8 @@ async function showApp(){
 
   const advArea=$('advancedArea'); const cardsArea=document.querySelector('.cards'); if(advArea&&cardsArea) cardsArea.parentNode.insertBefore(advArea,cardsArea);
   document.body.classList.add('app-ready');
+  const appEl=$('app'), advEl=$('advancedArea');
+  if(appEl && advEl && appEl.firstElementChild!==advEl) appEl.insertBefore(advEl, appEl.firstElementChild);
   const ws=document.querySelector('.workspace'); if(ws) ws.classList.add('tab-hidden');
   showAdvancedTab('home');
   initAdvanced();
@@ -3663,21 +3669,40 @@ function money(v){return v==null||v===''?'—':new Intl.NumberFormat('es-CO',{st
 function dateES(v){if(!v)return 'Sin fecha'; const d=new Date(v+'T00:00:00'); return d.toLocaleDateString('es-CO',{day:'numeric',month:'long',year:'numeric'});}
 function showAdvancedTab(tab){
  advancedTab=tab;
+ const area=$('advancedArea'),content=$('advancedContent'),workspace=document.querySelector('.workspace'),hero=document.querySelector('.hero'),cards=document.querySelector('.cards');
  document.querySelectorAll('.advTab').forEach(b=>b.classList.toggle('active',b.getAttribute('onclick')?.includes("'"+tab+"'")));
- const area=$('advancedArea'),content=$('advancedContent'),workspace=document.querySelector('.workspace');
  if(tab==='calendar'){
-   area.classList.add('calendar-mode'); content.innerHTML=''; if(workspace)workspace.classList.remove('tab-hidden');
+   area.classList.add('calendar-mode'); content.innerHTML='';
+   if(workspace)workspace.classList.remove('tab-hidden','appTabHidden');
+   if(hero)hero.classList.add('appTabHidden');
+   if(cards)cards.classList.add('appTabHidden');
+   setTimeout(()=>workspace?.scrollIntoView({behavior:'smooth',block:'start'}),40);
+ }else if(tab==='home'){
+   area.classList.remove('calendar-mode');
+   if(workspace)workspace.classList.add('tab-hidden');
+   if(hero)hero.classList.add('appTabHidden');
+   if(cards)cards.classList.add('appTabHidden');
+   renderAdvanced();
+   setTimeout(()=>area?.scrollIntoView({behavior:'smooth',block:'start'}),40);
  }else{
-   area.classList.remove('calendar-mode'); if(workspace)workspace.classList.add('tab-hidden'); renderAdvanced();
+   area.classList.remove('calendar-mode');
+   if(workspace)workspace.classList.add('tab-hidden');
+   if(hero)hero.classList.add('appTabHidden');
+   if(cards)cards.classList.add('appTabHidden');
+   renderAdvanced();
+   setTimeout(()=>area?.scrollIntoView({behavior:'smooth',block:'start'}),40);
  }
- if(tab!=='calendar') window.scrollTo({top:area.offsetTop-10,behavior:'smooth'}); else if(workspace) window.scrollTo({top:workspace.offsetTop-10,behavior:'smooth'});
 }
 function advHeader(title,sub,button,action){return `<div class="advHero"><div style="display:flex;justify-content:space-between;gap:18px;align-items:center;flex-wrap:wrap"><div><div style="font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:#a16a7d;font-weight:800">Nuestro espacio</div><h2 style="font:700 32px Georgia,serif;color:#653449;margin:5px 0">${title}</h2><p style="margin:0;color:#806572">${sub}</p></div>${button?`<button class="btn primary" onclick="${action}">${button}</button>`:''}</div></div>`}
 function renderAdvanced(){const c=$('advancedContent');if(!c)return; const map={home:renderAdvHome,story:renderAdvStory,memories:renderAdvMemories,letters:renderAdvLetters,dreams:renderAdvDreams,challenges:renderAdvChallenges,ideas:renderAdvIdeas,dates:renderAdvDates,goals:renderAdvGoals,places:renderAdvPlaces,achievements:renderAdvAchievements,private:renderAdvPrivate}; c.innerHTML=(map[advancedTab]||renderAdvHome)();}
 function renderAdvHome(){
- const p=plans.length,m=advCache.memories.length,d=advCache.dreams.filter(x=>x.status==='cumplido').length,g=advCache.goals.filter(x=>x.completed).length,ch=advCache.challenges.filter(x=>x.completed).length; const next=getNextUpcomingPlan(); const together=Math.max(0,Math.floor((Date.now()-new Date('2026-01-21T00:00:00'))/86400000)); const dating=Math.max(0,Math.floor((Date.now()-new Date('2026-04-21T00:00:00'))/86400000));
- return `<div class="homeWelcome"><div class="homeWelcomeContent"><div class="homePill">❤️ Nuestro Calendario #21 · Ana María & Nicolás</div><h2>Todo lo que somos,<br>todo lo que estamos construyendo.</h2><p>Este no es solo un calendario. Es nuestro pequeño rincón para guardar planes, recuerdos, sueños, cartas y todos esos momentos que algún día vamos a mirar hacia atrás.</p><div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:16px"><button class="btn primary" onclick="showAdvancedTab('calendar')">🗓️ Ver nuestro calendario</button><button class="btn" style="background:rgba(255,255,255,.90)" onclick="openQuickCreate()">✨ Crear algo especial</button></div></div></div><div class="homeStats"><div class="homeStat"><strong>${together}</strong><span>días juntos ❤️</span></div><div class="homeStat"><strong>${dating}</strong><span>días de novios 💍</span></div><div class="homeStat"><strong>${p}</strong><span>planes guardados</span></div><div class="homeStat"><strong>${m}</strong><span>recuerdos guardados</span></div></div><div class="homeNext"><div class="homeNextIcon">${next?categoryIcon(next.category):'♡'}</div><div style="flex:1"><div style="font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:#a16a7d;font-weight:900">Próximo capítulo</div><div class="homeNextTitle">${next?esc(next.title):'Todavía no hay un próximo plan'}</div><div class="homeNextMeta">${next?dateES(next._occurrenceDate)+(next.plan_time?' · '+formatTime(next.plan_time):''):'Creen uno y hagan que aparezca aquí ❤️'}</div>${next&&next.recurrence_enabled?'<span class="seriesBadge">🔁 Plan recurrente</span>':''}</div>${next?'<button class="btn" data-next-id="'+next.id+'" onclick="openPlanDetail(this.dataset.nextId)">Abrir</button>':''}</div><div class="advGrid"><div class="advCard"><h3>✨ Sueños cumplidos</h3><div class="advMetric">${d}</div><p>De ideas bonitas a cosas que realmente vivieron.</p></div><div class="advCard"><h3>💌 Cartas</h3><div class="advMetric">${advCache.letters.length}</div><p>Palabras para leer hoy o guardar para el futuro.</p></div><div class="advCard"><h3>🎯 Retos</h3><div class="advMetric">${ch}</div><p>Pequeños desafíos que convierten días normales en recuerdos.</p></div><div class="advCard"><h3>💰 Metas</h3><div class="advMetric">${g}</div><p>Lo que están construyendo juntos, paso a paso.</p></div></div>`;
+ const p=plans.length,m=advCache.memories.length,d=advCache.dreams.filter(x=>x.status==='cumplido').length,g=advCache.goals.filter(x=>x.completed).length,ch=advCache.challenges.filter(x=>x.completed).length;
+ const next=getNextUpcomingPlan();
+ const together=Math.max(0,Math.floor((Date.now()-new Date('2026-01-21T00:00:00'))/86400000));
+ const dating=Math.max(0,Math.floor((Date.now()-new Date('2026-04-21T00:00:00'))/86400000));
+ return `<div class="homeIntro"><div class="homeWelcome"><div class="homeWelcomeContent"><div class="homePill">❤️ Nuestro Calendario #21 · Ana María & Nicolás</div><h2>Este es nuestro lugar.<br>Esta es nuestra historia.</h2><p>Un pequeño rincón solo para nosotros: nuestros planes, recuerdos, sueños, cartas y todo lo que todavía nos falta vivir.</p><div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:18px"><button class="btn primary" onclick="showAdvancedTab('calendar')">🗓️ Entrar al calendario</button><button class="btn" style="background:rgba(255,255,255,.92)" onclick="openQuickCreate()">✨ Crear algo especial</button></div></div></div></div><div class="homeStats"><div class="homeStat"><strong>${together}</strong><span>días juntos ❤️</span></div><div class="homeStat"><strong>${dating}</strong><span>días de novios 💍</span></div><div class="homeStat"><strong>${p}</strong><span>planes guardados 🗓️</span></div><div class="homeStat"><strong>${m}</strong><span>recuerdos 📸</span></div></div><div class="homeNext"><div class="homeNextIcon">${next?categoryIcon(next.category):'♡'}</div><div style="flex:1"><div style="font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:#a16a7d;font-weight:900">Próximo capítulo</div><div class="homeNextTitle">${next?esc(next.title):'Todavía no hay un próximo plan'}</div><div class="homeNextMeta">${next?dateES(next._occurrenceDate)+(next.plan_time?' · '+formatTime(next.plan_time):''):'Creen uno y hagan que aparezca aquí ❤️'}</div>${next&&next.recurrence_enabled?'<span class="seriesBadge">🔁 Plan recurrente</span>':''}</div>${next?'<button class="btn" data-next-id="'+next.id+'" onclick="openPlanDetail(this.dataset.nextId)">Abrir</button>':''}</div><div class="advGrid"><div class="advCard"><h3>✨ Sueños cumplidos</h3><div class="advMetric">${d}</div><p>De ideas bonitas a cosas que realmente vivieron.</p></div><div class="advCard"><h3>💌 Cartas</h3><div class="advMetric">${advCache.letters.length}</div><p>Palabras para leer hoy o guardar para el futuro.</p></div><div class="advCard"><h3>🎯 Retos</h3><div class="advMetric">${ch}</div><p>Pequeños desafíos para hacer juntos.</p></div><div class="advCard"><h3>💰 Metas</h3><div class="advMetric">${g}</div><p>Lo que están construyendo paso a paso.</p></div></div>`;
 }
+
 function renderAdvStory(){const arr=[{date:'2026-01-21',title:'Comenzó nuestra historia',description:'El día que empezó todo. ❤️',category:'inicio'}, {date:'2026-04-21',title:'Nos hicimos novios',description:'Un nuevo capítulo juntos. 💍',category:'amor'},...advCache.memories.map(x=>({date:x.memory_date,title:x.title,description:x.description,category:x.category}))].sort((a,b)=>a.date.localeCompare(b.date)); return advHeader('Nuestra historia','Una línea de tiempo que irá creciendo con cada recuerdo.','📸 Añadir recuerdo','openMemoryForm()')+`<div class="advList">${arr.map((x,i)=>`<div class="advItem"><div><div class="advItemTitle">${i===0?'❤️ ':''}${esc(x.title)}</div><div class="advMeta">${dateES(x.date)} · ${esc(x.category||'momento')}</div><p>${esc(x.description||'')}</p></div></div>`).join('')}</div>`;}
 function renderAdvMemories(){return advHeader('Nuestros recuerdos','Fotos, historias y pequeños momentos que merecen quedarse.','📸 Nuevo recuerdo','openMemoryForm()')+`<div class="advList">${advCache.memories.length?advCache.memories.map(x=>`<div class="advItem"><div>${x.photo_url?`<img class="advPhoto" src="${esc(x.photo_url)}" alt="">`:''}<div class="advItemTitle">${x.favorite?'❤️ ':''}${esc(x.title)}</div><div class="advMeta">${dateES(x.memory_date)} · ${esc(x.category)}${x.location?' · 📍 '+esc(x.location):''}</div><p>${esc(x.description||'')}</p></div><div class="advActions"><button class="btn" onclick="toggleFavorite('memories','${x.id}',${!x.favorite})">${x.favorite?'💔 Quitar favorito':'❤️ Favorito'}</button><button class="btn" onclick="deleteAdvanced('memories','${x.id}')">🗑️</button></div></div>`).join(''):`<div class="advEmpty">📸 Todavía no hay recuerdos. El primero puede ser uno muy especial.</div>`}</div>`;}
 function renderAdvLetters(){return advHeader('Cartas para nosotros','Escribe hoy algo que quizá quieras que el otro lea mañana.','💌 Nueva carta','openLetterForm()')+`<div class="advList">${advCache.letters.length?advCache.letters.map(x=>{const locked=x.unlock_at&&new Date(x.unlock_at)>new Date();return `<div class="advItem"><div><div class="advItemTitle">${locked?'🔒 ': '💌 '}${esc(x.title)}</div><div class="advMeta">${x.category} · ${locked?'Se desbloquea '+new Date(x.unlock_at).toLocaleString('es-CO'):'Disponible'}</div><p>${locked?'Esta carta está guardada para el futuro. ❤️':esc(x.content)}</p></div><div class="advActions">${!locked&&x.opened_at?'✓ Leída':''}<button class="btn" onclick="deleteAdvanced('letters','${x.id}')">🗑️</button></div></div>`}).join(''):`<div class="advEmpty">💌 Escriban su primera carta. Puede ser para hoy, para un aniversario o para un día difícil.</div>`}</div>`;}
