@@ -5,6 +5,18 @@ let placeSearchResults=[];
 let lastPlaceSearchAt=0;
 function selectedPlaceById(id){return id?(advCache.places||[]).find(function(p){return p.id===id;})||null:null;}
 window.selectedPlaceById=selectedPlaceById;
+function placeLinkHtml(id,label){return '<button type="button" class="placeTextLink" onclick="showPlaceInPlaces(\\''+esc(id)+'\\')">'+esc(label||'Ver lugar')+'</button>';}
+window.placeLinkHtml=placeLinkHtml;
+function showPlaceInPlaces(id){
+ showAdvancedTab('places');
+ setTimeout(function(){
+  const cards=Array.from(document.querySelectorAll('#advancedContent [data-advanced-id]'));
+  const card=cards.find(function(el){return el.getAttribute('data-advanced-id')===String(id);});
+  if(card){card.scrollIntoView({behavior:'smooth',block:'center'});card.style.transition='box-shadow .25s ease';card.style.boxShadow='0 0 0 3px #e64d78, 0 12px 35px #562c3920';setTimeout(function(){card.style.boxShadow='';},2200);}
+  if(typeof focusSavedPlace==='function')setTimeout(function(){focusSavedPlace(id);},120);
+ },180);
+}
+window.showPlaceInPlaces=showPlaceInPlaces;
 function placeSelectField(id,label){return '<div class="field"><label>'+label+'</label><select id="adv_'+id+'"><option value="">Sin lugar vinculado</option>'+(advCache.places||[]).map(function(p){return '<option value="'+esc(p.id)+'">'+esc(p.name)+(p.address?' — '+esc(p.address):'')+'</option>';}).join('')+'</select></div>';}
 function placeMapsUrl(p){const raw=String(p.google_maps_url||'').trim();if(/^https?:\/\//i.test(raw)&&/(maps\.app\.goo\.gl|goo\.gl|google\.[^/]+\/maps|maps\.google\.[^/]+)/i.test(raw))return raw;if(p.latitude!=null&&p.longitude!=null)return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(p.latitude+','+p.longitude);return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent([p.name||'',p.address||''].filter(Boolean).join(' '));}
 function openGoogleMapsSearch(fromForm){let q='';if(fromForm){q=(document.getElementById('adv_place_search_query')||{}).value||(document.getElementById('adv_title')||{}).value||'';}else{q=(document.getElementById('placesMapSearch')||{}).value||'';}q=q.trim();if(!q){alert('Escribe primero el nombre del lugar que quieres buscar.');return;}const w=window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q),'_blank');if(w)w.opener=null;}
