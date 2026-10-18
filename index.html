@@ -17,7 +17,9 @@
 
 <title>Nuestro Calendario #21</title>
 
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
 
 <style>
 
@@ -811,6 +813,8 @@ body[data-theme] .themeChoice .advMeta{color:var(--muted) !important;}
 .storyMilestone{display:flex;gap:14px;align-items:center}.storyMilestoneIcon{font-size:27px;flex:0 0 40px;text-align:center}
 @media(max-width:520px){.storyMemoryItem{align-items:flex-start;gap:10px}.storyThumbWrap{flex-basis:82px;width:82px;height:82px}.storyMemoryText .advItemTitle{font-size:15px}}
 body.nc-resume-no-flash *,body.nc-resume-no-flash *::before,body.nc-resume-no-flash *::after{animation:none!important;transition:none!important}
+
+.placesMapToolbar{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:9px;align-items:center}.placesMapToolbar input{width:100%;min-width:0;padding:12px;border:1px solid var(--line);border-radius:12px;font:inherit;background:var(--surface,#fff);color:var(--ink)}.placesMapShell{border:1px solid var(--line);border-radius:22px;overflow:hidden;margin-top:14px;background:var(--surface,#fff);box-shadow:0 12px 32px rgba(70,30,50,.07)}#placesMap{width:100%;height:460px;z-index:1}.placesAttribution{font-size:11px;color:var(--muted);margin:8px 2px}.placeSearchResults{display:grid;gap:8px;margin-top:10px}.placeSearchResult{display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;border:1px solid var(--line);border-radius:13px;padding:12px;background:var(--surface,#fff);color:var(--ink);cursor:pointer}.placeSearchResult:hover{border-color:var(--rose);background:var(--soft)}.placeSearchResult small{display:block;color:var(--muted);margin-top:3px}.placeMapPopup{min-width:160px;color:#35262b}.placeMapPopup strong{display:block;margin-bottom:4px}.placeMapPopup a{display:inline-block;margin-top:5px;color:#a33f62}@media(max-width:700px){.placesMapToolbar{grid-template-columns:1fr 1fr}.placesMapToolbar input{grid-column:1/-1}#placesMap{height:360px}}
 </style>
 
 </head>
@@ -1302,6 +1306,8 @@ body.nc-resume-no-flash *,body.nc-resume-no-flash *::before,body.nc-resume-no-fl
 
     </div>
 
+
+    <div class="field"><label>Lugar guardado en nuestro mapa</label><select id="planPlaceId" onchange="syncPlanPlaceLocation()"><option value="">Sin lugar vinculado</option></select></div>
 
     <div class="field">
 
@@ -3218,6 +3224,7 @@ async function savePlan(){
         .value
         .trim() ||
       null,
+    place_id: $('planPlaceId')?.value || null,
 
     note:
       $('noteInput')
