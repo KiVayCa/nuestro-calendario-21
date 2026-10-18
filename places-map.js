@@ -5,7 +5,7 @@ let placeSearchResults=[];
 let lastPlaceSearchAt=0;
 function selectedPlaceById(id){return id?(advCache.places||[]).find(function(p){return p.id===id;})||null:null;}
 window.selectedPlaceById=selectedPlaceById;
-function placeLinkHtml(id,label){return '<button type="button" class="placeTextLink" onclick="showPlaceInPlaces(\\''+esc(id)+'\\')">'+esc(label||'Ver lugar')+'</button>';}
+function placeLinkHtml(id,label){return '<button type="button" class="placeTextLink" onclick="showPlaceInPlaces(\''+esc(id)+'\')">'+esc(label||'Ver lugar')+'</button>';}
 window.placeLinkHtml=placeLinkHtml;
 function showPlaceInPlaces(id){
  showAdvancedTab('places');
