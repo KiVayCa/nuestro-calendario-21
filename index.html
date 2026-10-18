@@ -12,7 +12,7 @@
 
 <meta
   name="viewport"
-  content="width=device-width,initial-scale=1"
+  content="width=device-width,initial-scale=1,viewport-fit=cover"
 >
 
 <title>Nuestro Calendario #21</title>
@@ -821,6 +821,90 @@ body.nc-resume-no-flash *,body.nc-resume-no-flash *::before,body.nc-resume-no-fl
 .budgetSummaryGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:18px 0}.budgetSummaryCard{padding:19px;border:1px solid var(--line,#f0dfe5);border-radius:18px;background:var(--surface,#fff);box-shadow:0 10px 28px rgba(80,30,50,.05)}.budgetSummaryCard span{display:block;font-size:12px;color:var(--muted);font-weight:700;margin-bottom:9px}.budgetSummaryCard strong{display:block;font-size:clamp(19px,2.3vw,27px);overflow-wrap:anywhere}.budgetPeopleGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:16px}.budgetPersonCard{min-width:0}.budgetPersonHeading{display:flex;align-items:center;gap:12px;margin-bottom:14px}.budgetPersonHeading h3{margin:0 0 3px}.budgetAvatar{display:grid;place-items:center;width:48px;height:48px;border-radius:15px;background:var(--soft,#fff0f5);font-size:25px}.budgetMetricRow,.budgetLiquidity,.budgetCategoryRow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line,#f2e5e9)}.budgetLiquidity{border-bottom:0;margin:4px -2px 10px;padding:12px;border-radius:12px;background:var(--soft,#fff3f7)}.incomeText{color:#25805b!important}.expenseText{color:#c44964!important}.budgetBarRow{margin:14px 0}.budgetBarLabel{display:flex;justify-content:space-between;gap:10px;font-size:12px;margin-bottom:6px}.budgetBarTrack{height:10px;border-radius:99px;background:var(--soft,#f8e9ee);overflow:hidden}.budgetBarFill{display:block;height:100%;border-radius:99px;background:#2e9b70;transition:width .35s ease}.budgetBarFill.expenseFill{background:#d96580}.budgetListHeading{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.budgetListHeading h3,.budgetListHeading p{margin:0 0 4px}.budgetMovementIcon{flex:0 0 38px;width:38px;height:38px;display:grid;place-items:center;border-radius:12px;font-size:22px;font-weight:800}.incomeIcon{background:#e0f5e9;color:#25805b}.expenseIcon{background:#ffe6ec;color:#c44964}.moneyModalIntro{display:flex;align-items:flex-start;gap:13px;padding:14px;margin-bottom:15px;background:var(--soft,#fff1f5);border:1px solid var(--line,#f2dce4);border-radius:16px}.moneyModalIntro>span{font-size:28px}.moneyModalIntro strong{display:block}.moneyModalIntro p{margin:5px 0 0;color:var(--muted);font-size:13px}.moneyTypeChoices{display:grid;grid-template-columns:1fr 1fr;gap:8px}.moneyTypeChoice{padding:12px;border:1px solid var(--line,#eddce2);border-radius:12px;background:var(--surface,#fff);color:var(--ink,#653449);font:inherit;font-weight:800;cursor:pointer}.moneyTypeChoice.active{background:var(--soft,#fff0f5);border-color:var(--rose,#e64d78);box-shadow:inset 0 0 0 1px var(--rose,#e64d78)}.moneyModalActions{display:flex;justify-content:flex-end;gap:9px;flex-wrap:wrap;margin-top:20px}.moneyFormError{margin-top:12px;padding:10px 12px;border-radius:11px;background:#fff0f0;color:#a32d43;font-size:13px}.moneyFormError[hidden]{display:none}.appToast{position:fixed;z-index:10000;bottom:24px;left:50%;transform:translate(-50%,20px);opacity:0;pointer-events:none;max-width:min(92vw,520px);padding:13px 18px;border-radius:14px;background:#246d4d;color:#fff;box-shadow:0 14px 38px #2b18252b;font-weight:700;transition:opacity .2s,transform .2s}.appToast.show{opacity:1;transform:translate(-50%,0)}.appToast.toastError{background:#9f3047}@media(max-width:760px){.budgetSummaryGrid{grid-template-columns:1fr}.budgetPeopleGrid{grid-template-columns:1fr}.budgetSummaryCard{padding:15px}.budgetSummaryCard strong{font-size:24px}.budgetListHeading{align-items:flex-start}}
 .notificationBell.active{background:var(--soft,#fff0f5);border-color:var(--rose,#e64d78);box-shadow:0 0 0 3px color-mix(in srgb,var(--rose,#e64d78) 12%,transparent)}
  .budgetMonthPicker{display:flex;align-items:center;justify-content:center;gap:14px;margin:18px 0;padding:14px;border:1px solid var(--line,#f0dfe5);border-radius:18px;background:var(--surface,#fff)}.budgetMonthPicker>div{display:grid;gap:5px;min-width:min(250px,58vw);text-align:center}.budgetMonthPicker label{font-size:11px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.05em}.budgetMonthPicker input{width:100%;padding:9px 12px;border:1px solid var(--line,#f0dfe5);border-radius:10px;background:var(--surface,#fff);color:var(--ink,#35262b);font:inherit;font-weight:800;text-align:center}.budgetMonthPicker strong{text-transform:capitalize;color:var(--rose,#e64d78)}@media(max-width:520px){.budgetMonthPicker{gap:8px;padding:10px}.budgetMonthPicker .btn{padding:9px 12px}}
+
+/* =====================================================
+   AJUSTES PWA — MÓVIL Y ANDROID
+===================================================== */
+html{width:100%;min-width:0;overflow-x:clip;scroll-padding-top:calc(88px + env(safe-area-inset-top))}
+body{width:100%;min-width:0;overflow-x:clip;-webkit-text-size-adjust:100%;overscroll-behavior-x:none}
+button,input,textarea,select{max-width:100%;font-family:inherit}
+#app,.app,.advanced,#advancedContent{min-width:0;max-width:100%}
+.advanced{width:100%;padding-left:clamp(8px,2vw,18px);padding-right:clamp(8px,2vw,18px)}
+.advancedNav{width:100%;min-width:0;gap:8px}
+.advTab,.profileChip,.notificationBell{flex:0 0 auto;min-height:42px}
+#advancedContent>*{min-width:0;max-width:100%}
+.advHero,.advCard,.settingsCard,.advItem,.budgetSummaryCard,.budgetPersonCard{min-width:0;overflow-wrap:anywhere}
+.advForm input,.advForm textarea,.advForm select,.field input,.field textarea,.field select{min-width:0;max-width:100%;font-size:16px}
+img,video,canvas,iframe{max-width:100%}
+.modal{padding:16px;padding-top:max(16px,env(safe-area-inset-top));padding-bottom:max(16px,env(safe-area-inset-bottom))}
+@media(max-width:800px){
+  .app{padding:8px}
+  .advanced{margin:10px auto 28px;padding-left:0;padding-right:0}
+  .advancedNav{position:sticky;top:env(safe-area-inset-top,0px);z-index:100;display:flex;flex-wrap:nowrap!important;justify-content:flex-start!important;align-items:center;gap:7px;width:100%;max-width:100%;padding:8px;margin:0 0 14px;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;scrollbar-width:none;border-radius:15px}
+  .advancedNav::-webkit-scrollbar{display:none}
+  .advancedNav .advTab{flex:0 0 auto;scroll-snap-align:center;min-height:40px;padding:9px 12px;font-size:12px;line-height:1.2;transform:none}
+  .advancedNav .profileChip{flex:0 0 auto;margin-left:0!important;max-width:145px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:9px 11px;font-size:12px}
+  .advancedNav .notificationBell{flex:0 0 42px}
+  .advancedNav .advTab.active{box-shadow:0 3px 12px rgba(141,71,100,.13)}
+  .homeWelcome{min-height:340px;border-radius:22px}
+  .homeWelcomeContent{padding:22px}
+  .homeWelcome h2{font-size:clamp(30px,8vw,40px);overflow-wrap:anywhere}
+  .homeWelcome p{font-size:14px}
+  .homeStats{gap:9px}
+  .homeStat{min-width:0;padding:13px;border-radius:16px}
+  .homeStat strong{font-size:clamp(19px,5vw,24px);overflow-wrap:anywhere}
+  .homeNext{align-items:flex-start;gap:11px;padding:13px}
+  .homeNextIcon{width:48px;height:48px;border-radius:14px;font-size:24px}
+  .homeNextTitle{font-size:19px;overflow-wrap:anywhere}
+  .advHero{border-radius:20px;padding:17px}
+  .advCard,.settingsCard{padding:16px;border-radius:18px}
+  .advItem{padding:14px;gap:10px}
+  .advItemTitle{font-size:16px;overflow-wrap:anywhere}
+  .advActions{width:100%;gap:7px}
+  .advActions .btn,.settingsActions .btn{min-height:42px}
+  .advFormGrid,.settingsGrid,.profileGrid,.budgetPeopleGrid{grid-template-columns:minmax(0,1fr)}
+  .budgetSummaryGrid{grid-template-columns:minmax(0,1fr)}
+  .budgetMonthPicker{gap:6px;padding:9px}
+  .budgetMonthPicker>div{min-width:0;flex:1}
+  .budgetMonthPicker .btn{padding:9px 10px}
+  .modal{place-items:end center;padding:10px;padding-bottom:max(10px,env(safe-area-inset-bottom))}
+  .modalBox{width:100%;max-width:560px;max-height:calc(100dvh - 24px);padding:19px;border-radius:20px;overscroll-behavior:contain}
+  .modalBox h2{font-size:22px}
+  .modalBtns{justify-content:stretch}
+  .modalBtns .btn{flex:1 1 auto;min-height:42px}
+  .moneyModalActions{justify-content:stretch}
+  .moneyModalActions .btn{flex:1 1 auto;min-height:42px}
+  .workspace{grid-template-columns:minmax(0,1fr);min-width:0}
+  .toolbar{gap:9px}
+  .toolbar h2{font-size:25px}
+  .controls{flex-wrap:wrap;max-width:100%}
+  .controls .btn{padding:9px 11px}
+  .week,.grid{grid-template-columns:repeat(7,minmax(0,1fr));width:100%}
+  .week div{min-width:0;padding:7px 0;font-size:clamp(8px,2.2vw,10px)}
+  .day{min-width:0;min-height:58px;padding:4px 2px;font-size:12px;overflow:hidden}
+  .event{max-width:100%;margin-top:4px;padding:2px;font-size:8px;line-height:1.15;white-space:nowrap}
+  .nextBody{padding:12px}
+  .placesMapToolbar{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .appToast{bottom:max(16px,env(safe-area-inset-bottom));max-width:calc(100vw - 24px)}
+}
+@media(max-width:390px){
+  .advancedNav{gap:6px;padding:7px}
+  .advancedNav .advTab{padding:9px 10px;font-size:11px}
+  .advancedNav .profileChip{max-width:112px}
+  .homeWelcome{min-height:310px}
+  .homeWelcomeContent{padding:17px}
+  .homeStats{gap:7px}
+  .homeStat{padding:11px}
+  .advHero{padding:14px}
+  .modalBox{padding:16px}
+  .day{min-height:50px;padding:3px 1px;font-size:11px}
+  .event{font-size:7px}
+}
+@media(orientation:landscape) and (max-height:500px){
+  .modal{place-items:center}
+  .modalBox{max-height:calc(100dvh - 16px)}
+}
+
 </style>
 
 </head>
@@ -3841,6 +3925,8 @@ function showAdvancedTab(tab,options={}){
  advancedTab=tab;
  try{localStorage.setItem('nc21_last_tab',tab);}catch(e){}
  document.querySelectorAll('.advTab').forEach(b=>b.classList.toggle('active',b.getAttribute('onclick')?.includes("'"+tab+"'")));
+  const activeNavButton=Array.from(document.querySelectorAll('.advTab')).find(b=>b.getAttribute('onclick')?.includes("'"+tab+"'"));
+  if(activeNavButton){const nav=$('advancedNav');if(nav&&window.matchMedia('(max-width: 800px)').matches){const targetLeft=activeNavButton.offsetLeft-nav.offsetLeft-(nav.clientWidth-activeNavButton.clientWidth)/2;nav.scrollTo({left:Math.max(0,targetLeft),behavior:options.skipScroll?'auto':'smooth'});}}
   const notificationBell=$('notificationsTab');if(notificationBell)notificationBell.classList.toggle('active',tab==='notifications');
  if(tab==='calendar'){
    area.classList.add('calendar-mode'); content.innerHTML='';
