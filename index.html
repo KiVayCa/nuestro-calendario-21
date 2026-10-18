@@ -2520,7 +2520,8 @@ async function showApp(){
   const appEl=$('app'), advEl=$('advancedArea');
   if(appEl && advEl && appEl.firstElementChild!==advEl) appEl.insertBefore(advEl, appEl.firstElementChild);
   const ws=document.querySelector('.workspace'); if(ws) ws.classList.add('tab-hidden');
-  showAdvancedTab(advancedTab);
+  const requestedTab=new URLSearchParams(location.search).get('tab');
+  showAdvancedTab(validAdvancedTabs.has(requestedTab)?requestedTab:advancedTab);
   initAdvanced();
 }
 
