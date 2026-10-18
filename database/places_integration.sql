@@ -3,6 +3,8 @@
 begin;
 alter table public.places add column if not exists google_maps_url text;
 alter table public.memories add column if not exists place_id uuid;
+alter table public.love_letters add column if not exists place_id uuid;
+alter table public.challenges add column if not exists place_id uuid;
 alter table public.dreams add column if not exists place_id uuid;
 alter table public.goals add column if not exists place_id uuid;
 alter table public.important_dates add column if not exists place_id uuid;
@@ -13,6 +15,12 @@ do $$
 begin
  if not exists (select 1 from pg_constraint where conname='memories_place_same_couple_fk') then
   alter table public.memories add constraint memories_place_same_couple_fk foreign key(place_id,couple_id) references public.places(id,couple_id) on delete set null (place_id);
+ end if;
+ if not exists (select 1 from pg_constraint where conname='love_letters_place_same_couple_fk') then
+  alter table public.love_letters add constraint love_letters_place_same_couple_fk foreign key(place_id,couple_id) references public.places(id,couple_id) on delete set null (place_id);
+ end if;
+ if not exists (select 1 from pg_constraint where conname='challenges_place_same_couple_fk') then
+  alter table public.challenges add constraint challenges_place_same_couple_fk foreign key(place_id,couple_id) references public.places(id,couple_id) on delete set null (place_id);
  end if;
  if not exists (select 1 from pg_constraint where conname='dreams_place_same_couple_fk') then
   alter table public.dreams add constraint dreams_place_same_couple_fk foreign key(place_id,couple_id) references public.places(id,couple_id) on delete set null (place_id);
@@ -31,6 +39,8 @@ begin
  end if;
 end $$;
 create index if not exists memories_place_id_idx on public.memories(place_id);
+create index if not exists love_letters_place_id_idx on public.love_letters(place_id);
+create index if not exists challenges_place_id_idx on public.challenges(place_id);
 create index if not exists dreams_place_id_idx on public.dreams(place_id);
 create index if not exists goals_place_id_idx on public.goals(place_id);
 create index if not exists important_dates_place_id_idx on public.important_dates(place_id);
