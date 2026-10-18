@@ -4114,7 +4114,10 @@ $('advModal')?.addEventListener('click',e=>{if(e.target===$('advModal'))closeAdv
 
 // Conserva la pestaña elegida al volver al navegador y evita animaciones que parpadeen al reanudar.
 window.addEventListener('pagehide',()=>{try{localStorage.setItem('nc21_last_tab',advancedTab);}catch(e){}});
-let lastResumeRestoreAt=0;\nfunction restoreLastTabOnResume(){if(document.visibilityState!=='visible'||!user||!couple)return;const now=Date.now();if(now-lastResumeRestoreAt<800)return;lastResumeRestoreAt=now;suppressTabAnimation=true;document.body.classList.add('nc-resume-no-flash');const saved=(()=>{try{return localStorage.getItem('nc21_last_tab')||advancedTab;}catch(e){return advancedTab;}})();if(validAdvancedTabs.has(saved)&&saved!==advancedTab)showAdvancedTab(saved,{skipScroll:true});setTimeout(()=>{document.body.classList.remove('nc-resume-no-flash');suppressTabAnimation=false;},300);}\nwindow.addEventListener('pageshow',restoreLastTabOnResume);\ndocument.addEventListener('visibilitychange',restoreLastTabOnResume);
+let lastResumeRestoreAt=0;
+function restoreLastTabOnResume(){if(document.visibilityState!=='visible'||!user||!couple)return;const now=Date.now();if(now-lastResumeRestoreAt<800)return;lastResumeRestoreAt=now;suppressTabAnimation=true;document.body.classList.add('nc-resume-no-flash');const saved=(()=>{try{return localStorage.getItem('nc21_last_tab')||advancedTab;}catch(e){return advancedTab;}})();if(validAdvancedTabs.has(saved)&&saved!==advancedTab)showAdvancedTab(saved,{skipScroll:true});setTimeout(()=>{document.body.classList.remove('nc-resume-no-flash');suppressTabAnimation=false;},300);}
+window.addEventListener('pageshow',restoreLastTabOnResume);
+document.addEventListener('visibilitychange',restoreLastTabOnResume);
 
 Object.assign(window,{showAdvancedTab,openQuickCreate,openMemoryForm,openLetterForm,openDreamForm,openChallengeForm,openDateForm,openGoalForm,openPlaceForm,openIdeaForm,openPrivateForm,openAdvancedEdit,saveAdvancedEdit,saveMemory,saveLetter,saveDream,saveChallenge,saveDate,saveGoal,savePlace,saveIdea,savePrivate,deleteAdvanced,toggleFavorite,setDreamStatus,toggleChallenge,toggleGoal,advanceGoal,randomIdea,selectTheme,previewAccent,saveSettingsFromUI,useDefaultCouplePhoto,uploadCouplePhoto,openProfilePanel,closeProfilePanel,saveMyProfile,changePassword,openMemoryPhoto,closeMemoryPhoto});
 
