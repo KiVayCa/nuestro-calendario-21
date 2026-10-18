@@ -32,7 +32,8 @@ drop policy if exists "Recipients can delete their own notifications" on public.
 create policy "Recipients can delete their own notifications"
   on public.notifications for delete to authenticated
   using (recipient_user_id = (select auth.uid()) and public.is_couple_member(couple_id));
-grant select, update, delete on public.notifications to authenticated;
+grant select, delete on public.notifications to authenticated;
+grant update (read_at) on public.notifications to authenticated;
 
 create table if not exists public.shared_expenses (
   id uuid primary key default gen_random_uuid(),
