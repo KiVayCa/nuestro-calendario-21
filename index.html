@@ -10,6 +10,22 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <meta name="theme-color" content="#c96888">
 
+<script>
+/* Carga visual del tema guardado antes del primer pintado para evitar el destello de colores. */
+(function(){
+  try {
+    const saved=JSON.parse(localStorage.getItem('nc21_couple_settings')||'null');
+    if(!saved||!saved.theme)return;
+    document.documentElement.dataset.ncThemeBoot='1';
+    const palette=saved.palette||{};
+    Object.entries(palette).forEach(([key,value])=>{
+      if(value)document.documentElement.style.setProperty('--nc-boot-'+key,value);
+    });
+    window.__nc21ThemeBoot=saved;
+  } catch(_) {}
+})();
+</script>
+
 <meta
   name="viewport"
   content="width=device-width,initial-scale=1,viewport-fit=cover"
@@ -481,8 +497,7 @@ body{
 }
 
 .detailDate{
-  color:var(--rose);
-  font-weight:800;
+  color:var(--rose);  font-weight:800;
 }
 
 .detailRow{
@@ -497,8 +512,7 @@ body{
 }
 
 .detailEmoji{
-  width:30px;
-  font-size:18px;
+  width:30px;  font-size:18px;
 }
 
 .detailContent{
@@ -941,12 +955,67 @@ body[data-theme] #advancedContent [style*="text-transform:uppercase"]{color:var(
 body[data-theme] #advancedContent .dailyQuestionCard{background:linear-gradient(135deg,var(--soft),var(--surface));border-color:var(--line)}
 body[data-theme] #advancedContent .settingsNote{background:var(--soft);color:var(--muted);border-color:var(--line)}
 
+
+/* =====================================================
+   ARRANQUE VISUAL SIN PARPADEO + ANIMACIONES LIGERAS
+===================================================== */
+html[data-nc-theme-boot] body{
+  background:var(--nc-boot-bodybg,linear-gradient(135deg,#fffaf8,#f8e6eb))!important;
+  color:var(--nc-boot-ink,#35262b)!important;
+}
+body.nc-theme-ready{transition:color .16s ease}
+.themeChoice{
+  position:relative;overflow:hidden;transform:translateZ(0);
+  transition:transform .16s cubic-bezier(.2,.8,.2,1),box-shadow .16s ease,border-color .16s ease,background-color .16s ease;
+}
+.themeChoice:hover{transform:translateY(-2px);box-shadow:0 9px 22px rgba(45,25,35,.10)}
+.themeChoice:active{transform:scale(.985)}
+.themeChoice.active{border-color:var(--rose);box-shadow:0 0 0 2px color-mix(in srgb,var(--rose) 18%,transparent),0 8px 22px rgba(45,25,35,.08)}
+.themeChoice.active .themeSwatch{position:relative}
+.themeChoice.active .themeSwatch:after{
+  content:"✓";position:absolute;right:9px;top:9px;width:27px;height:27px;border-radius:50%;
+  display:grid;place-items:center;background:rgba(255,255,255,.96);color:var(--rose);
+  font:900 15px/1 system-ui;box-shadow:0 2px 8px rgba(0,0,0,.12);animation:ncCheckIn .16s ease-out both;
+}
+.btn,.advTab,.profileChip,.notificationBell,.moneyTypeChoice{
+  transition:transform .16s cubic-bezier(.2,.8,.2,1),box-shadow .16s ease,background-color .16s ease,border-color .16s ease,opacity .16s ease;
+}
+.btn:hover,.advTab:hover,.profileChip:hover,.notificationBell:hover,.moneyTypeChoice:hover{transform:translateY(-1px)}
+.btn:active,.advTab:active,.profileChip:active,.notificationBell:active,.moneyTypeChoice:active{transform:scale(.985);transition-duration:.07s}
+.modal.show{animation:modalBackdropIn .14s ease-out both}
+.modal.show .modalBox{animation:modalBoxIn .22s cubic-bezier(.2,.8,.2,1) both}
+.advGrid > *, .advList > *{animation:ncItemIn .19s cubic-bezier(.2,.8,.2,1) both}
+.advGrid > :nth-child(2),.advList > :nth-child(2){animation-delay:.025s}
+.advGrid > :nth-child(3),.advList > :nth-child(3){animation-delay:.05s}
+.advGrid > :nth-child(4),.advList > :nth-child(4){animation-delay:.075s}
+.advGrid > :nth-child(5),.advList > :nth-child(5){animation-delay:.1s}
+.advGrid > :nth-child(6),.advList > :nth-child(6){animation-delay:.1s}
+.advGrid > :nth-child(n+10),.advList > :nth-child(n+10){animation:none}
+#profileModal .modalBox{overscroll-behavior:contain}
+#profileModalBody{min-height:180px}
+@keyframes ncItemIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+@keyframes ncCheckIn{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
+@media(hover:none){.btn:hover,.advTab:hover,.profileChip:hover,.notificationBell:hover,.moneyTypeChoice:hover,.themeChoice:hover{transform:none;box-shadow:none}}
+@media(prefers-reduced-motion:reduce){.themeChoice.active .themeSwatch:after{animation:none}.advGrid > *, .advList > *{animation:none!important}}
 </style>
 
 </head>
 
 
 <body>
+
+<script>
+/* El tema en caché se aplica antes de que el navegador procese el contenido visible. */
+(function(){
+  const saved=window.__nc21ThemeBoot;
+  if(!saved)return;
+  const body=document.body;
+  body.dataset.theme=saved.theme||'romance';
+  if(saved.accent_color)body.style.setProperty('--rose',saved.accent_color);
+  if(saved.background_color)document.documentElement.style.setProperty('--bodybg',saved.background_color);
+})();
+</script>
+
 
 
 <!-- =====================================================
@@ -997,8 +1066,7 @@ body[data-theme] #advancedContent .settingsNote{background:var(--soft);color:var
       class="btn"
       id="registerBtn"
       style="width:100%;margin-top:8px"
-    >
-      Crear mi cuenta
+    >      Crear mi cuenta
     </button>
 
     <button
@@ -1428,7 +1496,6 @@ body[data-theme] #advancedContent .settingsNote{background:var(--soft);color:var
 
     </div>
 
-
     <div class="field"><label>Lugar</label><select id="planPlaceId" onchange="syncPlanPlaceLocation()"><option value="">Sin lugar vinculado</option></select></div>
 
     <div class="field">
@@ -1497,8 +1564,7 @@ body[data-theme] #advancedContent .settingsNote{background:var(--soft);color:var
           <label class="dayCheck"><input type="checkbox" name="recurrenceDay" value="1"><span>Lun</span></label><label class="dayCheck"><input type="checkbox" name="recurrenceDay" value="2"><span>Mar</span></label><label class="dayCheck"><input type="checkbox" name="recurrenceDay" value="3"><span>Mié</span></label><label class="dayCheck"><input type="checkbox" name="recurrenceDay" value="4"><span>Jue</span></label><label class="dayCheck"><input type="checkbox" name="recurrenceDay" value="5"><span>Vie</span></label><label class="dayCheck"><input type="checkbox" name="recurrenceDay" value="6"><span>Sáb</span></label><label class="dayCheck"><input type="checkbox" name="recurrenceDay" value="7"><span>Dom</span></label>
         </div></div>
         <div class="field" style="margin:12px 0 0"><label>Repetir hasta (opcional)</label><input id="recurrenceEndDate" type="date"><div style="font-size:11px;color:var(--muted);margin-top:4px">Vacío = sin fecha final.</div></div>
-      </div>
-    </div>
+      </div>    </div>
 
     <div class="modalBtns">
 
@@ -1928,8 +1994,7 @@ async function login(){
 
     console.error(err);
 
-    $('loginBtn').disabled =
-      false;
+    $('loginBtn').disabled =      false;
 
     setMsg(
       'Ocurrió un error inesperado.'
@@ -1996,7 +2061,6 @@ async function register(){
 
     $('registerBtn').disabled =
       true;
-
 
     setMsg(
       'Creando tu cuenta…'
@@ -2429,8 +2493,7 @@ async function setup(){
 
       .insert({
 
-        couple_id:
-        c.id,
+        couple_id:        c.id,
 
         user_id:
         user.id,
@@ -2497,8 +2560,7 @@ async function setup(){
     'NUESTRO #21';
 
 
-  $('joinIntro').textContent =
-    'Nicolás debe compartir contigo el código de su espacio.';
+  $('joinIntro').textContent =    'Nicolás debe compartir contigo el código de su espacio.';
 
 
   $('joinMsg').textContent =
@@ -2930,8 +2992,7 @@ function render(){
 
 
   for(
-    let i=0;
-    i<42;
+    let i=0;    i<42;
     i++
   ){
 
@@ -2997,8 +3058,7 @@ function render(){
   }
 
 
-  $('grid').innerHTML =
-    html;
+  $('grid').innerHTML =    html;
 
 
   renderNextPlan();
@@ -3431,8 +3491,7 @@ async function savePlan(){
   closeModal();
   await loadPlans();
   if(!editingId&&createdPlanId){
-    const planOwnerName=myProfile?.display_name||coupleProfiles.find(p=>p.user_id===user.id)?.display_name||'Tu pareja';
-    await createPartnerNotification({event_type:'plan_created',title:'Nuevo plan en el calendario ❤️',body:planOwnerName+' agregó «'+title+'» para el '+formatDate(planData.plan_date)+'.',target_tab:'calendar',target_id:createdPlanId});
+    const planOwnerName=myProfile?.display_name||coupleProfiles.find(p=>p.user_id===user.id)?.display_name||'Tu pareja';    await createPartnerNotification({event_type:'plan_created',title:'Nuevo plan en el calendario ❤️',body:planOwnerName+' agregó «'+title+'» para el '+formatDate(planData.plan_date)+'.',target_tab:'calendar',target_id:createdPlanId});
   }
 
 }
@@ -3497,7 +3556,6 @@ function closePlansModal(){
     'none';
 
 }
-
 
 /* =====================================================
    ABRIR DETALLE
@@ -3932,7 +3990,6 @@ $('detailModal')
         event.target ===
         $('detailModal')
       ){
-
         closeDetailModal();
 
       }
@@ -3997,8 +4054,7 @@ function renderAdvMemories(){return advHeader('Nuestros recuerdos','Fotos, histo
 function openMemoryPhoto(img){
  if(!img||!img.src)return;
  let overlay=document.getElementById('memoryPhotoLightbox');
- if(!overlay){
-  overlay=document.createElement('div');overlay.id='memoryPhotoLightbox';overlay.className='memoryLightbox';
+ if(!overlay){  overlay=document.createElement('div');overlay.id='memoryPhotoLightbox';overlay.className='memoryLightbox';
   overlay.innerHTML='<button type="button" class="memoryLightboxClose" aria-label="Cerrar imagen" title="Cerrar">×</button><img class="memoryLightboxImage" alt=""><div class="memoryLightboxCaption"></div>';
   overlay.addEventListener('click',e=>{if(e.target===overlay||e.target.classList.contains('memoryLightboxClose'))closeMemoryPhoto();});
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMemoryPhoto();});
@@ -4038,6 +4094,7 @@ function renderAdvAchievements(){
 function renderAdvPrivate(){return advHeader('Mi rincón privado','Estas notas solo las puede ver la persona que las creó.','🔐 Nueva nota','openPrivateForm()')+`<div class="advList">${advCache.privateNotes.length?advCache.privateNotes.map(x=>`<div class="advItem"><div><div class="advItemTitle">🔐 ${esc(x.title)}</div><p>${esc(x.content)}</p></div><div class="advActions"><button class="btn" onclick="openAdvancedEdit('privateNotes','${x.id}')">✏️ Editar</button><button class="btn danger" onclick="deleteAdvanced('privateNotes','${x.id}')">🗑️</button></div></div>`).join(''):`<div class="advEmpty">🔐 Un espacio solo para ti. La otra persona no puede leer estas notas.</div>`}</div>`;}
 async function advLoadAll(){
   if(!couple || !sb || !user) return;
+  const settingsPromise=loadCoupleSettings();
   const entries=Object.entries(advTables);
   const results=await Promise.all(entries.map(async ([key,table])=>{
     let q=sb.from(table).select('*');
@@ -4054,11 +4111,12 @@ async function advLoadAll(){
     const {data,error}=await sb.from('shared_expenses').select('*').eq('couple_id',couple.id).order('created_at',{ascending:false});
     if(!error)advCache.expenses=data||[];
   }
-  await loadCoupleSettings();
+  await settingsPromise;
   renderAdvanced();
   render();
 }
-let coupleSettings={theme:'romance',accent_color:'#e64d78',background_color:'#fff7fa',home_photo_path:null,logo_photo_path:null};
+const cachedCoupleSettings=window.__nc21ThemeBoot||{};
+let coupleSettings={theme:cachedCoupleSettings.theme||'romance',accent_color:cachedCoupleSettings.accent_color||'#e64d78',background_color:cachedCoupleSettings.background_color||'#fff7fa',home_photo_path:cachedCoupleSettings.home_photo_path||null,logo_photo_path:cachedCoupleSettings.logo_photo_path||null};
 let settingsDraft=null;
 async function loadCoupleSettings(){
   const {data}=await sb.from('couple_settings').select('*').eq('couple_id',couple.id).maybeSingle();
@@ -4068,7 +4126,14 @@ async function loadCoupleSettings(){
 function applyCoupleSettings(){
   const root=document.documentElement,body=document.body,theme=coupleSettings.theme||'romance',accent=coupleSettings.accent_color||'#e64d78';
   body.dataset.theme=theme;body.style.setProperty('--rose',accent);root.style.setProperty('--rose',accent);root.style.setProperty('--bodybg',coupleSettings.background_color||'');root.style.setProperty('--accent',accent);
+  root.removeAttribute('data-nc-theme-boot');
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content',accent);
+  try{
+    const css=getComputedStyle(body);
+    const palette={soft:css.getPropertyValue('--soft').trim(),ink:css.getPropertyValue('--ink').trim(),muted:css.getPropertyValue('--muted').trim(),line:css.getPropertyValue('--line').trim(),surface:css.getPropertyValue('--surface').trim(),bodybg:css.getPropertyValue('--bodybg').trim()};
+    localStorage.setItem('nc21_couple_settings',JSON.stringify({...coupleSettings,palette}));
+  }catch(_){}
+  body.classList.add('nc-theme-ready');
 }
 async function applyHomePhoto(){
   const url=await signedPhoto(coupleSettings.home_photo_path);
@@ -4259,30 +4324,64 @@ async function loadProfiles(){
   const chip=$('profileChipName');if(chip)chip.textContent=myProfile.display_name||defaultDisplayName();
 }
 async function profileAvatarUrl(path){return signedPhoto(path);}
-async function activityCountsFor(uid){
-  const tables=['plans','memories','love_letters','dreams','challenges','important_dates','goals','places','activity_ideas'];
+function activityCountsFor(uid){
+  const sources={
+    plans:plans||[],
+    memories:advCache.memories||[],
+    love_letters:advCache.letters||[],
+    dreams:advCache.dreams||[],
+    challenges:advCache.challenges||[],
+    important_dates:advCache.dates||[],
+    goals:advCache.goals||[],
+    places:advCache.places||[],
+    activity_ideas:advCache.ideas||[]
+  };
   const out={};
-  await Promise.all(tables.map(async t=>{const {count}=await sb.from(t).select('id',{count:'exact',head:true}).eq('created_by',uid);out[t]=count||0;}));
+  Object.entries(sources).forEach(([table,rows])=>{out[table]=rows.filter(row=>row.created_by===uid).length;});
   return out;
 }
-async function openProfilePanel(){
-  await loadProfiles();
-  const url=await profileAvatarUrl(myProfile.avatar_path);
-  const counts=await activityCountsFor(user.id);
-  const total=Object.values(counts).reduce((a,b)=>a+b,0);
-  const body=$('profileModalBody');
-  body.innerHTML=`<div class="profileHero"><img id="profileAvatarPreview" class="profileAvatar" src="${esc(url||'pareja.jpeg')}" alt="Foto de perfil"><div><h3 style="margin:0;color:#653449">${esc(myProfile.display_name||defaultDisplayName())}</h3><p style="margin:5px 0;color:#806572">${esc(user.email||'')}</p><p style="margin:8px 0 0;color:#806572">${esc(myProfile.bio||'Sin biografía todavía.')}</p></div></div>
-  <div class="profileGrid"><div class="profileStat"><strong>${counts.plans}</strong><span>planes creados</span></div><div class="profileStat"><strong>${counts.memories}</strong><span>recuerdos</span></div><div class="profileStat"><strong>${counts.love_letters}</strong><span>cartas</span></div><div class="profileStat"><strong>${total}</strong><span>aportaciones a nuestro espacio</span></div></div>
+function renderProfileActivitySummary(){
+  const target=$('coupleActivitySummary');
+  if(!target)return;
+  const others=(coupleProfiles||[]).filter(p=>p.user_id!==user?.id);
+  target.innerHTML=others.length?others.map(p=>{
+    const c=activityCountsFor(p.user_id),n=Object.values(c).reduce((a,b)=>a+b,0);
+    return '<div class="advItem"><div><div class="advItemTitle">'+esc(p.display_name||'Tu persona ❤️')+'</div><div class="advMeta">'+c.plans+' planes · '+c.memories+' recuerdos · '+c.love_letters+' cartas · '+n+' aportaciones</div></div></div>';
+  }).join(''):'<div class="advEmpty">Aún no hay otro perfil vinculado.</div>';
+}
+function refreshProfilePanelFromCache(){
+  if(!$('profileModal')?.classList.contains('show'))return;
+  const name=myProfile.display_name||defaultDisplayName();
+  const heading=$('profileDisplayNameHeading');if(heading)heading.textContent=name;
+  const nameInput=$('profileName');if(nameInput&&document.activeElement!==nameInput)nameInput.value=name;
+  const bioInput=$('profileBio');if(bioInput&&document.activeElement!==bioInput)bioInput.value=myProfile.bio||'';
+  const bioText=$('profileBioPreview');if(bioText)bioText.textContent=myProfile.bio||'Sin biografía todavía.';
+  const counts=activityCountsFor(user.id),total=Object.values(counts).reduce((a,b)=>a+b,0);
+  const values={plans:counts.plans,memories:counts.memories,letters:counts.love_letters,total};
+  Object.entries(values).forEach(([key,value])=>{const el=$('profileCount'+key[0].toUpperCase()+key.slice(1));if(el)el.textContent=String(value);});
+  renderProfileActivitySummary();
+}
+function openProfilePanel(){
+  if(!user||!couple)return;
+  const body=$('profileModalBody'),modal=$('profileModal');
+  if(!body||!modal)return;
+  const counts=activityCountsFor(user.id),total=Object.values(counts).reduce((a,b)=>a+b,0);
+  body.innerHTML=`<div class="profileHero"><img id="profileAvatarPreview" class="profileAvatar" src="pareja.jpeg" alt="Foto de perfil" loading="lazy"><div><h3 id="profileDisplayNameHeading" style="margin:0;color:var(--ink)">${esc(myProfile.display_name||defaultDisplayName())}</h3><p style="margin:5px 0;color:var(--muted)">${esc(user.email||'')}</p><p id="profileBioPreview" style="margin:8px 0 0;color:var(--muted)">${esc(myProfile.bio||'Sin biografía todavía.')}</p></div></div>
+  <div class="profileGrid"><div class="profileStat"><strong id="profileCountPlans">${counts.plans}</strong><span>planes creados</span></div><div class="profileStat"><strong id="profileCountMemories">${counts.memories}</strong><span>recuerdos</span></div><div class="profileStat"><strong id="profileCountLetters">${counts.love_letters}</strong><span>cartas</span></div><div class="profileStat"><strong id="profileCountTotal">${total}</strong><span>aportaciones a nuestro espacio</span></div></div>
   <div class="settingsCard" style="margin-top:16px"><h3>👤 Mis datos</h3><div class="advFormGrid"><div class="field"><label>Nombre</label><input id="profileName" value="${esc(myProfile.display_name||'')}"></div><div class="field"><label>Correo</label><input value="${esc(user.email||'')}" disabled></div></div><div class="field"><label>Sobre mí</label><textarea id="profileBio" placeholder="Una frase, apodo o lo que quieras...">${esc(myProfile.bio||'')}</textarea></div><div class="field"><label>Foto de perfil</label><input id="profilePhotoInput" type="file" accept="image/*"></div><div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap"><button class="btn" onclick="changePassword()">🔐 Cambiar contraseña</button><button class="btn primary" onclick="saveMyProfile()">Guardar perfil ❤️</button><button class="btn danger" onclick="logout()">🚪 Cerrar sesión</button></div><div id="profileMsg" class="settingsNote hidden"></div></div>
   <div class="settingsCard" style="margin-top:16px"><h3>👩‍❤️‍👨 Nuestra actividad</h3><div id="coupleActivitySummary" class="advList"><div class="advEmpty">Cargando...</div></div></div>`;
-  $('profileModal').classList.add('show');
-  const others=(coupleProfiles||[]).filter(p=>p.user_id!==user.id);
-  let html='';
-  for(const p of others){const c=await activityCountsFor(p.user_id);const n=Object.values(c).reduce((a,b)=>a+b,0);html+=`<div class="advItem"><div><div class="advItemTitle">${esc(p.display_name||'Tu persona ❤️')}</div><div class="advMeta">${c.plans} planes · ${c.memories} recuerdos · ${c.love_letters} cartas · ${n} aportaciones</div></div></div>`;}
-  if(!html)html='<div class="advEmpty">Aún no hay otro perfil vinculado.</div>';
-  $('coupleActivitySummary').innerHTML=html;
-}
-function closeProfilePanel(){$('profileModal')?.classList.remove('show');}
+  modal.classList.add('show');
+  renderProfileActivitySummary();
+  if(myProfile.user_id!==user.id){
+    loadProfiles().then(()=>refreshProfilePanelFromCache()).catch(err=>console.warn('No se pudo actualizar el perfil:',err));
+  }
+  if(myProfile.avatar_path){
+    profileAvatarUrl(myProfile.avatar_path).then(url=>{
+      const img=$('profileAvatarPreview');
+      if(url&&img&&modal.classList.contains('show'))img.src=url;
+    }).catch(()=>{});
+  }
+}function closeProfilePanel(){$('profileModal')?.classList.remove('show');}
 async function saveMyProfile(){
   const name=$('profileName')?.value.trim()||defaultDisplayName(),bio=$('profileBio')?.value.trim()||null;
   let avatar_path=myProfile.avatar_path; const f=$('profilePhotoInput')?.files?.[0];
