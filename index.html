@@ -2445,6 +2445,9 @@ async function forgotPassword(){
 }
 
 
+/* Evita ejecutar setup más de una vez al restaurar la misma sesión. */
+let authSetupUserId=null;
+
 /* =====================================================
    INICIALIZAR
 ===================================================== */
@@ -2503,7 +2506,10 @@ async function init(){
         if(session && (event === 'INITIAL_SESSION' || event === 'SIGNED_IN')){
           user = session.user;
           document.body.classList.add('auth-pending');
+          if(authSetupUserId===session.user.id)return;
+          authSetupUserId=session.user.id;
           setup().catch(err=>{
+            authSetupUserId=null;
             console.error('No se pudo restaurar la sesión:',err);
             document.body.classList.remove('auth-pending');
             $('login').classList.remove('hidden');
@@ -2518,6 +2524,7 @@ async function init(){
           event === 'SIGNED_OUT'
         ){
 
+          authSetupUserId=null;
           user = null;
 
           couple = null;
@@ -4274,7 +4281,7 @@ function renderAdvHome(){
  const next=getNextUpcomingPlan();
  const together=Math.max(0,Math.floor((Date.now()-new Date('2026-01-21T00:00:00'))/86400000));
  const dating=Math.max(0,Math.floor((Date.now()-new Date('2026-04-21T00:00:00'))/86400000));
- return `<div class="homeIntro"><div class="homeWelcome" style="position:relative;overflow:hidden"><img data-home-photo src="${esc(cachedHomePhotoUrl()||\'pareja.jpeg\')}" alt="Nuestra foto" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:1;z-index:0"><div style="position:relative;z-index:1"><div class="homeWelcomeContent"><div class="homePill">❤️ Nuestro Calendario #21 · Ana María & Nicolás</div><h2>Este es nuestro lugar.<br>Esta es nuestra historia.</h2><p>Un pequeño rincón solo para nosotros: nuestros planes, recuerdos, sueños, cartas y todo lo que todavía nos falta vivir.</p><div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:18px"><button class="btn primary" onclick="showAdvancedTab('calendar')">🗓️ Entrar al calendario</button><button class="btn" style="background:rgba(255,255,255,.92)" onclick="openQuickCreate()">✨ Crear algo especial</button></div></div></div></div></div><div class="homeStats"><div class="homeStat"><strong>${together}</strong><span>días juntos ❤️</span></div><div class="homeStat"><strong>${dating}</strong><span>días de novios 💍</span></div><div class="homeStat"><strong>${p}</strong><span>planes guardados 🗓️</span></div><div class="homeStat"><strong>${m}</strong><span>recuerdos 📸</span></div></div><div class="homeNext"><div class="homeNextIcon">${next?categoryIcon(next.category):'♡'}</div><div style="flex:1"><div style="font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:#a16a7d;font-weight:900">Próximo capítulo</div><div class="homeNextTitle">${next?esc(next.title):'Todavía no hay un próximo plan'}</div><div class="homeNextMeta">${next?dateES(next._occurrenceDate)+(next.plan_time?' · '+formatTime(next.plan_time):''):'Creen uno y hagan que aparezca aquí ❤️'}</div>${next&&next.recurrence_enabled?'<span class="seriesBadge">🔁 Plan recurrente</span>':''}</div>${next?'<button class="btn" data-next-id="'+next.id+'" onclick="openPlanDetail(this.dataset.nextId)">Abrir</button>':''}</div>${dailyQuestionHomeCard()}<div class="advGrid"><div class="advCard"><h3>✨ Sueños cumplidos</h3><div class="advMetric">${d}</div><p>De ideas bonitas a cosas que realmente vivieron.</p></div><div class="advCard"><h3>💌 Cartas</h3><div class="advMetric">${advCache.letters.length}</div><p>Palabras para leer hoy o guardar para el futuro.</p></div><div class="advCard"><h3>🎯 Retos</h3><div class="advMetric">${ch}</div><p>Pequeños desafíos para hacer juntos.</p></div><div class="advCard"><h3>💰 Metas</h3><div class="advMetric">${g}</div><p>Lo que están construyendo paso a paso.</p></div></div>`;
+ return `<div class="homeIntro"><div class="homeWelcome" style="position:relative;overflow:hidden"><img data-home-photo src="${esc(cachedHomePhotoUrl()||'pareja.jpeg')}" alt="Nuestra foto" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:1;z-index:0"><div style="position:relative;z-index:1"><div class="homeWelcomeContent"><div class="homePill">❤️ Nuestro Calendario #21 · Ana María & Nicolás</div><h2>Este es nuestro lugar.<br>Esta es nuestra historia.</h2><p>Un pequeño rincón solo para nosotros: nuestros planes, recuerdos, sueños, cartas y todo lo que todavía nos falta vivir.</p><div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:18px"><button class="btn primary" onclick="showAdvancedTab('calendar')">🗓️ Entrar al calendario</button><button class="btn" style="background:rgba(255,255,255,.92)" onclick="openQuickCreate()">✨ Crear algo especial</button></div></div></div></div></div><div class="homeStats"><div class="homeStat"><strong>${together}</strong><span>días juntos ❤️</span></div><div class="homeStat"><strong>${dating}</strong><span>días de novios 💍</span></div><div class="homeStat"><strong>${p}</strong><span>planes guardados 🗓️</span></div><div class="homeStat"><strong>${m}</strong><span>recuerdos 📸</span></div></div><div class="homeNext"><div class="homeNextIcon">${next?categoryIcon(next.category):'♡'}</div><div style="flex:1"><div style="font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:#a16a7d;font-weight:900">Próximo capítulo</div><div class="homeNextTitle">${next?esc(next.title):'Todavía no hay un próximo plan'}</div><div class="homeNextMeta">${next?dateES(next._occurrenceDate)+(next.plan_time?' · '+formatTime(next.plan_time):''):'Creen uno y hagan que aparezca aquí ❤️'}</div>${next&&next.recurrence_enabled?'<span class="seriesBadge">🔁 Plan recurrente</span>':''}</div>${next?'<button class="btn" data-next-id="'+next.id+'" onclick="openPlanDetail(this.dataset.nextId)">Abrir</button>':''}</div>${dailyQuestionHomeCard()}<div class="advGrid"><div class="advCard"><h3>✨ Sueños cumplidos</h3><div class="advMetric">${d}</div><p>De ideas bonitas a cosas que realmente vivieron.</p></div><div class="advCard"><h3>💌 Cartas</h3><div class="advMetric">${advCache.letters.length}</div><p>Palabras para leer hoy o guardar para el futuro.</p></div><div class="advCard"><h3>🎯 Retos</h3><div class="advMetric">${ch}</div><p>Pequeños desafíos para hacer juntos.</p></div><div class="advCard"><h3>💰 Metas</h3><div class="advMetric">${g}</div><p>Lo que están construyendo paso a paso.</p></div></div>`;
 }
 
 function renderAdvStory(){
