@@ -497,8 +497,7 @@ body{
 }
 
 .detailDate{
-  color:var(--rose);
-  font-weight:800;
+  color:var(--rose);  font-weight:800;
 }
 
 .detailRow{
@@ -998,7 +997,6 @@ body.nc-theme-ready{transition:color .16s ease}
 @keyframes ncCheckIn{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
 @media(hover:none){.btn:hover,.advTab:hover,.profileChip:hover,.notificationBell:hover,.moneyTypeChoice:hover,.themeChoice:hover{transform:none;box-shadow:none}}
 @media(prefers-reduced-motion:reduce){.themeChoice.active .themeSwatch:after{animation:none}.advGrid > *, .advList > *{animation:none!important}}
-
 </style>
 
 </head>
@@ -1498,7 +1496,6 @@ body.nc-theme-ready{transition:color .16s ease}
 
     </div>
 
-
     <div class="field"><label>Lugar</label><select id="planPlaceId" onchange="syncPlanPlaceLocation()"><option value="">Sin lugar vinculado</option></select></div>
 
     <div class="field">
@@ -1997,8 +1994,7 @@ async function login(){
 
     console.error(err);
 
-    $('loginBtn').disabled =
-      false;
+    $('loginBtn').disabled =      false;
 
     setMsg(
       'Ocurrió un error inesperado.'
@@ -2497,8 +2493,7 @@ async function setup(){
 
       .insert({
 
-        couple_id:
-        c.id,
+        couple_id:        c.id,
 
         user_id:
         user.id,
@@ -2997,8 +2992,7 @@ function render(){
 
 
   for(
-    let i=0;
-    i<42;
+    let i=0;    i<42;
     i++
   ){
 
@@ -3497,8 +3491,7 @@ async function savePlan(){
   closeModal();
   await loadPlans();
   if(!editingId&&createdPlanId){
-    const planOwnerName=myProfile?.display_name||coupleProfiles.find(p=>p.user_id===user.id)?.display_name||'Tu pareja';
-    await createPartnerNotification({event_type:'plan_created',title:'Nuevo plan en el calendario ❤️',body:planOwnerName+' agregó «'+title+'» para el '+formatDate(planData.plan_date)+'.',target_tab:'calendar',target_id:createdPlanId});
+    const planOwnerName=myProfile?.display_name||coupleProfiles.find(p=>p.user_id===user.id)?.display_name||'Tu pareja';    await createPartnerNotification({event_type:'plan_created',title:'Nuevo plan en el calendario ❤️',body:planOwnerName+' agregó «'+title+'» para el '+formatDate(planData.plan_date)+'.',target_tab:'calendar',target_id:createdPlanId});
   }
 
 }
@@ -3997,7 +3990,6 @@ $('detailModal')
         event.target ===
         $('detailModal')
       ){
-
         closeDetailModal();
 
       }
@@ -4134,6 +4126,7 @@ async function loadCoupleSettings(){
 function applyCoupleSettings(){
   const root=document.documentElement,body=document.body,theme=coupleSettings.theme||'romance',accent=coupleSettings.accent_color||'#e64d78';
   body.dataset.theme=theme;body.style.setProperty('--rose',accent);root.style.setProperty('--rose',accent);root.style.setProperty('--bodybg',coupleSettings.background_color||'');root.style.setProperty('--accent',accent);
+  root.removeAttribute('data-nc-theme-boot');
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content',accent);
   try{
     const css=getComputedStyle(body);
