@@ -69,6 +69,10 @@ body{
   display:none!important;
 }
 
+/* No mostrar el formulario de acceso mientras Supabase restaura la sesión. */
+body.auth-pending #login{visibility:hidden}
+body.auth-pending::before{content:"Cargando nuestro espacio ❤️";position:fixed;inset:0;z-index:99999;display:grid;place-items:center;background:linear-gradient(135deg,#fffaf8,#f8e6eb);color:#8d4764;font:italic 24px Georgia,serif}
+
 .center{
   min-height:100vh;
   display:grid;
@@ -644,7 +648,6 @@ body.app-ready .cards{display:none}body.app-ready .hero{display:none}.workspace.
 @media(max-width:800px){.advancedNav{justify-content:flex-start;flex-wrap:nowrap;overflow-x:auto}.homeStats{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:520px){.homeWelcome{min-height:520px}.homeWelcome h2{font-size:38px}.homeStats{grid-template-columns:1fr 1fr}.homeStat strong{font-size:22px}}
 .homeWelcome{position:relative;overflow:hidden;min-height:430px;border-radius:30px;background:#28151d center/cover no-repeat;box-shadow:0 22px 65px rgba(70,25,45,.18);display:flex;align-items:flex-end}
-html[data-nc-home-photo-pending] [data-home-photo]{opacity:0!important}
 [data-home-photo]{transition:opacity .22s ease;object-position:center center}
 .homePhotoCropPreview{display:block;width:100%;height:auto;aspect-ratio:auto;max-height:none;object-fit:fill;background:#24131d;border:1px solid #f0dce4;border-radius:16px}
 #advModal .modalBox:has(#homePhotoCropCanvas){width:min(1000px,96vw)}
@@ -1187,12 +1190,35 @@ a{transition:color var(--nc-motion-fast) ease,opacity var(--nc-motion-fast) ease
 @media(max-width:800px){#advancedContent > *{animation-duration:.48s}#advModal .modalBox{max-height:calc(100dvh - 24px);overflow-y:auto}}
 @media(prefers-reduced-motion:reduce){#advancedContent > *,#advancedContent .advHero,#advancedContent .homeWelcome,#advancedContent .homeNext,#advancedContent .advGrid > *,#advancedContent .advList > *,#advancedContent .achievementGrid > *,#advancedContent .homeStats > *,#advModal.show .modalBox,#profileModal.show .modalBox,#modal[style*="display: grid"] .modalBox,#appDialog.show .appDialogBox{animation:none!important;filter:none!important}.advTab::after{display:none!important}}
 
+
+/* Estabilidad visual: el contenido se vuelve a renderizar con actualizaciones realtime.
+   No repetir animaciones de entrada en cada render; mantener las transiciones de controles y modales. */
+#advancedContent > *,
+#advancedContent .advHero,
+#advancedContent .homeWelcome,
+#advancedContent .homeNext,
+#advancedContent .advGrid > *,
+#advancedContent .advList > *,
+#advancedContent .achievementGrid > *,
+#advancedContent .homeStats > * {
+  animation: none !important;
+  filter: none !important;
+  will-change: auto !important;
+}
+#advModal.show .modalBox::before { animation: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  #advancedContent *, #advancedContent *::before, #advancedContent *::after {
+    animation: none !important;
+    transition-duration: .001ms !important;
+  }
+}
+
 </style>
 
 </head>
 
 
-<body>
+<body class="auth-pending">
 
 <script>
 /* El tema en caché se aplica antes de que el navegador procese el contenido visible. */
@@ -2419,6 +2445,9 @@ async function forgotPassword(){
 }
 
 
+/* Evita ejecutar setup más de una vez al restaurar la misma sesión. */
+let authSetupUserId=null;
+
 /* =====================================================
    INICIALIZAR
 ===================================================== */
@@ -2450,7 +2479,7 @@ async function init(){
 
     $('login')
       .classList
-      .remove('hidden');
+      .add('hidden');
 
     $('join')
       .classList
@@ -2474,16 +2503,20 @@ async function init(){
         );
 
 
-        if(
-          event === 'SIGNED_IN' &&
-          session
-        ){
-
-          user =
-            session.user;
-
-          await setup();
-
+        if(session && (event === 'INITIAL_SESSION' || event === 'SIGNED_IN')){
+          user = session.user;
+          document.body.classList.add('auth-pending');
+          if(authSetupUserId===session.user.id)return;
+          authSetupUserId=session.user.id;
+          setup().catch(err=>{
+            authSetupUserId=null;
+            console.error('No se pudo restaurar la sesión:',err);
+            document.body.classList.remove('auth-pending');
+            $('login').classList.remove('hidden');
+          });
+        } else if(event === 'INITIAL_SESSION' && !session){
+          document.body.classList.remove('auth-pending');
+          $('login').classList.remove('hidden');
         }
 
 
@@ -2491,6 +2524,7 @@ async function init(){
           event === 'SIGNED_OUT'
         ){
 
+          authSetupUserId=null;
           user = null;
 
           couple = null;
@@ -2519,6 +2553,7 @@ async function init(){
             .add('hidden');
 
 
+          document.body.classList.remove('auth-pending');
           $('login')
             .classList
             .remove('hidden');
@@ -2902,6 +2937,7 @@ async function showApp(){
   const requestedTab=new URLSearchParams(location.search).get('tab');
   showAdvancedTab(validAdvancedTabs.has(requestedTab)?requestedTab:advancedTab);
   initAdvanced();
+  document.body.classList.remove('auth-pending');
 }
 
 
@@ -4231,12 +4267,21 @@ function showAdvancedTab(tab,options={}){
 }
 function advHeader(title,sub,button,action){return `<div class="advHero"><div style="display:flex;justify-content:space-between;gap:18px;align-items:center;flex-wrap:wrap"><div><div style="font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:#a16a7d;font-weight:800">Nuestro espacio</div><h2 style="font:700 32px Georgia,serif;color:#653449;margin:5px 0">${title}</h2><p style="margin:0;color:#806572">${sub}</p></div>${button?`<button class="btn primary" onclick="${action}">${button}</button>`:''}</div></div>`}
 function renderAdvanced(){const c=$('advancedContent');if(!c)return; const map={home:renderAdvHome,story:renderAdvStory,memories:renderAdvMemories,letters:renderAdvLetters,dreams:renderAdvDreams,challenges:renderAdvChallenges,ideas:renderAdvIdeas,dates:renderAdvDates,goals:renderAdvGoals,budget:renderAdvBudget,notifications:renderAdvNotifications,question:renderAdvQuestion,places:renderAdvPlaces,achievements:renderAdvAchievements,private:renderAdvPrivate,settings:renderAdvSettings}; c.innerHTML=(map[advancedTab]||renderAdvHome)(); c.classList.remove('tab-enter','tab-leave'); updateNotificationBadge(); if(advancedTab==='home') setTimeout(()=>applyHomePhoto(),0);}
+function cachedHomePhotoUrl(){
+  const path=coupleSettings.home_photo_path;
+  if(!path)return null;
+  try{
+    const cached=JSON.parse(localStorage.getItem('nc21_signed_photo_'+encodeURIComponent(path))||'null');
+    if(cached?.url&&cached.expiresAt>Date.now()+10*60*1000)return cached.url;
+  }catch(_){}
+  return null;
+}
 function renderAdvHome(){
  const p=plans.length,m=advCache.memories.length,d=advCache.dreams.filter(x=>x.status==='cumplido').length,g=advCache.goals.length,ch=advCache.challenges.filter(x=>x.completed).length;
  const next=getNextUpcomingPlan();
  const together=Math.max(0,Math.floor((Date.now()-new Date('2026-01-21T00:00:00'))/86400000));
  const dating=Math.max(0,Math.floor((Date.now()-new Date('2026-04-21T00:00:00'))/86400000));
- return `<div class="homeIntro"><div class="homeWelcome" style="position:relative;overflow:hidden"><img data-home-photo src="pareja.jpeg" alt="Nuestra foto" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:1;z-index:0"><div style="position:relative;z-index:1"><div class="homeWelcomeContent"><div class="homePill">❤️ Nuestro Calendario #21 · Ana María & Nicolás</div><h2>Este es nuestro lugar.<br>Esta es nuestra historia.</h2><p>Un pequeño rincón solo para nosotros: nuestros planes, recuerdos, sueños, cartas y todo lo que todavía nos falta vivir.</p><div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:18px"><button class="btn primary" onclick="showAdvancedTab('calendar')">🗓️ Entrar al calendario</button><button class="btn" style="background:rgba(255,255,255,.92)" onclick="openQuickCreate()">✨ Crear algo especial</button></div></div></div></div></div><div class="homeStats"><div class="homeStat"><strong>${together}</strong><span>días juntos ❤️</span></div><div class="homeStat"><strong>${dating}</strong><span>días de novios 💍</span></div><div class="homeStat"><strong>${p}</strong><span>planes guardados 🗓️</span></div><div class="homeStat"><strong>${m}</strong><span>recuerdos 📸</span></div></div><div class="homeNext"><div class="homeNextIcon">${next?categoryIcon(next.category):'♡'}</div><div style="flex:1"><div style="font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:#a16a7d;font-weight:900">Próximo capítulo</div><div class="homeNextTitle">${next?esc(next.title):'Todavía no hay un próximo plan'}</div><div class="homeNextMeta">${next?dateES(next._occurrenceDate)+(next.plan_time?' · '+formatTime(next.plan_time):''):'Creen uno y hagan que aparezca aquí ❤️'}</div>${next&&next.recurrence_enabled?'<span class="seriesBadge">🔁 Plan recurrente</span>':''}</div>${next?'<button class="btn" data-next-id="'+next.id+'" onclick="openPlanDetail(this.dataset.nextId)">Abrir</button>':''}</div>${dailyQuestionHomeCard()}<div class="advGrid"><div class="advCard"><h3>✨ Sueños cumplidos</h3><div class="advMetric">${d}</div><p>De ideas bonitas a cosas que realmente vivieron.</p></div><div class="advCard"><h3>💌 Cartas</h3><div class="advMetric">${advCache.letters.length}</div><p>Palabras para leer hoy o guardar para el futuro.</p></div><div class="advCard"><h3>🎯 Retos</h3><div class="advMetric">${ch}</div><p>Pequeños desafíos para hacer juntos.</p></div><div class="advCard"><h3>💰 Metas</h3><div class="advMetric">${g}</div><p>Lo que están construyendo paso a paso.</p></div></div>`;
+ return `<div class="homeIntro"><div class="homeWelcome" style="position:relative;overflow:hidden"><img data-home-photo src="${esc(cachedHomePhotoUrl()||'pareja.jpeg')}" alt="Nuestra foto" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:1;z-index:0"><div style="position:relative;z-index:1"><div class="homeWelcomeContent"><div class="homePill">❤️ Nuestro Calendario #21 · Ana María & Nicolás</div><h2>Este es nuestro lugar.<br>Esta es nuestra historia.</h2><p>Un pequeño rincón solo para nosotros: nuestros planes, recuerdos, sueños, cartas y todo lo que todavía nos falta vivir.</p><div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:18px"><button class="btn primary" onclick="showAdvancedTab('calendar')">🗓️ Entrar al calendario</button><button class="btn" style="background:rgba(255,255,255,.92)" onclick="openQuickCreate()">✨ Crear algo especial</button></div></div></div></div></div><div class="homeStats"><div class="homeStat"><strong>${together}</strong><span>días juntos ❤️</span></div><div class="homeStat"><strong>${dating}</strong><span>días de novios 💍</span></div><div class="homeStat"><strong>${p}</strong><span>planes guardados 🗓️</span></div><div class="homeStat"><strong>${m}</strong><span>recuerdos 📸</span></div></div><div class="homeNext"><div class="homeNextIcon">${next?categoryIcon(next.category):'♡'}</div><div style="flex:1"><div style="font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:#a16a7d;font-weight:900">Próximo capítulo</div><div class="homeNextTitle">${next?esc(next.title):'Todavía no hay un próximo plan'}</div><div class="homeNextMeta">${next?dateES(next._occurrenceDate)+(next.plan_time?' · '+formatTime(next.plan_time):''):'Creen uno y hagan que aparezca aquí ❤️'}</div>${next&&next.recurrence_enabled?'<span class="seriesBadge">🔁 Plan recurrente</span>':''}</div>${next?'<button class="btn" data-next-id="'+next.id+'" onclick="openPlanDetail(this.dataset.nextId)">Abrir</button>':''}</div>${dailyQuestionHomeCard()}<div class="advGrid"><div class="advCard"><h3>✨ Sueños cumplidos</h3><div class="advMetric">${d}</div><p>De ideas bonitas a cosas que realmente vivieron.</p></div><div class="advCard"><h3>💌 Cartas</h3><div class="advMetric">${advCache.letters.length}</div><p>Palabras para leer hoy o guardar para el futuro.</p></div><div class="advCard"><h3>🎯 Retos</h3><div class="advMetric">${ch}</div><p>Pequeños desafíos para hacer juntos.</p></div><div class="advCard"><h3>💰 Metas</h3><div class="advMetric">${g}</div><p>Lo que están construyendo paso a paso.</p></div></div>`;
 }
 
 function renderAdvStory(){
