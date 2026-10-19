@@ -739,111 +739,24 @@ async function setup(){
     'nickolasmorales82@gmail.com'
   ){
 
-    const {
-      data:c,
-      error
-    } =
-    await sb
-
-      .from('couples')
-
-      .insert({
-
-        name:
-        'Nuestro Calendario #21',
-
-        created_by:
-        user.id
-
-      })
-
-      .select()
-
-      .single();
-
+    const {data:c,error} = await sb.rpc('get_or_create_our_couple');
 
     if(error){
-
-      console.error(error);
-
-      $('login')
-        .classList
-        .add('hidden');
-
-      $('join')
-        .classList
-        .remove('hidden');
-
-      $('joinMsg').textContent =
-        'No pudimos crear el espacio: ' +
-        error.message;
-
+      console.error('No se pudo obtener el espacio compartido:',error);
+      $('login').classList.add('hidden');
+      $('join').classList.remove('hidden');
+      $('joinMsg').textContent = 'No pudimos preparar el espacio: ' + error.message;
       return;
-
     }
-
-
-    const {
-      error:memberError
-    } =
-    await sb
-
-      .from('couple_members')
-
-      .insert({
-
-        couple_id:        c.id,
-
-        user_id:
-        user.id,
-
-        display_name:
-        'Nicolás'
-
-      });
-
-
-    if(memberError){
-
-      console.error(
-        memberError
-      );
-
-      $('joinMsg').textContent =
-        'No pudimos asociar tu usuario: ' +
-        memberError.message;
-
-      return;
-
-    }
-
 
     couple = c;
-
-
-    $('joinCode').textContent =
-      c.join_code ||
-      'NUESTRO #21';
-
-
-    $('join')
-      .classList
-      .remove('hidden');
-
-
-    $('login')
-      .classList
-      .add('hidden');
-
-
-    $('joinMsg').textContent =
-      'Este es tu código. Compártelo con Ana. ❤️';
-
-
+    $('joinCode').textContent = c.join_code || 'NUESTRO #21';
+    $('join').classList.remove('hidden');
+    $('login').classList.add('hidden');
+    $('joinMsg').textContent = 'Este es tu código. Compártelo con Ana. ❤️';
     return;
 
   }
-
 
   $('login')
     .classList
@@ -2605,7 +2518,7 @@ function renderAdvQuestion(){const q=todayQuestion();const answers=advCache.dail
 async function saveDailyAnswer(){const answer=$('dailyAnswerInput')?.value.trim();if(!answer)return appAlert('Escribe tu respuesta antes de guardarla ❤️');const q=todayQuestion();const {error}=await sb.from('daily_answers').upsert({couple_id:couple.id,user_id:user.id,question_date:q.date,question_text:q.text,answer,updated_at:new Date().toISOString()},{onConflict:'couple_id,user_id,question_date'});if(error)return appAlert('No se pudo guardar la respuesta: '+error.message);await advLoadAll();appAlert('Tu respuesta quedó guardada ❤️');}
 function updateNotificationBadge(){const b=$('notificationsTab'),badge=$('notificationBadge');if(!b||!badge)return;const n=advCache.notifications.filter(x=>!x.read_at).length;badge.hidden=!n;badge.textContent=n>99?'99+':String(n);b.setAttribute('aria-label',n?`Notificaciones, ${n} sin leer`:'Notificaciones');b.title=n?`${n} notificación(es) sin leer`:'Notificaciones';}
 function renderAdvNotifications(){const arr=advCache.notifications;const unread=arr.filter(x=>!x.read_at).length;const names=new Map(coupleProfiles.map(p=>[p.user_id,p.display_name||'Tu pareja']));return advHeader('Notificaciones','Aquí aparecen las novedades que tu pareja comparte en el calendario, recuerdos, sueños y metas.',unread?'✓ Marcar todo leído':'🔄 Actualizar',unread?'markAllNotificationsRead()':'advLoadAll()')+`<div class="advList">${arr.length?arr.map(n=>`<div class="advItem ${n.read_at?'notificationRead':'notificationUnread'}"><div style="flex:1"><div class="advItemTitle">${n.read_at?'':'🔴 '}${esc(n.title)}</div><div class="advMeta">${esc(names.get(n.actor_user_id)||'Tu pareja')} · ${new Date(n.created_at).toLocaleString('es-CO')}</div><p>${esc(n.body||'Hay una novedad en su espacio compartido.')}</p></div><div class="advActions">${n.target_tab?`<button class="btn" onclick="openNotificationTarget('${n.id}','${n.target_tab}')">Ver</button>`:''}${!n.read_at?`<button class="btn" onclick="markNotificationRead('${n.id}')">Marcar leído</button>`:''}</div></div>`).join(''):`<div class="advEmpty">💌 Todavía no hay avisos. Cuando alguno de los dos agregue algo nuevo, aparecerá aquí.</div>`}</div><div class="advCard" style="margin-top:18px"><h3>🔔 Notificaciones del navegador</h3><p>Permite que el navegador muestre avisos mientras usas la aplicación. Los avisos push cuando la app está cerrada requieren una configuración adicional del servidor.</p><button class="btn primary" onclick="enableBrowserNotifications()">Activar notificaciones del navegador</button></div>`;}
-async function createPartnerNotification({event_type,title,body,target_tab,target_id}){const partner=(coupleProfiles||[]).find(p=>p.user_id&&p.user_id!==user?.id);if(!partner||!user?.id||!couple?.id)return;const actorName=myProfile?.display_name||coupleProfiles.find(p=>p.user_id===user.id)?.display_name||'Tu pareja';const {error}=await sb.from('notifications').insert({couple_id:couple.id,recipient_user_id:partner.user_id,actor_user_id:user.id,event_type,title,body,target_tab:target_tab||null,target_id:target_id||null});if(error)console.warn('No se pudo notificar a tu pareja:',error.message);}
+async function createPartnerNotification({event_type,title,body,target_tab,target_id}){const partner=(coupleProfiles||[]).find(p=>p.user_id&&p.user_id!==user?.id);if(!partner||!user?.id||!couple?.id)return;const {error}=await sb.from('notifications').insert({couple_id:couple.id,recipient_user_id:partner.user_id,actor_user_id:user.id,event_type,title,body,target_tab:target_tab||null,target_id:target_id||null});if(error){console.warn('No se pudo guardar la notificación:',error.message);return;}try{const {data,error:pushError}=await sb.functions.invoke('send-push-notification',{body:{couple_id:couple.id,recipient_user_id:partner.user_id,title,body:body||'Tienes una novedad de pareja. ❤️',target_tab:target_tab||'notifications',event_type}});if(pushError)console.warn('No se pudo enviar la notificación push:',pushError.message);else if(data?.error)console.warn('El servidor push no pudo enviar la notificación:',data.error);}catch(e){console.warn('No se pudo contactar al servidor de notificaciones push:',e?.message||e);}}
 async function markNotificationRead(id){const {error}=await sb.from('notifications').update({read_at:new Date().toISOString()}).eq('id',id).eq('recipient_user_id',user.id);if(error)return appAlert('No se pudo marcar como leído: '+error.message);await advLoadAll();}
 async function markAllNotificationsRead(){const ids=advCache.notifications.filter(n=>!n.read_at).map(n=>n.id);if(!ids.length)return;const {error}=await sb.from('notifications').update({read_at:new Date().toISOString()}).in('id',ids).eq('recipient_user_id',user.id);if(error)return appAlert('No se pudieron actualizar los avisos: '+error.message);await advLoadAll();}
 async function openNotificationTarget(id,tab){await markNotificationRead(id);if(validAdvancedTabs.has(tab))showAdvancedTab(tab);}
@@ -2615,7 +2528,9 @@ async function sendLocalReminder(title,body,key,targetTab){if(reminderWasSent(ke
 function checkLocalReminders(){if(!user||!couple||!('Notification'in window)||Notification.permission!=='granted')return;const now=new Date();for(const p of plans){if(!p.plan_date)continue;const when=new Date(p.plan_date+'T'+(p.plan_time||'09:00:00'));const mins=(when-now)/60000;if(mins>=0&&mins<=15){const key='plan_'+p.id+'_'+p.plan_date+'_'+(p.plan_time||'09');sendLocalReminder('Próximo plan ❤️',p.title+' comienza en '+Math.max(1,Math.ceil(mins))+' min.',key,'calendar');}}
 const today=new Date(now.getFullYear(),now.getMonth(),now.getDate());for(const d of advCache.dates){if(!d.event_date)continue;const parts=d.event_date.split('-').map(Number);let target=new Date(parts[0],parts[1]-1,parts[2]);const recurring=!!d.recurring||d.recurrence_type==='yearly';if(recurring&&target<today)target=new Date(now.getFullYear()+1,parts[1]-1,parts[2]);if(!recurring&&target<today)continue;const days=Math.round((target-today)/86400000);if(days===Number(d.reminder_days||0)){const dateKey=localISODate(target);sendLocalReminder(days===0?'Hoy es una fecha especial ❤️':'Se acerca una fecha especial ❤️',d.title+(days===0?' es hoy.':' es en '+days+' día(s).'),'date_'+d.id+'_'+dateKey,'dates');}}
 }
-async function enableBrowserNotifications(){if(!('Notification'in window))return appAlert('Este navegador no admite notificaciones. Prueba Chrome en Android o PC.');if(!('serviceWorker'in navigator))return appAlert('Este navegador no admite el servicio necesario para notificaciones.');const permission=await Notification.requestPermission();if(permission!=='granted')return appAlert('No se concedió permiso. Puedes cambiarlo desde los ajustes del navegador.');checkLocalReminders();try{const reg=await navigator.serviceWorker.ready;await reg.showNotification('Nuestro Calendario #21',{body:'¡Las notificaciones del navegador están activadas en este dispositivo! ❤️',icon:'/icon-192.png',badge:'/icon-192.png',tag:'nc21-test'});appAlert('¡Listo! Este dispositivo ya permite mostrar notificaciones. Los avisos automáticos con la app cerrada se habilitarán en la siguiente etapa del servidor.');}catch(e){appAlert('No pudimos mostrar la notificación: '+e.message);}}
+const PUSH_VAPID_PUBLIC_KEY='BB0iqrnyRyEHM5I3OVVs5ZmRiDvDHkqHfGha7wG9QcqaGmpR4jO3KBxtQjQZ99sMjbPLjDX8bqrvzsTNI_xlumI';
+function pushBase64UrlToBytes(value){const pad='='.repeat((4-value.length%4)%4);const base64=(value+pad).replace(/-/g,'+').replace(/_/g,'/');const raw=atob(base64);return Uint8Array.from(raw,c=>c.charCodeAt(0));}
+async function enableBrowserNotifications(){if(!('Notification'in window))return appAlert('Este navegador no admite notificaciones. Prueba Chrome en Android o PC.');if(!('serviceWorker'in navigator)||!('PushManager'in window))return appAlert('Este navegador no admite notificaciones push. Prueba Chrome actualizado o instala la PWA.');if(!user?.id||!couple?.id||!sb)return appAlert('Primero inicia sesión en vuestro espacio.');const permission=await Notification.requestPermission();if(permission!=='granted')return appAlert('No se concedió permiso. Puedes cambiarlo desde los ajustes del navegador.');try{const reg=await navigator.serviceWorker.ready;let subscription=await reg.pushManager.getSubscription();if(!subscription)subscription=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:pushBase64UrlToBytes(PUSH_VAPID_PUBLIC_KEY)});const json=subscription.toJSON();const {error}=await sb.from('push_subscriptions').upsert({couple_id:couple.id,user_id:user.id,endpoint:subscription.endpoint,p256dh:json.keys?.p256dh,auth:json.keys?.auth,user_agent:navigator.userAgent.slice(0,300)},{onConflict:'endpoint'});if(error)throw error;checkLocalReminders();const {data,error:pushError}=await sb.functions.invoke('send-push-notification',{body:{couple_id:couple.id,recipient_user_id:user.id,title:'Nuestro Calendario #21 ❤️',body:'¡Las notificaciones push de este dispositivo están activas!',target_tab:'notifications',test:true}});if(pushError)throw pushError;if(data?.error)throw new Error(data.error);appAlert('¡Notificaciones push activadas! Se envió una prueba real a este dispositivo. Cuando tu pareja agregue un plan, recibirás un aviso aunque la PWA no esté abierta, siempre que el dispositivo tenga conexión. ❤️');}catch(e){console.error('Error activando push:',e);appAlert('No pudimos activar las notificaciones push: '+(e?.message||'error desconocido')+'. Verifica que el servidor push esté configurado y vuelve a intentarlo.');}}
 let deferredInstallPrompt=null;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstallPrompt=e;});
 async function installCalendarApp(){if(deferredInstallPrompt){deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;return;}appAlert('En Android abre este sitio en Chrome, toca el menú ⋮ y elige “Instalar aplicación” o “Añadir a pantalla de inicio”. En PC, busca el icono de instalación en la barra de direcciones.');}
 function budgetProfiles(){const ps=coupleProfiles||[];const ana=ps.find(p=>(p.display_name||'').toLowerCase().includes('ana'))||ps[0];const nico=ps.find(p=>(p.display_name||'').toLowerCase().includes('nicol'))||ps.find(p=>p.user_id!==ana?.user_id)||ps[1];return [{id:ana?.user_id,name:ana?.display_name||'Ana María',key:'ana'},{id:nico?.user_id,name:nico?.display_name||'Nicolás',key:'nicolas'}].filter((p,i,a)=>p.id&&a.findIndex(q=>q.id===p.id)===i);}
