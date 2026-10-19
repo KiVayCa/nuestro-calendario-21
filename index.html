@@ -905,6 +905,42 @@ img,video,canvas,iframe{max-width:100%}
   .modalBox{max-height:calc(100dvh - 16px)}
 }
 
+
+/* =====================================================
+   PALETAS AMPLIADAS + TÍTULOS CON CONTRASTE ADAPTATIVO
+===================================================== */
+body[data-theme="sage"]{--rose:#64856a;--soft:#e5efe4;--ink:#243529;--muted:#657768;--line:#d1dfd0;--surface:#fcfefb;--bodybg:linear-gradient(135deg,#fbfdf9,#e5efe4)}
+body[data-theme="blueberry"]{--rose:#6476c8;--soft:#e9edff;--ink:#252d4c;--muted:#68739b;--line:#d3daf7;--surface:#fcfcff;--bodybg:linear-gradient(135deg,#fbfbff,#e9edff)}
+body[data-theme="terracotta"]{--rose:#b85f48;--soft:#f7e4db;--ink:#43291f;--muted:#89675b;--line:#e8cfc3;--surface:#fffaf7;--bodybg:linear-gradient(135deg,#fffaf6,#f7e4db)}
+body[data-theme="butter"]{--rose:#a98527;--soft:#fff4cf;--ink:#3c3218;--muted:#81724a;--line:#ebdfb6;--surface:#fffef9;--bodybg:linear-gradient(135deg,#fffef9,#fff4cf)}
+body[data-theme="lagoon"]{--rose:#258e95;--soft:#dff4f2;--ink:#17363a;--muted:#5f7f82;--line:#c4e4e2;--surface:#fbfffe;--bodybg:linear-gradient(135deg,#f8fffe,#dff4f2)}
+body[data-theme="rosegold"]{--rose:#b76e79;--soft:#f5e1e4;--ink:#3e252b;--muted:#896c71;--line:#e6cbd0;--surface:#fffafb;--bodybg:linear-gradient(135deg,#fffafa,#f5e1e4)}
+/* Los títulos usan el color de texto de cada paleta, no un vinotinto fijo. */
+body[data-theme] #advancedContent .advHero h2,
+body[data-theme] #advancedContent .advHero h3,
+body[data-theme] #advancedContent .advCard h2,
+body[data-theme] #advancedContent .advCard h3,
+body[data-theme] #advancedContent .advItemTitle,
+body[data-theme] #advancedContent .settingsCard h3,
+body[data-theme] #advancedContent .dailyQuestionCard h3,
+body[data-theme] #advancedContent .profileStat strong,
+body[data-theme] #advancedContent .detailTitle,
+body[data-theme] #advancedContent .budgetPersonHeading h3,
+body[data-theme] #advancedContent .budgetListHeading h3,
+body[data-theme] #advancedContent .homeNextTitle,
+body[data-theme] #advancedContent .advMetric,
+body[data-theme] .modalBox h2,
+body[data-theme] .modalBox h3{
+  color:var(--ink)!important;
+}
+body[data-theme] #advancedContent .homeWelcome h2,
+body[data-theme] #advancedContent .homeWelcome h3{color:#fff!important}
+body[data-theme] #advancedContent .homeStat strong{color:var(--ink)!important}
+body[data-theme] #advancedContent .profileChip{background:var(--surface)!important;color:var(--ink)!important;border-color:var(--line)!important}
+body[data-theme] #advancedContent [style*="text-transform:uppercase"]{color:var(--rose)!important}
+body[data-theme] #advancedContent .dailyQuestionCard{background:linear-gradient(135deg,var(--soft),var(--surface));border-color:var(--line)}
+body[data-theme] #advancedContent .settingsNote{background:var(--soft);color:var(--muted);border-color:var(--line)}
+
 </style>
 
 </head>
@@ -4123,10 +4159,10 @@ async function saveRecurringTemplate(){const title=$('adv_recurring_title').valu
 async function toggleRecurringTemplate(id,active){const {error}=await sb.from('budget_recurring_templates').update({active}).eq('id',id).eq('couple_id',couple.id).eq('owner_user_id',user.id);if(error)return showAppToast('No se pudo actualizar: '+error.message,'error');await advLoadAll();showAppToast(active?'Movimiento recurrente reactivado.':'Movimiento recurrente pausado.');}
 function renderAdvSettings(){
  if(!settingsDraft) settingsDraft={theme:coupleSettings.theme||'romance',accent_color:coupleSettings.accent_color||'#e64d78',background_color:coupleSettings.background_color||'#fff7fa'};
- const themes=[['romance','🌹 Romance','#e64d78','#fff7fa'],['night','🌙 Noche','#d78aa7','#1d151b'],['lavender','🌸 Lavanda','#9a78c7','#f7f3ff'],['sunset','🌅 Atardecer','#d96b48','#fff6ef'],['ocean','🌊 Océano','#4b8fb4','#f1fbff'],['cherry','🍒 Cereza','#d7265e','#ffe3eb'],['emerald','🌿 Esmeralda','#2f8f73','#e0f4ec'],['coffee','☕ Café','#a56a43','#f3e3d5'],['sakura','🌸 Sakura','#e58cab','#ffe9f1'],['royal','👑 Royal','#7255b5','#ece5fb'],['forest','🌲 Bosque','#557a55','#e4efe2'],['wine','🍷 Vino','#9d3d58','#f4dfe6'],['sky','☁️ Cielo','#4c8ec4','#e3f1fb'],['mint','🍃 Menta','#4a9b88','#dff4ee'],['peach','🍑 Durazno','#e58b62','#ffeadf'],['gold','✨ Dorado','#b48a2d','#f8efd2'],['plum','🪻 Ciruela','#8d4f91','#f1e3f1'],['midnight','🌌 Medianoche','#8ca8ff','#252c47'],['charcoal','🖤 Carbón','#d9a7b8','#34343a'],['blush','🌷 Blush','#c95f87','#f7dce7'],['ice','🧊 Hielo','#639eb7','#e2f3f8'],['rosewood','🌹 Rosewood','#a74d62','#f1dfe4'],['aurora','🌌 Aurora','#65a6a4','#dff1ee']];
+ const themes=[['romance','🌹 Romance','#e64d78','#fff7fa'],['night','🌙 Noche','#d78aa7','#1d151b'],['lavender','🌸 Lavanda','#9a78c7','#f7f3ff'],['sunset','🌅 Atardecer','#d96b48','#fff6ef'],['ocean','🌊 Océano','#4b8fb4','#f1fbff'],['cherry','🍒 Cereza','#d7265e','#ffe3eb'],['emerald','🌿 Esmeralda','#2f8f73','#e0f4ec'],['coffee','☕ Café','#a56a43','#f3e3d5'],['sakura','🌸 Sakura','#e58cab','#ffe9f1'],['royal','👑 Royal','#7255b5','#ece5fb'],['forest','🌲 Bosque','#557a55','#e4efe2'],['wine','🍷 Vino','#9d3d58','#f4dfe6'],['sky','☁️ Cielo','#4c8ec4','#e3f1fb'],['mint','🍃 Menta','#4a9b88','#dff4ee'],['peach','🍑 Durazno','#e58b62','#ffeadf'],['gold','✨ Dorado','#b48a2d','#f8efd2'],['plum','🪻 Ciruela','#8d4f91','#f1e3f1'],['midnight','🌌 Medianoche','#8ca8ff','#252c47'],['charcoal','🖤 Carbón','#d9a7b8','#34343a'],['blush','🌷 Blush','#c95f87','#f7dce7'],['ice','🧊 Hielo','#639eb7','#e2f3f8'],['rosewood','🌹 Rosewood','#a74d62','#f1dfe4'],['aurora','🌌 Aurora','#65a6a4','#dff1ee'],['sage','🌱 Salvia','#64856a','#e5efe4'],['blueberry','🫐 Arándano','#6476c8','#e9edff'],['terracotta','🏺 Terracota','#b85f48','#f7e4db'],['butter','🌼 Vainilla','#a98527','#fff4cf'],['lagoon','🩵 Laguna','#258e95','#dff4f2'],['rosegold','✨ Oro rosa','#b76e79','#f5e1e4']];
  const active=settingsDraft.theme||coupleSettings.theme||'romance';
  return advHeader('Configuración','Hagan que Nuestro Calendario #21 se sienta todavía más de ustedes.','💾 Guardar','saveSettingsFromUI()')+`<div class="settingsCard" style="margin-bottom:16px"><h3>📲 Instalar en este dispositivo</h3><p>Abre Nuestro Calendario #21 como una aplicación en Android o PC, usando la misma cuenta y los mismos datos.</p><button class="btn primary" onclick="installCalendarApp()">Instalar / añadir a pantalla de inicio</button></div><div class="settingsGrid">
- <div class="settingsCard"><h3>🎨 Tema de la aplicación</h3><p>Elige el estilo general. Se guarda para los dos.</p><div class="themeChoices">${themes.map(t=>`<button type="button" class="themeChoice ${active===t[0]?'active':''}" onclick="selectTheme('${t[0]}')"><div class="themeSwatch" style="background:linear-gradient(135deg,${t[2]},${t[3]})"></div><b>${t[1]}</b><div class="advMeta">${t[0]==='romance'?'Romántico y cálido':t[0]==='night'?'Elegante y nocturno':t[0]==='lavender'?'Suave y delicado':t[0]==='sunset'?'Cálido y alegre':'Fresco y tranquilo'}</div></button>`).join('')}</div>
+ <div class="settingsCard"><h3>🎨 Tema de la aplicación</h3><p>Elige el estilo general. Se guarda para los dos.</p><div class="themeChoices">${themes.map(t=>`<button type="button" class="themeChoice ${active===t[0]?'active':''}" onclick="selectTheme('${t[0]}')"><div class="themeSwatch" style="background:linear-gradient(135deg,${t[2]},${t[3]})"></div><b>${t[1]}</b><div class="advMeta">${({romance:'Romántico y cálido',night:'Elegante y nocturno',lavender:'Suave y delicado',sunset:'Atardecer cálido',ocean:'Fresco y sereno',cherry:'Intenso y romántico',emerald:'Natural y equilibrado',coffee:'Tonos tierra acogedores',sakura:'Rosa suave y delicado',royal:'Violeta elegante',forest:'Verde natural',wine:'Clásico y profundo',sky:'Azul claro y limpio',mint:'Fresco y relajante',peach:'Cálido y luminoso',gold:'Dorado suave',plum:'Ciruela sofisticada',midnight:'Oscuro con acentos azules',charcoal:'Minimalista y oscuro',blush:'Rosa empolvado',ice:'Azul hielo',rosewood:'Rosa madera',aurora:'Verde agua sereno',sage:'Verde salvia natural',blueberry:'Azul violeta delicado',terracotta:'Arcilla cálida',butter:'Amarillo crema suave',lagoon:'Turquesa tranquilo',rosegold:'Rosa dorado elegante'})[t[0]]||'Una combinación equilibrada'}</div></button>`).join('')}</div>
  <div class="colorRow"><input id="settingsAccent" type="color" value="${esc(settingsDraft.accent_color||coupleSettings.accent_color||'#e64d78')}" onchange="previewAccent(this.value)"><div><b>Color principal</b><div class="advMeta">Personaliza botones, detalles y acentos.</div></div></div></div>
  <div class="settingsCard"><h3>📸 Fotos de la aplicación</h3><p>Pueden reemplazar la foto principal sin modificar el código.</p>
  <div class="photoSetting"><img id="settingsHomePreview" class="photoPreview" src="pareja.jpeg" alt="Portada"><div><b>Foto de portada</b><div class="advMeta">Es la imagen grande de Inicio.</div><input id="settingsHomePhoto" type="file" accept="image/*" style="margin-top:10px" onchange="uploadCouplePhoto('settingsHomePhoto','home_photo_path')"></div></div>
@@ -4138,8 +4174,11 @@ function renderAdvSettings(){
 }
 function selectTheme(theme){
  if(!settingsDraft) settingsDraft={theme:coupleSettings.theme||'romance',accent_color:coupleSettings.accent_color||'#e64d78',background_color:coupleSettings.background_color||'#fff7fa'};
+ const themeAccents={romance:'#e64d78',night:'#d78aa7',lavender:'#9a78c7',sunset:'#d96b48',ocean:'#4b8fb4',cherry:'#d7265e',emerald:'#2f8f73',coffee:'#a56a43',sakura:'#e58cab',royal:'#7255b5',forest:'#557a55',wine:'#9d3d58',sky:'#4c8ec4',mint:'#4a9b88',peach:'#e58b62',gold:'#b48a2d',plum:'#8d4f91',midnight:'#8ca8ff',charcoal:'#d9a7b8',blush:'#c95f87',ice:'#639eb7',rosewood:'#a74d62',aurora:'#65a6a4',sage:'#64856a',blueberry:'#6476c8',terracotta:'#b85f48',butter:'#a98527',lagoon:'#258e95',rosegold:'#b76e79'};
  settingsDraft.theme=theme;
- document.querySelectorAll('.themeChoice').forEach(b=>b.classList.toggle('active',b.querySelector('b')?.parentElement===b && b.getAttribute('onclick')?.includes(`'${theme}'`)));
+ settingsDraft.accent_color=themeAccents[theme]||themeAccents.romance;
+ const accentInput=$('settingsAccent');if(accentInput)accentInput.value=settingsDraft.accent_color;
+ document.querySelectorAll('.themeChoice').forEach(b=>b.classList.toggle('active',b.getAttribute('onclick')?.includes(`'${theme}'`)));
 }
 function previewAccent(v){
  if(!settingsDraft) settingsDraft={theme:coupleSettings.theme||'romance',accent_color:coupleSettings.accent_color||'#e64d78',background_color:coupleSettings.background_color||'#fff7fa'};
