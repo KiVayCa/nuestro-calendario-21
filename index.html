@@ -1125,6 +1125,53 @@ a{transition:color var(--nc-motion-fast) ease,opacity var(--nc-motion-fast) ease
  button:active,.btn:active,.advTab:active,.profileChip:active,.notificationBell:active{transform:none}
 }
 
+
+/* =====================================================
+   TRANSICIONES CINEMÁTICAS · MÓDULOS, SLIDES Y VENTANAS
+===================================================== */
+:root{--nc-motion-fast:cubic-bezier(.2,.75,.25,1);--nc-motion-spring:cubic-bezier(.18,1.22,.32,1)}
+.advancedNav{perspective:900px;isolation:isolate}
+.advTab{position:relative;transform:translateZ(0);transition:transform .32s var(--nc-motion-spring),box-shadow .32s ease,background .32s ease,border-color .32s ease,color .25s ease,filter .25s ease;overflow:hidden}
+.advTab::after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(115deg,transparent 18%,rgba(255,255,255,.78) 48%,transparent 78%);transform:translateX(-130%);transition:transform .65s var(--nc-motion-fast);pointer-events:none}
+.advTab:hover::after,.advTab:focus-visible::after{transform:translateX(130%)}
+.advTab.active{transform:translateY(-2px) scale(1.025);box-shadow:0 9px 22px rgba(141,71,100,.2),inset 0 0 0 1px rgba(255,255,255,.7)}
+.advTab:active{transform:scale(.96)}
+#advancedContent{perspective:1200px;transform-style:preserve-3d}
+#advancedContent > *{transform-origin:50% 0%;animation:ncModuleSlideIn .62s var(--nc-motion-spring) both;will-change:opacity,transform,filter}
+#advancedContent .advHero,#advancedContent .homeWelcome,#advancedContent .homeNext{animation:ncHeroGlide .72s var(--nc-motion-spring) both}
+#advancedContent .advGrid > *,#advancedContent .advList > *,#advancedContent .achievementGrid > *,#advancedContent .homeStats > *{animation:ncCardLiftIn .55s var(--nc-motion-spring) both}
+#advancedContent .advGrid > *:nth-child(2),#advancedContent .advList > *:nth-child(2),#advancedContent .achievementGrid > *:nth-child(2),#advancedContent .homeStats > *:nth-child(2){animation-delay:.055s}
+#advancedContent .advGrid > *:nth-child(3),#advancedContent .advList > *:nth-child(3),#advancedContent .achievementGrid > *:nth-child(3),#advancedContent .homeStats > *:nth-child(3){animation-delay:.11s}
+#advancedContent .advGrid > *:nth-child(4),#advancedContent .advList > *:nth-child(4),#advancedContent .achievementGrid > *:nth-child(4),#advancedContent .homeStats > *:nth-child(4){animation-delay:.165s}
+#advancedContent .advGrid > *:nth-child(5),#advancedContent .advList > *:nth-child(5),#advancedContent .achievementGrid > *:nth-child(5){animation-delay:.22s}
+#advancedContent .advGrid > *:nth-child(6),#advancedContent .advList > *:nth-child(6),#advancedContent .achievementGrid > *:nth-child(6){animation-delay:.275s}
+.advCard,.advItem,.homeStat,.homeNext,.achievementCard,.planOption,.settingsCard{transition:transform .34s var(--nc-motion-spring),box-shadow .34s ease,border-color .28s ease,background-color .28s ease}
+@media(hover:hover) and (pointer:fine){#advancedContent .advCard:hover,#advancedContent .advItem:hover,#advancedContent .homeStat:hover,#advancedContent .homeNext:hover,#advancedContent .achievementCard:not(.locked):hover,#advancedContent .settingsCard:hover{transform:translateY(-5px) scale(1.008);box-shadow:0 20px 42px rgba(86,35,57,.13);border-color:rgba(230,77,120,.3)}}
+.modal.show,.modal.is-closing{backdrop-filter:blur(8px) saturate(1.12)}
+.modal.show .modalBox{animation:ncModalBloom .42s var(--nc-motion-spring) both;transform-origin:50% 45%}
+.modal.is-closing .modalBox{animation:ncModalFoldOut .2s ease-in both;pointer-events:none}
+.modal.is-closing{animation:ncBackdropOut .2s ease-in both;pointer-events:none}
+#advModal .modalBox{border:1px solid rgba(255,255,255,.82);box-shadow:0 30px 100px rgba(38,12,25,.34),0 0 0 1px rgba(230,77,120,.08)}
+#advModal.show .modalBox::before{content:"";display:block;height:4px;border-radius:999px;margin:-24px -24px 20px;background:linear-gradient(90deg,#e64d78,#f7b7ca,#c28bd7,#e64d78);background-size:220% 100%;animation:ncShimmerTrack 2.8s linear infinite}
+#advModal .advGrid .btn{min-height:76px;border:1px solid rgba(230,77,120,.15);border-radius:16px;transition:transform .28s var(--nc-motion-spring),box-shadow .28s ease,background .28s ease}
+#advModal .advGrid .btn:hover{transform:translateY(-3px) scale(1.025);box-shadow:0 12px 25px rgba(141,71,100,.14)}
+#advModal .advForm .field,#profileModal .settingsCard{animation:ncCardLiftIn .38s var(--nc-motion-spring) both}
+#modal[style*="display: grid"] .modalBox{animation:ncModalBloom .42s var(--nc-motion-spring) both}
+#modal.is-closing .modalBox{animation:ncModalFoldOut .2s ease-in both}
+#appDialog.show .appDialogBox{animation:ncModalBloom .4s var(--nc-motion-spring) both}
+#appDialog.is-closing .appDialogBox{animation:ncModalFoldOut .2s ease-in both}
+.btn,.placeTextLink,.memoryLightboxClose{transition:transform .25s var(--nc-motion-spring),box-shadow .25s ease,filter .2s ease}
+.btn:active{transform:scale(.96)}
+@keyframes ncModuleSlideIn{0%{opacity:0;transform:translate3d(0,28px,-16px) scale(.985);filter:blur(5px)}65%{opacity:1;filter:blur(0)}100%{opacity:1;transform:translate3d(0,0,0) scale(1);filter:blur(0)}}
+@keyframes ncHeroGlide{0%{opacity:0;transform:translate3d(0,22px,0) scale(.985);filter:blur(4px)}100%{opacity:1;transform:translate3d(0,0,0) scale(1);filter:blur(0)}}
+@keyframes ncCardLiftIn{0%{opacity:0;transform:translate3d(0,18px,0) scale(.975)}100%{opacity:1;transform:translate3d(0,0,0) scale(1)}}
+@keyframes ncModalBloom{0%{opacity:0;transform:translate3d(0,30px,0) scale(.9) rotateX(3deg);filter:blur(7px)}70%{opacity:1;filter:blur(0)}100%{opacity:1;transform:translate3d(0,0,0) scale(1) rotateX(0);filter:blur(0)}}
+@keyframes ncModalFoldOut{from{opacity:1;transform:translate3d(0,0,0) scale(1);filter:blur(0)}to{opacity:0;transform:translate3d(0,14px,0) scale(.96);filter:blur(3px)}}
+@keyframes ncBackdropOut{from{opacity:1}to{opacity:0}}
+@keyframes ncShimmerTrack{to{background-position:220% 0}}
+@media(max-width:800px){#advancedContent > *{animation-duration:.48s}#advModal .modalBox{max-height:calc(100dvh - 24px);overflow-y:auto}}
+@media(prefers-reduced-motion:reduce){#advancedContent > *,#advancedContent .advHero,#advancedContent .homeWelcome,#advancedContent .homeNext,#advancedContent .advGrid > *,#advancedContent .advList > *,#advancedContent .achievementGrid > *,#advancedContent .homeStats > *,#advModal.show .modalBox,#profileModal.show .modalBox,#modal[style*="display: grid"] .modalBox,#appDialog.show .appDialogBox{animation:none!important;filter:none!important}.advTab::after{display:none!important}}
+
 </style>
 
 </head>
@@ -3344,8 +3391,8 @@ function openModal(d){
     'Agregar un plan ♡';
 
 
-  $('modal').style.display =
-    'grid';
+  $('modal').classList.remove('is-closing');
+  $('modal').style.display = 'grid';
 
 
   $('date').value =
@@ -3462,10 +3509,9 @@ function openEditModal(plan){
 ===================================================== */
 
 function closeModal(){
-
-  $('modal').style.display =
-    'none';
-
+  const modal=$('modal');
+  modal.classList.add('is-closing');
+  window.setTimeout(()=>{if(modal.classList.contains('is-closing')){modal.style.display='none';modal.classList.remove('is-closing');}},210);
 }
 
 
@@ -4388,14 +4434,14 @@ async function saveSettingsFromUI(){
  if(ok){settingsDraft=null;await renderSettingsPhotoPreviews();renderAdvanced();appAlert('✅ Configuración guardada para los dos ❤️');}
 }
 async function useDefaultCouplePhoto(){if(coupleSettings.home_photo_path){await sb.storage.from('couple-media').remove([coupleSettings.home_photo_path]);}await saveCoupleSettings({home_photo_path:null});await renderSettingsPhotoPreviews();renderAdvanced();}
-function openAdvModal(title,body){$('advModalTitle').textContent=title;$('advModalBody').innerHTML=body;$('advModal').classList.add('show');}
+function openAdvModal(title,body){const modal=$('advModal');modal.classList.remove('is-closing');$('advModalTitle').textContent=title;$('advModalBody').innerHTML=body;modal.classList.add('show');}
 function moneyModalActions(action,label='Guardar'){return '<div class="moneyModalActions"><button class="btn" onclick="closeAdvModal()">Cancelar</button><button class="btn primary" onclick="'+action+'">'+label+'</button></div><div id="moneyFormError" class="moneyFormError" role="alert" hidden></div>';}
 function moneyFormError(message){const e=$('moneyFormError');if(e){e.textContent=message;e.hidden=false;}else showAppToast(message,'error');}
 function openConfirmModal(title,message,confirmLabel,action){openAdvModal(title,'<div class="moneyModalIntro"><span>💗</span><div><strong>'+esc(message)+'</strong></div></div><div class="moneyModalActions"><button class="btn" onclick="closeAdvModal()">Cancelar</button><button class="btn danger" onclick="'+action+'">'+esc(confirmLabel)+'</button></div>');}
 function showAppToast(message,type='success'){let toast=$('appToast');if(!toast){toast=document.createElement('div');toast.id='appToast';toast.className='appToast';toast.setAttribute('role','status');document.body.appendChild(toast);}toast.className='appToast '+(type==='error'?'toastError':'toastSuccess');toast.textContent=message;toast.classList.add('show');clearTimeout(window.nc21ToastTimer);window.nc21ToastTimer=setTimeout(()=>toast.classList.remove('show'),3200);}
 function openGoalMovement(id,mode='add'){const x=advCache.goals.find(g=>g.id===id);if(!x)return;const adding=mode==='add';openAdvModal(adding?'Aportar a la meta ❤️':'Retirar dinero de la meta','<div class="moneyModalIntro"><span>'+(adding?'🌱':'↘️')+'</span><div><strong>'+esc(x.title)+'</strong><p>Saldo actual: <b>'+money(x.current_amount||0)+'</b>'+(x.target_amount?' · Objetivo: '+money(x.target_amount):'')+'</p></div></div><div class="field"><label>'+(adding?'Valor que vas a aportar':'Valor que vas a retirar')+'</label><input id="goalMovementAmount" type="number" min="1" step="1" placeholder="Ej. 50000" inputmode="numeric"></div><div class="field"><label>Nota (opcional)</label><input id="goalMovementNote" type="text" maxlength="120" placeholder="'+(adding?'Ahorro del mes':'Retiro de la meta')+'"></div>'+moneyModalActions('saveGoalMovement(\''+id+'\',\''+mode+'\')',adding?'Registrar aporte':'Registrar retiro'));}
 async function saveGoalMovement(id,mode){const x=advCache.goals.find(g=>g.id===id);const amount=Number($('goalMovementAmount')?.value);if(!x)return;if(!Number.isFinite(amount)||amount<=0)return moneyFormError('Ingresa un valor mayor que cero.');const current=Number(x.current_amount||0),adding=mode==='add';if(!adding&&amount>current)return moneyFormError('No puedes retirar más dinero del que tiene la meta.');const next=adding?current+amount:current-amount;const completed=!!x.target_amount&&next>=Number(x.target_amount);const note=$('goalMovementNote')?.value.trim();const {error}=await sb.from('goals').update({current_amount:next,completed}).eq('id',id).eq('couple_id',couple.id);if(error)return moneyFormError('No se pudo actualizar la meta: '+error.message);closeAdvModal();await advLoadAll();showAppToast((adding?'Aporte registrado: ':'Retiro registrado: ')+money(amount)+(note?' · '+note:''));}
-function closeAdvModal(){$('advModal').classList.remove('show');}
+function closeAdvModal(){const modal=$('advModal');if(!modal||!modal.classList.contains('show'))return;modal.classList.add('is-closing');window.setTimeout(()=>{if(modal.classList.contains('is-closing'))modal.classList.remove('show','is-closing');},210);}
 function formShell(fields,submit){return `<div class="advForm">${fields}</div><div style="display:flex;justify-content:flex-end;gap:8px;margin-top:18px"><button class="btn" onclick="closeAdvModal()">Cancelar</button><button class="btn primary" onclick="${submit}">Guardar ❤️</button></div>`;}
 function input(id,label,type='text',extra=''){return `<div class="field"><label>${label}</label><input id="adv_${id}" type="${type}" ${extra}></div>`}
 function textarea(id,label,ph=''){return `<div class="field"><label>${label}</label><textarea id="adv_${id}" placeholder="${ph}"></textarea></div>`}
@@ -4502,6 +4548,7 @@ function openProfilePanel(){
   <div class="profileGrid"><div class="profileStat"><strong id="profileCountPlans">${counts.plans}</strong><span>planes creados</span></div><div class="profileStat"><strong id="profileCountMemories">${counts.memories}</strong><span>recuerdos</span></div><div class="profileStat"><strong id="profileCountLetters">${counts.love_letters}</strong><span>cartas</span></div><div class="profileStat"><strong id="profileCountTotal">${total}</strong><span>aportaciones a nuestro espacio</span></div></div>
   <div class="settingsCard" style="margin-top:16px"><h3>👤 Mis datos</h3><div class="advFormGrid"><div class="field"><label>Nombre</label><input id="profileName" value="${esc(myProfile.display_name||'')}"></div><div class="field"><label>Correo</label><input value="${esc(user.email||'')}" disabled></div></div><div class="field"><label>Sobre mí</label><textarea id="profileBio" placeholder="Una frase, apodo o lo que quieras...">${esc(myProfile.bio||'')}</textarea></div><div class="field"><label>Foto de perfil</label><input id="profilePhotoInput" type="file" accept="image/*"></div><div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap"><button class="btn" onclick="changePassword()">🔐 Cambiar contraseña</button><button class="btn primary" onclick="saveMyProfile()">Guardar perfil ❤️</button><button class="btn danger" onclick="logout()">🚪 Cerrar sesión</button></div><div id="profileMsg" class="settingsNote hidden"></div></div>
   <div class="settingsCard" style="margin-top:16px"><h3>👩‍❤️‍👨 Nuestra actividad</h3><div id="coupleActivitySummary" class="advList"><div class="advEmpty">Cargando...</div></div></div>`;
+  modal.classList.remove('is-closing');
   modal.classList.add('show');
   renderProfileActivitySummary();
   if(myProfile.user_id!==user.id){
@@ -4513,7 +4560,7 @@ function openProfilePanel(){
       if(url&&img&&modal.classList.contains('show'))img.src=url;
     }).catch(()=>{});
   }
-}function closeProfilePanel(){$('profileModal')?.classList.remove('show');}
+}function closeProfilePanel(){const modal=$('profileModal');if(!modal||!modal.classList.contains('show'))return;modal.classList.add('is-closing');window.setTimeout(()=>{if(modal.classList.contains('is-closing'))modal.classList.remove('show','is-closing');},210);}
 async function saveMyProfile(){
   const name=$('profileName')?.value.trim()||defaultDisplayName(),bio=$('profileBio')?.value.trim()||null;
   let avatar_path=myProfile.avatar_path; const f=$('profilePhotoInput')?.files?.[0];
@@ -4571,9 +4618,9 @@ setInterval(checkLocalReminders,60000);
 
 
 let appDialogResolver=null,appDialogMode='alert';
-function appDialogClose(value){const el=$('appDialog');if(!el)return;if(!el.classList.contains('show'))return;el.classList.remove('show');const resolve=appDialogResolver;appDialogResolver=null;if(resolve)resolve(value);}
+function appDialogClose(value){const el=$('appDialog');if(!el)return;if(!el.classList.contains('show'))return;el.classList.add('is-closing');window.setTimeout(()=>{if(el.classList.contains('is-closing'))el.classList.remove('show','is-closing');},210);const resolve=appDialogResolver;appDialogResolver=null;if(resolve)resolve(value);}
 function appDialogSubmit(){if(appDialogMode==='prompt'){const input=$('appDialogInput');const value=input?.value??'';appDialogClose(value);}else if(appDialogMode==='confirm'){appDialogClose(true);}else appDialogClose(true);}
-function appDialogOpen({title='Nuestro espacio ❤️',message='',mode='alert',label='Continuar ❤️',inputLabel='Respuesta',defaultValue='',placeholder='',icon='♡',danger=false}){return new Promise(resolve=>{if(appDialogResolver)appDialogClose(null);appDialogResolver=resolve;appDialogMode=mode;$('appDialogTitle').textContent=title;$('appDialogMessage').textContent=String(message??'');$('appDialogIcon').textContent=icon;$('appDialogInputWrap').hidden=mode!=='prompt';$('appDialogInputLabel').textContent=inputLabel;$('appDialogInput').value=defaultValue;$('appDialogInput').placeholder=placeholder;$('appDialogError').hidden=true;$('appDialogCancel').hidden=mode==='alert';$('appDialogOk').textContent=label;$('appDialogOk').className='btn '+(danger?'danger':'primary');$('appDialog').classList.add('show');requestAnimationFrame(()=>{if(mode==='prompt')$('appDialogInput').focus();else $('appDialogOk').focus();});});}
+function appDialogOpen({title='Nuestro espacio ❤️',message='',mode='alert',label='Continuar ❤️',inputLabel='Respuesta',defaultValue='',placeholder='',icon='♡',danger=false}){return new Promise(resolve=>{if(appDialogResolver)appDialogClose(null);$('appDialog').classList.remove('is-closing');appDialogResolver=resolve;appDialogMode=mode;$('appDialogTitle').textContent=title;$('appDialogMessage').textContent=String(message??'');$('appDialogIcon').textContent=icon;$('appDialogInputWrap').hidden=mode!=='prompt';$('appDialogInputLabel').textContent=inputLabel;$('appDialogInput').value=defaultValue;$('appDialogInput').placeholder=placeholder;$('appDialogError').hidden=true;$('appDialogCancel').hidden=mode==='alert';$('appDialogOk').textContent=label;$('appDialogOk').className='btn '+(danger?'danger':'primary');$('appDialog').classList.add('show');requestAnimationFrame(()=>{if(mode==='prompt')$('appDialogInput').focus();else $('appDialogOk').focus();});});}
 function appAlert(message,title='Nuestro espacio ❤️'){return appDialogOpen({title,message,mode:'alert',label:'Entendido ❤️',icon:'💗'});}
 function appConfirm(message,title='¿Confirmamos?',danger=true){return appDialogOpen({title,message,mode:'confirm',label:danger?'Sí, continuar':'Confirmar ❤️',icon:danger?'🩷':'💗',danger});}
 function appPrompt(message,title='Un dato para nosotros',defaultValue='',inputLabel='Respuesta',placeholder=''){return appDialogOpen({title,message,mode:'prompt',label:'Guardar ❤️',inputLabel,defaultValue,placeholder,icon:'💌'});}
