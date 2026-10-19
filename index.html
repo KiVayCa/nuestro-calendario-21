@@ -1191,8 +1191,8 @@ a{transition:color var(--nc-motion-fast) ease,opacity var(--nc-motion-fast) ease
 @media(prefers-reduced-motion:reduce){#advancedContent > *,#advancedContent .advHero,#advancedContent .homeWelcome,#advancedContent .homeNext,#advancedContent .advGrid > *,#advancedContent .advList > *,#advancedContent .achievementGrid > *,#advancedContent .homeStats > *,#advModal.show .modalBox,#profileModal.show .modalBox,#modal[style*="display: grid"] .modalBox,#appDialog.show .appDialogBox{animation:none!important;filter:none!important}.advTab::after{display:none!important}}
 
 
-/* Estabilidad visual: el contenido se vuelve a renderizar con actualizaciones realtime.
-   No repetir animaciones de entrada en cada render; mantener las transiciones de controles y modales. */
+/* Estabilidad visual: las actualizaciones realtime no reinician animaciones.
+   La entrada cinematográfica se activa solo cuando el usuario cambia de módulo. */
 #advancedContent > *,
 #advancedContent .advHero,
 #advancedContent .homeWelcome,
@@ -1205,6 +1205,40 @@ a{transition:color var(--nc-motion-fast) ease,opacity var(--nc-motion-fast) ease
   filter: none !important;
   will-change: auto !important;
 }
+#advancedContent.tab-enter > * {
+  animation: ncModuleSlideIn .62s var(--nc-motion-spring) both !important;
+  filter: none !important;
+  will-change: opacity, transform !important;
+}
+#advancedContent.tab-enter .advHero,
+#advancedContent.tab-enter .homeWelcome,
+#advancedContent.tab-enter .homeNext {
+  animation: ncHeroGlide .72s var(--nc-motion-spring) both !important;
+}
+#advancedContent.tab-enter .advGrid > *,
+#advancedContent.tab-enter .advList > *,
+#advancedContent.tab-enter .achievementGrid > *,
+#advancedContent.tab-enter .homeStats > * {
+  animation: ncCardLiftIn .55s var(--nc-motion-spring) both !important;
+}
+#advancedContent.tab-enter .advGrid > *:nth-child(2),
+#advancedContent.tab-enter .advList > *:nth-child(2),
+#advancedContent.tab-enter .achievementGrid > *:nth-child(2),
+#advancedContent.tab-enter .homeStats > *:nth-child(2) { animation-delay:55ms !important; }
+#advancedContent.tab-enter .advGrid > *:nth-child(3),
+#advancedContent.tab-enter .advList > *:nth-child(3),
+#advancedContent.tab-enter .achievementGrid > *:nth-child(3),
+#advancedContent.tab-enter .homeStats > *:nth-child(3) { animation-delay:110ms !important; }
+#advancedContent.tab-enter .advGrid > *:nth-child(4),
+#advancedContent.tab-enter .advList > *:nth-child(4),
+#advancedContent.tab-enter .achievementGrid > *:nth-child(4),
+#advancedContent.tab-enter .homeStats > *:nth-child(4) { animation-delay:165ms !important; }
+#advancedContent.tab-enter .advGrid > *:nth-child(5),
+#advancedContent.tab-enter .advList > *:nth-child(5),
+#advancedContent.tab-enter .achievementGrid > *:nth-child(5) { animation-delay:220ms !important; }
+#advancedContent.tab-enter .advGrid > *:nth-child(6),
+#advancedContent.tab-enter .advList > *:nth-child(6),
+#advancedContent.tab-enter .achievementGrid > *:nth-child(6) { animation-delay:275ms !important; }
 #advModal.show .modalBox::before { animation: none !important; }
 @media (prefers-reduced-motion: reduce) {
   #advancedContent *, #advancedContent *::before, #advancedContent *::after {
@@ -4235,6 +4269,7 @@ $('detailModal')
 ===================================================== */
 let advancedTab=(function(){try{return localStorage.getItem('nc21_last_tab')||'home';}catch(e){return 'home';}})();
 let suppressTabAnimation=false;
+let animateNextModuleRender=false;
 const validAdvancedTabs=new Set(['home','calendar','story','memories','letters','dreams','challenges','ideas','dates','goals','budget','notifications','question','places','achievements','private','settings']);
 if(!validAdvancedTabs.has(advancedTab))advancedTab='home';
 let advCache={memories:[],letters:[],dreams:[],challenges:[],dates:[],goals:[],places:[],ideas:[],privateNotes:[],expenses:[],recurring:[],notifications:[],dailyAnswers:[]};
@@ -4246,7 +4281,9 @@ function dateES(v){if(!v)return 'Sin fecha'; const d=new Date(v+'T00:00:00'); re
 function showAdvancedTab(tab,options={}){
  if(!validAdvancedTabs.has(tab))tab='home';
  const area=$('advancedArea'),content=$('advancedContent'),workspace=document.querySelector('.workspace'),hero=document.querySelector('.hero'),cards=document.querySelector('.cards');
+ const previousTab=advancedTab;
  advancedTab=tab;
+ animateNextModuleRender=previousTab!==tab&&!suppressTabAnimation&&!document.body.classList.contains('nc-resume-no-flash');
  try{localStorage.setItem('nc21_last_tab',tab);}catch(e){}
  document.querySelectorAll('.advTab').forEach(b=>b.classList.toggle('active',b.getAttribute('onclick')?.includes("'"+tab+"'")));
   const activeNavButton=Array.from(document.querySelectorAll('.advTab')).find(b=>b.getAttribute('onclick')?.includes("'"+tab+"'"));
@@ -4268,7 +4305,7 @@ function showAdvancedTab(tab,options={}){
  }
 }
 function advHeader(title,sub,button,action){return `<div class="advHero"><div style="display:flex;justify-content:space-between;gap:18px;align-items:center;flex-wrap:wrap"><div><div style="font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:#a16a7d;font-weight:800">Nuestro espacio</div><h2 style="font:700 32px Georgia,serif;color:#653449;margin:5px 0">${title}</h2><p style="margin:0;color:#806572">${sub}</p></div>${button?`<button class="btn primary" onclick="${action}">${button}</button>`:''}</div></div>`}
-function renderAdvanced(){const c=$('advancedContent');if(!c)return; const map={home:renderAdvHome,story:renderAdvStory,memories:renderAdvMemories,letters:renderAdvLetters,dreams:renderAdvDreams,challenges:renderAdvChallenges,ideas:renderAdvIdeas,dates:renderAdvDates,goals:renderAdvGoals,budget:renderAdvBudget,notifications:renderAdvNotifications,question:renderAdvQuestion,places:renderAdvPlaces,achievements:renderAdvAchievements,private:renderAdvPrivate,settings:renderAdvSettings}; c.innerHTML=(map[advancedTab]||renderAdvHome)(); c.classList.remove('tab-enter','tab-leave'); updateNotificationBadge(); if(advancedTab==='home') setTimeout(()=>applyHomePhoto(),0);}
+function renderAdvanced(){const c=$('advancedContent');if(!c)return; const shouldAnimate=animateNextModuleRender;animateNextModuleRender=false;const map={home:renderAdvHome,story:renderAdvStory,memories:renderAdvMemories,letters:renderAdvLetters,dreams:renderAdvDreams,challenges:renderAdvChallenges,ideas:renderAdvIdeas,dates:renderAdvDates,goals:renderAdvGoals,budget:renderAdvBudget,notifications:renderAdvNotifications,question:renderAdvQuestion,places:renderAdvPlaces,achievements:renderAdvAchievements,private:renderAdvPrivate,settings:renderAdvSettings}; c.classList.remove('tab-enter','tab-leave');c.innerHTML=(map[advancedTab]||renderAdvHome)();if(shouldAnimate){void c.offsetWidth;c.classList.add('tab-enter');window.setTimeout(()=>c.classList.remove('tab-enter'),760);} updateNotificationBadge(); if(advancedTab==='home') setTimeout(()=>applyHomePhoto(),0);}
 function cachedHomePhotoUrl(){
   const path=coupleSettings.home_photo_path;
   if(!path)return null;
