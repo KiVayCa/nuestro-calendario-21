@@ -42,6 +42,8 @@ create policy push_subscriptions_delete_own on public.push_subscriptions
 
 -- Membership creation must only occur through the guarded RPC functions.
 drop policy if exists "users can add themselves as member" on public.couple_members;
+drop policy if exists "members can update own membership" on public.couple_members;
+drop policy if exists "creator can delete couple" on public.couples;
 drop policy if exists "authenticated can create a couple" on public.couples;
 
 create or replace function public.get_or_create_our_couple()
