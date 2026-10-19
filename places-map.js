@@ -1,6 +1,8 @@
 (function(){
 let placesMapInstance=null;
 let placeDraftMarker=null;
+let currentLocationMarker=null;
+let currentLocationAccuracy=null;
 let placeSearchResults=[];
 let lastPlaceSearchAt=0;
 function selectedPlaceById(id){return id?(advCache.places||[]).find(function(p){return p.id===id;})||null:null;}
@@ -23,7 +25,7 @@ function openGoogleMapsSearch(fromForm){let q='';if(fromForm){q=(document.getEle
 window.openGoogleMapsSearch=openGoogleMapsSearch;
 function renderAdvPlaces(){
  let html=advHeader('Nuestro mapa de lugares','Guarden sitios desde el mapa, búsquenlos aquí o tráiganlos desde Google Maps. Cada lugar podrá vincularse con recuerdos, sueños, metas y planes.','📍 Guardar lugar','openPlaceForm()');
- html+='<div class="advCard" style="margin-top:16px"><div class="placesMapToolbar"><input id="placesMapSearch" type="search" placeholder="Buscar un lugar o dirección (ej. Salento, Quindío)" onkeydown="if(event.key===\'Enter\'){event.preventDefault();searchPlacesFromMap();}"><button class="btn primary" onclick="searchPlacesFromMap()">🔎 Buscar en el mapa</button><button class="btn" onclick="openGoogleMapsSearch(false)">🌐 Buscar en Google Maps</button></div><div id="placeSearchResults" class="placeSearchResults" aria-live="polite"></div></div>';
+ html+='<div class="advCard" style="margin-top:16px"><div class="placesMapToolbar"><input id="placesMapSearch" type="search" placeholder="Buscar un lugar o dirección (ej. Salento, Quindío)" onkeydown="if(event.key===\'Enter\'){event.preventDefault();searchPlacesFromMap();}"><button class="btn primary" onclick="searchPlacesFromMap()">🔎 Buscar en el mapa</button><button class="btn" onclick="locateCurrentPosition()">📍 Mi ubicación actual</button><button class="btn" onclick="openGoogleMapsSearch(false)">🌐 Buscar en Google Maps</button></div><div id="currentLocationStatus" class="advMeta" role="status" aria-live="polite"></div><div id="placeSearchResults" class="placeSearchResults" aria-live="polite"></div></div>';
  html+='<div class="placesMapShell"><div id="placesMap" role="region" aria-label="Mapa compartido de lugares"></div></div><div class="placesAttribution">Mapa © OpenStreetMap contributors · Mapa interactivo con Leaflet. La búsqueda se realiza solo cuando ustedes pulsan Buscar.</div>';
  html+='<div class="advList" style="margin-top:16px">';
  if((advCache.places||[]).length){html+=(advCache.places||[]).map(function(p){return '<div class="advItem" data-advanced-id="'+esc(p.id)+'"><div style="flex:1"><div class="advItemTitle">📍 '+esc(p.name)+'</div><div class="advMeta">'+esc(p.category||'Lugar')+(p.visit_date?' · '+dateES(p.visit_date):'')+(p.address?' · '+esc(p.address):'')+'</div><p>'+esc(p.description||'')+'</p><div class="advActions" style="justify-content:flex-start">'+(p.latitude!=null&&p.longitude!=null?'<button class="btn" onclick="focusSavedPlace(\''+esc(p.id)+'\')">📌 Ver en el mapa</button>':'')+'<a class="btn" style="text-decoration:none" target="_blank" rel="noopener noreferrer" href="'+esc(placeMapsUrl(p))+'">🌐 Abrir Google Maps</a></div></div><div class="advActions"><button class="btn" onclick="openAdvancedEdit(\'places\',\''+esc(p.id)+'\')">✏️ Editar</button><button class="btn danger" onclick="deleteAdvanced(\'places\',\''+esc(p.id)+'\')">🗑️</button></div></div>';}).join('');}
@@ -44,6 +46,27 @@ function initPlacesMap(){
  setTimeout(function(){if(placesMapInstance)placesMapInstance.invalidateSize();},120);
 }
 window.initPlacesMap=initPlacesMap;
+function locateCurrentPosition(){
+ const status=document.getElementById('currentLocationStatus');
+ if(!placesMapInstance){if(status)status.textContent='Abre primero la pestaña Lugares y espera a que cargue el mapa.';return;}
+ if(!navigator.geolocation){if(status)status.textContent='Este navegador no permite obtener la ubicación.';return;}
+ if(status)status.textContent='Solicitando permiso para conocer tu ubicación…';
+ navigator.geolocation.getCurrentPosition(function(position){
+  if(!placesMapInstance)return;
+  const lat=position.coords.latitude,lon=position.coords.longitude,accuracy=Math.max(0,Number(position.coords.accuracy)||0);
+  if(currentLocationMarker){try{placesMapInstance.removeLayer(currentLocationMarker);}catch(e){}currentLocationMarker=null;}
+  if(currentLocationAccuracy){try{placesMapInstance.removeLayer(currentLocationAccuracy);}catch(e){}currentLocationAccuracy=null;}
+  currentLocationMarker=L.circleMarker([lat,lon],{radius:9,color:'#ffffff',weight:3,fillColor:'#2563eb',fillOpacity:1}).addTo(placesMapInstance);
+  currentLocationMarker.bindPopup('<div class="placeMapPopup"><strong>📍 Estás aquí</strong><div>Tu ubicación actual en este dispositivo.</div><small>Precisión aproximada: '+Math.round(accuracy)+' m</small></div>').openPopup();
+  if(accuracy>0)currentLocationAccuracy=L.circle([lat,lon],{radius:accuracy,color:'#2563eb',weight:1,fillColor:'#60a5fa',fillOpacity:.12,interactive:false}).addTo(placesMapInstance);
+  placesMapInstance.setView([lat,lon],16,{animate:true});
+  if(status)status.textContent='Ubicación encontrada. Solo se muestra en este mapa y no se guarda como lugar compartido.';
+ },function(error){
+  const messages={1:'No se concedió permiso de ubicación. Puedes habilitarlo en los permisos del navegador.',2:'No fue posible determinar la ubicación. Comprueba el GPS o la conexión e inténtalo de nuevo.',3:'La solicitud tardó demasiado. Inténtalo otra vez.'};
+  if(status)status.textContent=messages[error.code]||'No se pudo obtener la ubicación actual.';
+ },{enableHighAccuracy:true,timeout:15000,maximumAge:30000});
+}
+window.locateCurrentPosition=locateCurrentPosition;
 function focusSavedPlace(id){const p=selectedPlaceById(id);if(!p||p.latitude==null||p.longitude==null||!placesMapInstance)return;placesMapInstance.setView([Number(p.latitude),Number(p.longitude)],15);let target=null;placesMapInstance.eachLayer(function(l){if(l instanceof L.Marker){const a=l.getLatLng();if(Math.abs(a.lat-Number(p.latitude))<0.000001&&Math.abs(a.lng-Number(p.longitude))<0.000001)target=l;}});if(target)target.openPopup();}
 window.focusSavedPlace=focusSavedPlace;
 async function runPlaceSearch(query,targetId,mode){
