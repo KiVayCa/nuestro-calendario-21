@@ -647,7 +647,7 @@ body.app-ready .cards{display:none}body.app-ready .hero{display:none}.workspace.
 html[data-nc-home-photo-pending] [data-home-photo]{opacity:0!important}
 [data-home-photo]{transition:opacity .22s ease;object-position:center center}
 .homePhotoCropPreview{display:block;width:100%;aspect-ratio:8/3;max-height:360px;object-fit:contain;background:#24131d;border:1px solid #f0dce4;border-radius:16px}
-html[data-nc-home-photo-pending] #settingsHomePreview{opacity:0}
+html[data-nc-settings-photo-pending] #settingsHomePreview{opacity:0}
 #settingsHomePreview{transition:opacity .2s ease}
 .homePhotoCropControls{display:grid;grid-template-columns:1fr;gap:14px;margin:18px 0}
 .homePhotoCropControls label{display:flex;justify-content:space-between;gap:12px;font-weight:700;font-size:13px}
@@ -4436,11 +4436,11 @@ async function saveHomePhotoCrop(){
 async function renderSettingsPhotoPreviews(){
   const root=document.documentElement,home=$('settingsHomePreview'),logo=$('settingsLogoPreview');
   const hasHome=!!coupleSettings.home_photo_path;
-  if(hasHome)root.dataset.ncHomePhotoPending='1';
+  if(hasHome)root.dataset.ncSettingsPhotoPending='1';
   const [homeUrl,logoUrl]=await Promise.all([signedPhoto(coupleSettings.home_photo_path),signedPhoto(coupleSettings.logo_photo_path)]);
-  if(home){home.src=homeUrl||'pareja.jpeg';home.onload=()=>{if(homeUrl)root.removeAttribute('data-nc-home-photo-pending');};}
+  if(home){home.src=homeUrl||'pareja.jpeg';home.onload=()=>{if(homeUrl)root.removeAttribute('data-nc-settings-photo-pending');};}
   if(logo)logo.src=logoUrl||'pareja.jpeg';
-  if(!homeUrl)root.removeAttribute('data-nc-home-photo-pending');
+  if(!homeUrl)root.removeAttribute('data-nc-settings-photo-pending');
 }
 
 const dailyQuestionBank=[
