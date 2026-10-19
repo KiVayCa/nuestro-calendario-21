@@ -77,6 +77,20 @@ Deno.serve(async (req: Request) => {
       .from("couple_members").select("user_id").eq("couple_id", coupleId).eq("user_id", recipientId).maybeSingle();
     if (recipientError || !recipientMember) return reply(origin, { error: "El destinatario no pertenece a este espacio" }, 403);
 
+    if (!isTest) {
+      const { data: event, error: eventError } = await admin
+        .from("notifications").select("id")
+        .eq("couple_id", coupleId)
+        .eq("actor_user_id", user.id)
+        .eq("recipient_user_id", recipientId)
+        .eq("title", title)
+        .gte("created_at", new Date(Date.now() - 5 * 60 * 1000).toISOString())
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (eventError || !event) return reply(origin, { error: "No existe una notificación reciente autorizada para enviar" }, 403);
+    }
+
     webpush.setVapidDetails(vapidSubject, vapidPublic, vapidPrivate);
     const { data: subscriptions, error: subscriptionError } = await admin
       .from("push_subscriptions").select("endpoint,p256dh,auth").eq("couple_id", coupleId).eq("user_id", recipientId);
