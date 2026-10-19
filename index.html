@@ -1187,6 +1187,29 @@ a{transition:color var(--nc-motion-fast) ease,opacity var(--nc-motion-fast) ease
 @media(max-width:800px){#advancedContent > *{animation-duration:.48s}#advModal .modalBox{max-height:calc(100dvh - 24px);overflow-y:auto}}
 @media(prefers-reduced-motion:reduce){#advancedContent > *,#advancedContent .advHero,#advancedContent .homeWelcome,#advancedContent .homeNext,#advancedContent .advGrid > *,#advancedContent .advList > *,#advancedContent .achievementGrid > *,#advancedContent .homeStats > *,#advModal.show .modalBox,#profileModal.show .modalBox,#modal[style*="display: grid"] .modalBox,#appDialog.show .appDialogBox{animation:none!important;filter:none!important}.advTab::after{display:none!important}}
 
+
+/* Estabilidad visual: el contenido se vuelve a renderizar con actualizaciones realtime.
+   No repetir animaciones de entrada en cada render; mantener las transiciones de controles y modales. */
+#advancedContent > *,
+#advancedContent .advHero,
+#advancedContent .homeWelcome,
+#advancedContent .homeNext,
+#advancedContent .advGrid > *,
+#advancedContent .advList > *,
+#advancedContent .achievementGrid > *,
+#advancedContent .homeStats > * {
+  animation: none !important;
+  filter: none !important;
+  will-change: auto !important;
+}
+#advModal.show .modalBox::before { animation: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  #advancedContent *, #advancedContent *::before, #advancedContent *::after {
+    animation: none !important;
+    transition-duration: .001ms !important;
+  }
+}
+
 </style>
 
 </head>
