@@ -997,6 +997,84 @@ body.nc-theme-ready{transition:color .16s ease}
 @keyframes ncCheckIn{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
 @media(hover:none){.btn:hover,.advTab:hover,.profileChip:hover,.notificationBell:hover,.moneyTypeChoice:hover,.themeChoice:hover{transform:none;box-shadow:none}}
 @media(prefers-reduced-motion:reduce){.themeChoice.active .themeSwatch:after{animation:none}.advGrid > *, .advList > *{animation:none!important}}
+
+/* Navegación de módulos: barra compacta para escritorio y desplazamiento táctil en pantallas pequeñas. */
+.advancedNav{
+  display:flex;
+  flex-wrap:nowrap;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  min-width:0;
+  padding:8px;
+  overflow:visible;
+}
+.advancedNavModules{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex:1 1 auto;
+  min-width:0;
+  overflow-x:auto;
+  overflow-y:hidden;
+  padding:3px 2px 7px;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(141,71,100,.28) transparent;
+  overscroll-behavior-x:contain;
+  scroll-behavior:smooth;
+}
+.advancedNavModules::-webkit-scrollbar{height:5px}
+.advancedNavModules::-webkit-scrollbar-track{background:transparent}
+.advancedNavModules::-webkit-scrollbar-thumb{background:rgba(141,71,100,.25);border-radius:999px}
+.advancedNav .advTab{
+  flex:0 0 auto;
+  padding:10px 12px;
+  border-radius:12px;
+  box-shadow:none;
+  transition:background-color .18s ease,border-color .18s ease,color .18s ease,transform .18s ease,box-shadow .18s ease;
+}
+.advancedNav .advTab.active{
+  color:var(--rose,#a64e70);
+  background:var(--soft,#fde8ee);
+  border-color:var(--rose,#c96888);
+  box-shadow:inset 0 -2px 0 var(--rose,#c96888),0 3px 10px rgba(90,35,55,.07);
+}
+.advancedNav .advTab:hover{transform:translateY(-1px);box-shadow:0 5px 12px rgba(90,35,55,.08)}
+.advancedNav .advTab:focus-visible,
+.advancedNavActions button:focus-visible{outline:3px solid var(--rose,#c96888);outline-offset:2px}
+.advancedNavActions{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  flex:0 0 auto;
+  padding-left:10px;
+  border-left:1px solid var(--line,#efdee4);
+  background:inherit;
+}
+.advancedNavActions .profileChip{white-space:nowrap;max-width:180px}
+.advancedNavActions .profileChip span{display:inline-block;max-width:120px;overflow:hidden;text-overflow:ellipsis;vertical-align:middle}
+.advancedNavActions .notificationBell{flex:0 0 auto}
+@media(min-width:801px){
+  .advancedNav{border-radius:16px;padding:8px 10px}
+  .advancedNavModules{scrollbar-width:thin;padding-bottom:3px}
+  .advancedNavModules::-webkit-scrollbar{display:block;height:4px}
+  .advancedNav .advTab{padding:10px 11px;font-size:13px}
+  .advancedNavActions{padding-left:10px}
+}
+@media(max-width:800px){
+  .advancedNav{justify-content:flex-start;gap:7px;padding:7px}
+  .advancedNavModules{flex:1 1 auto;gap:6px;scrollbar-width:none;padding-bottom:4px}
+  .advancedNavModules::-webkit-scrollbar{display:none}
+  .advancedNav .advTab{padding:9px 11px;font-size:12px}
+  .advancedNavActions{gap:5px;padding-left:7px}
+  .advancedNavActions .profileChip{max-width:48px;padding:9px 10px}
+  .advancedNavActions .profileChip span{display:none}
+}
+@media(prefers-reduced-motion:reduce){
+  .advancedNavModules{scroll-behavior:auto}
+  .advancedNav .advTab{transition:none}
+}
+
 </style>
 
 </head>
@@ -1146,24 +1224,28 @@ body.nc-theme-ready{transition:color .16s ease}
 
 <section class="advanced" id="advancedArea">
   <div class="advancedNav" id="advancedNav">
-    <button class="advTab active" onclick="showAdvancedTab('home')">🏠 Inicio</button>
-    <button class="advTab" onclick="showAdvancedTab('calendar')">🗓️ Calendario</button>
-    <button class="advTab" onclick="showAdvancedTab('story')">📖 Historia</button>
-    <button class="advTab" onclick="showAdvancedTab('memories')">📸 Recuerdos</button>
-    <button class="advTab" onclick="showAdvancedTab('letters')">💌 Cartas</button>
-    <button class="advTab" onclick="showAdvancedTab('dreams')">✨ Sueños</button>
-    <button class="advTab" onclick="showAdvancedTab('challenges')">🎯 Retos</button>
-    <button class="advTab" onclick="showAdvancedTab('ideas')">🎲 ¿Qué hacemos?</button>
-    <button class="advTab" onclick="showAdvancedTab('dates')">📅 Fechas</button>
-    <button class="advTab" onclick="showAdvancedTab('goals')">💰 Metas</button>
-    <button class="advTab" onclick="showAdvancedTab('budget')">🧾 Presupuesto</button>
-    <button class="advTab" onclick="showAdvancedTab('question')">💭 Pregunta</button>
-    <button class="advTab" onclick="showAdvancedTab('places')">📍 Lugares</button>
-    <button class="advTab" onclick="showAdvancedTab('achievements')">🏆 Logros</button>
-    <button class="advTab" onclick="showAdvancedTab('private')">🔐 Privado</button>
-    <button class="advTab" onclick="showAdvancedTab('settings')">⚙️ Configuración</button>
-    <button class="profileChip" id="profileChip" onclick="openProfilePanel()">👤 <span id="profileChipName">Mi perfil</span></button>
-    <button class="notificationBell" id="notificationsTab" type="button" onclick="showAdvancedTab('notifications')" aria-label="Notificaciones" title="Notificaciones"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><span class="notificationBadge" id="notificationBadge" hidden>0</span></button>
+    <div class="advancedNavModules" id="advancedNavModules" aria-label="Módulos de la aplicación">
+      <button class="advTab active" onclick="showAdvancedTab('home')">🏠 Inicio</button>
+      <button class="advTab" onclick="showAdvancedTab('calendar')">🗓️ Calendario</button>
+      <button class="advTab" onclick="showAdvancedTab('story')">📖 Historia</button>
+      <button class="advTab" onclick="showAdvancedTab('memories')">📸 Recuerdos</button>
+      <button class="advTab" onclick="showAdvancedTab('letters')">💌 Cartas</button>
+      <button class="advTab" onclick="showAdvancedTab('dreams')">✨ Sueños</button>
+      <button class="advTab" onclick="showAdvancedTab('challenges')">🎯 Retos</button>
+      <button class="advTab" onclick="showAdvancedTab('ideas')">🎲 ¿Qué hacemos?</button>
+      <button class="advTab" onclick="showAdvancedTab('dates')">📅 Fechas</button>
+      <button class="advTab" onclick="showAdvancedTab('goals')">💰 Metas</button>
+      <button class="advTab" onclick="showAdvancedTab('budget')">🧾 Presupuesto</button>
+      <button class="advTab" onclick="showAdvancedTab('question')">💭 Pregunta</button>
+      <button class="advTab" onclick="showAdvancedTab('places')">📍 Lugares</button>
+      <button class="advTab" onclick="showAdvancedTab('achievements')">🏆 Logros</button>
+      <button class="advTab" onclick="showAdvancedTab('private')">🔐 Privado</button>
+      <button class="advTab" onclick="showAdvancedTab('settings')">⚙️ Configuración</button>
+    </div>
+    <div class="advancedNavActions" aria-label="Cuenta y avisos">
+      <button class="profileChip" id="profileChip" onclick="openProfilePanel()">👤 <span id="profileChipName">Mi perfil</span></button>
+      <button class="notificationBell" id="notificationsTab" type="button" onclick="showAdvancedTab('notifications')" aria-label="Notificaciones" title="Notificaciones"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><span class="notificationBadge" id="notificationBadge" hidden>0</span></button>
+    </div>
   </div>
   <div id="advancedContent"></div>
 </section>
