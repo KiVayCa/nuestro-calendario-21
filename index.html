@@ -2505,8 +2505,10 @@ async function init(){
 
         if(session && (event === 'INITIAL_SESSION' || event === 'SIGNED_IN')){
           user = session.user;
-          document.body.classList.add('auth-pending');
+          // SIGNED_IN puede emitirse al volver a una pestaña o renovar el token.
+          // Si este usuario ya está configurado, no reactives la pantalla de carga.
           if(authSetupUserId===session.user.id)return;
+          document.body.classList.add('auth-pending');
           authSetupUserId=session.user.id;
           setup().catch(err=>{
             authSetupUserId=null;
