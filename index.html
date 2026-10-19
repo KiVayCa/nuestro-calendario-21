@@ -1075,6 +1075,56 @@ body.nc-theme-ready{transition:color .16s ease}
   .advancedNav .advTab{transition:none}
 }
 
+
+/* Movimiento global refinado: respuesta consistente en controles, tarjetas, modales y contenido. */
+:root{--nc-motion-fast:150ms;--nc-motion-base:220ms;--nc-motion-slow:320ms;--nc-ease:cubic-bezier(.2,.75,.25,1)}
+button,a,.btn,.advTab,.profileChip,.notificationBell,.themeChoice,.moneyTypeChoice,
+input,textarea,select,.advCard,.advItem,.homeStat,.homeNext,.homePill,.settingsCard,
+.progress,.profileStat,.calendarDay,.calendarEvent,.modalBox,.homeWelcome{
+  transition:color var(--nc-motion-base) var(--nc-ease),
+    background-color var(--nc-motion-base) var(--nc-ease),
+    border-color var(--nc-motion-base) var(--nc-ease),
+    box-shadow var(--nc-motion-base) var(--nc-ease),
+    transform var(--nc-motion-base) var(--nc-ease),
+    opacity var(--nc-motion-base) var(--nc-ease);
+}
+button,.btn,.advTab,.profileChip,.notificationBell,.themeChoice,.moneyTypeChoice{-webkit-tap-highlight-color:transparent;transform-origin:center}
+button:active,.btn:active,.advTab:active,.profileChip:active,.notificationBell:active,.themeChoice:active,.moneyTypeChoice:active{transform:scale(.975)}
+button:focus-visible,.btn:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid color-mix(in srgb,var(--rose,#e64d78) 55%,transparent);outline-offset:3px}
+input,textarea,select{transition:border-color var(--nc-motion-base) var(--nc-ease),box-shadow var(--nc-motion-base) var(--nc-ease),background-color var(--nc-motion-base) var(--nc-ease)}
+input:focus,textarea:focus,select:focus{box-shadow:0 0 0 4px color-mix(in srgb,var(--rose,#e64d78) 13%,transparent)}
+.advCard,.advItem,.homeStat,.homeNext,.settingsCard,.profileStat{transform:translateZ(0);backface-visibility:hidden}
+@media(hover:hover) and (pointer:fine){
+ .advCard:hover,.homeStat:hover,.homeNext:hover,.settingsCard:hover,.profileStat:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(87,40,57,.09)}
+ .advItem:hover{border-color:color-mix(in srgb,var(--rose,#e64d78) 30%,var(--line,#eadde2))}
+ .btn:hover,button:hover{filter:brightness(1.015)}
+}
+#advancedContent.tab-enter{animation:ncPageEnter .34s var(--nc-ease) both!important}
+@keyframes ncPageEnter{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+#advancedContent .advHero{animation:ncPageEnter .28s var(--nc-ease) both}
+#advancedContent .advGrid>.advCard,#advancedContent .advList>.advItem{animation:ncContentEnter .32s var(--nc-ease) both}
+#advancedContent .advGrid>.advCard:nth-child(2),#advancedContent .advList>.advItem:nth-child(2){animation-delay:25ms}
+#advancedContent .advGrid>.advCard:nth-child(3),#advancedContent .advList>.advItem:nth-child(3){animation-delay:50ms}
+#advancedContent .advGrid>.advCard:nth-child(4),#advancedContent .advList>.advItem:nth-child(4){animation-delay:75ms}
+#advancedContent .advGrid>.advCard:nth-child(5),#advancedContent .advList>.advItem:nth-child(5){animation-delay:100ms}
+@keyframes ncContentEnter{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.homeWelcome{animation:ncWelcomeEnter .55s var(--nc-ease) both}
+@keyframes ncWelcomeEnter{from{opacity:.65;transform:translateY(5px) scale(.995)}to{opacity:1;transform:translateY(0) scale(1)}}
+.homeStat strong,.advMetric,.profileStat strong{font-variant-numeric:tabular-nums}
+.progress span{transition:width .55s var(--nc-ease)}
+.modal.show .modalBox{animation:ncModalEnter .25s var(--nc-ease) both}
+@keyframes ncModalEnter{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+img{transition:opacity .25s ease,filter .25s ease}
+a{transition:color var(--nc-motion-fast) ease,opacity var(--nc-motion-fast) ease}
+@media(max-width:800px){
+ .advCard:hover,.homeStat:hover,.homeNext:hover,.settingsCard:hover,.profileStat:hover{transform:none;box-shadow:none}
+ #advancedContent .advGrid>.advCard,#advancedContent .advList>.advItem{animation-duration:.24s}
+}
+@media(prefers-reduced-motion:reduce){
+ #advancedContent.tab-enter,#advancedContent .advHero,#advancedContent .advGrid>.advCard,#advancedContent .advList>.advItem,.homeWelcome,.modal.show .modalBox{animation:none!important}
+ button:active,.btn:active,.advTab:active,.profileChip:active,.notificationBell:active{transform:none}
+}
+
 </style>
 
 </head>
@@ -4121,7 +4171,7 @@ function showAdvancedTab(tab,options={}){
 function advHeader(title,sub,button,action){return `<div class="advHero"><div style="display:flex;justify-content:space-between;gap:18px;align-items:center;flex-wrap:wrap"><div><div style="font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:#a16a7d;font-weight:800">Nuestro espacio</div><h2 style="font:700 32px Georgia,serif;color:#653449;margin:5px 0">${title}</h2><p style="margin:0;color:#806572">${sub}</p></div>${button?`<button class="btn primary" onclick="${action}">${button}</button>`:''}</div></div>`}
 function renderAdvanced(){const c=$('advancedContent');if(!c)return; const map={home:renderAdvHome,story:renderAdvStory,memories:renderAdvMemories,letters:renderAdvLetters,dreams:renderAdvDreams,challenges:renderAdvChallenges,ideas:renderAdvIdeas,dates:renderAdvDates,goals:renderAdvGoals,budget:renderAdvBudget,notifications:renderAdvNotifications,question:renderAdvQuestion,places:renderAdvPlaces,achievements:renderAdvAchievements,private:renderAdvPrivate,settings:renderAdvSettings}; c.innerHTML=(map[advancedTab]||renderAdvHome)(); c.classList.remove('tab-enter','tab-leave'); updateNotificationBadge(); if(advancedTab==='home') setTimeout(()=>applyHomePhoto(),0);}
 function renderAdvHome(){
- const p=plans.length,m=advCache.memories.length,d=advCache.dreams.filter(x=>x.status==='cumplido').length,g=advCache.goals.filter(x=>x.completed).length,ch=advCache.challenges.filter(x=>x.completed).length;
+ const p=plans.length,m=advCache.memories.length,d=advCache.dreams.filter(x=>x.status==='cumplido').length,g=advCache.goals.length,ch=advCache.challenges.filter(x=>x.completed).length;
  const next=getNextUpcomingPlan();
  const together=Math.max(0,Math.floor((Date.now()-new Date('2026-01-21T00:00:00'))/86400000));
  const dating=Math.max(0,Math.floor((Date.now()-new Date('2026-04-21T00:00:00'))/86400000));
