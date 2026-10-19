@@ -1001,6 +1001,7 @@ body.nc-theme-ready{transition:color .16s ease}
 /* Navegación de módulos: barra compacta para escritorio y desplazamiento táctil en pantallas pequeñas. */
 .advancedNav{
   display:flex;
+  flex-wrap:nowrap;
   align-items:center;
   justify-content:space-between;
   gap:10px;
@@ -1055,8 +1056,8 @@ body.nc-theme-ready{transition:color .16s ease}
 .advancedNavActions .notificationBell{flex:0 0 auto}
 @media(min-width:801px){
   .advancedNav{border-radius:16px;padding:8px 10px}
-  .advancedNavModules{scrollbar-width:none;padding-bottom:3px}
-  .advancedNavModules::-webkit-scrollbar{display:none}
+  .advancedNavModules{scrollbar-width:thin;padding-bottom:3px}
+  .advancedNavModules::-webkit-scrollbar{display:block;height:4px}
   .advancedNav .advTab{padding:10px 11px;font-size:13px}
   .advancedNavActions{padding-left:10px}
 }
