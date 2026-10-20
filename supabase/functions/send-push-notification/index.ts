@@ -77,6 +77,7 @@ Deno.serve(async (req: Request) => {
       .from("couple_members").select("user_id").eq("couple_id", coupleId).eq("user_id", recipientId).maybeSingle();
     if (recipientError || !recipientMember) return reply(origin, { error: "El destinatario no pertenece a este espacio" }, 403);
 
+    let notificationEventId = "";
     if (!isTest) {
       const { data: event, error: eventError } = await admin
         .from("notifications").select("id")
@@ -89,6 +90,7 @@ Deno.serve(async (req: Request) => {
         .limit(1)
         .maybeSingle();
       if (eventError || !event) return reply(origin, { error: "No existe una notificación reciente autorizada para enviar" }, 403);
+      notificationEventId = String(event.id);
     }
 
     webpush.setVapidDetails(vapidSubject, vapidPublic, vapidPrivate);
@@ -101,7 +103,8 @@ Deno.serve(async (req: Request) => {
       title,
       body: message,
       url: "/?tab=" + encodeURIComponent(tab),
-      tag: "nc21-" + String(body.event_type || (isTest ? "push-test" : "notification")).replace(/[^a-z0-9_-]/gi, "").slice(0, 60),
+      // Etiqueta única para evitar que eventos del mismo tipo reemplacen avisos sin alertar.
+      tag: "nc21-" + String(body.event_type || (isTest ? "push-test" : "notification")).replace(/[^a-z0-9_-]/gi, "").slice(0, 24) + "-" + (notificationEventId || crypto.randomUUID()).slice(0, 36),
     });
     let sent = 0;
     let failed = 0;
