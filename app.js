@@ -866,51 +866,7 @@ async function showApp(){
   await loadPlans();
 
 
-  if(realtimeChannel){
-
-    await sb
-      .removeChannel(
-        realtimeChannel
-      );
-
-  }
-
-
-  realtimeChannel =
-    sb
-
-      .channel(
-        'plans-live-' +
-        couple.id
-      )
-
-      .on(
-
-        'postgres_changes',
-
-        {
-
-          event:'*',
-
-          schema:'public',
-
-          table:'plans',
-
-          filter:
-          'couple_id=eq.' +
-          couple.id
-
-        },
-
-        ()=>{
-
-          loadPlans();
-
-        }
-
-      )
-
-      .subscribe();
+  await setupPlanRealtime();
 
   const advArea=$('advancedArea'); const cardsArea=document.querySelector('.cards'); if(advArea&&cardsArea) cardsArea.parentNode.insertBefore(advArea,cardsArea);
   document.body.classList.add('app-ready');
@@ -2743,7 +2699,126 @@ async function changePassword(){
   const pass = await appPrompt('Escribe tu nueva contraseña (mínimo 6 caracteres):');if(pass===null)return;if(pass.length<6)return appAlert('La contraseña debe tener al menos 6 caracteres.');const {error}=await sb.auth.updateUser({password:pass});if(error)return appAlert('No se pudo cambiar la contraseña: '+error.message);appAlert('✅ Contraseña actualizada correctamente.');
 }
 
-async function initAdvanced(){if(!couple)return;await loadProfiles();await advLoadAll();if(!window.advancedRealtime){const tables=['memories','love_letters','dreams','challenges','important_dates','goals','places','activity_ideas','private_notes','couple_settings','shared_expenses','budget_recurring_templates','notifications','daily_answers'];window.advancedRealtime=sb.channel('advanced-live-'+couple.id);tables.forEach(table=>{window.advancedRealtime.on('postgres_changes',{event:'*',schema:'public',table,filter:'couple_id=eq.'+couple.id},payload=>{if(table==='notifications'&&payload.eventType==='INSERT'&&payload.new?.recipient_user_id===user?.id){const note=payload.new;if(document.visibilityState==='visible')showAppToast(note.title||'Nueva notificación de tu pareja ❤️');if('Notification'in window&&Notification.permission==='granted'&&document.visibilityState!=='visible'){navigator.serviceWorker?.ready.then(reg=>reg.showNotification(note.title||'Nuestro Calendario #21',{body:note.body||'Tu pareja compartió algo contigo.',icon:'/icon-192.png',badge:'/icon-192.png',tag:note.id,data:{url:'/?tab='+encodeURIComponent(note.target_tab||'notifications')}})).catch(()=>{});}}advLoadAll();});});window.advancedRealtime.subscribe();}}
+
+/* Sincronización Realtime: recrea canales por pareja, informa estados y agrupa cambios simultáneos. */
+let plansRealtimeCoupleId=null;
+let plansRealtimeStatus='CLOSED';
+let advancedRealtimeCoupleId=null;
+let advancedRealtimeStatus='CLOSED';
+let realtimeRefreshTimer=null;
+let realtimeRefreshPlans=false;
+let realtimeRefreshBusy=false;
+let realtimeRefreshAgain=false;
+
+function scheduleRealtimeRefresh(includePlans=false){
+  realtimeRefreshPlans=realtimeRefreshPlans||includePlans;
+  if(realtimeRefreshTimer)clearTimeout(realtimeRefreshTimer);
+  realtimeRefreshTimer=window.setTimeout(async()=>{
+    realtimeRefreshTimer=null;
+    const withPlans=realtimeRefreshPlans;
+    realtimeRefreshPlans=false;
+    if(realtimeRefreshBusy){
+      realtimeRefreshAgain=true;
+      realtimeRefreshPlans=realtimeRefreshPlans||withPlans;
+      return;
+    }
+    realtimeRefreshBusy=true;
+    try{
+      await advLoadAll();
+      if(withPlans)await loadPlans();
+    }catch(err){
+      console.warn('No se pudo actualizar el calendario en tiempo real:',err);
+    }finally{
+      realtimeRefreshBusy=false;
+      if(realtimeRefreshAgain){
+        realtimeRefreshAgain=false;
+        scheduleRealtimeRefresh(realtimeRefreshPlans);
+      }
+    }
+  },180);
+}
+
+async function setupPlanRealtime(force=false){
+  if(!sb||!couple?.id)return;
+  if(realtimeChannel&&plansRealtimeCoupleId===couple.id&&!force)return;
+  if(realtimeChannel){
+    try{await sb.removeChannel(realtimeChannel);}catch(err){console.warn('No se pudo cerrar el canal anterior de planes:',err);}
+    realtimeChannel=null;
+  }
+  plansRealtimeCoupleId=couple.id;
+  plansRealtimeStatus='CLOSED';
+  realtimeChannel=sb.channel('plans-live-'+couple.id)
+    .on('postgres_changes',{event:'*',schema:'public',table:'plans',filter:'couple_id=eq.'+couple.id},()=>scheduleRealtimeRefresh(true))
+    .subscribe(status=>{
+      plansRealtimeStatus=status;
+      if(status==='SUBSCRIBED'){
+        console.info('Realtime conectado: planes');
+        scheduleRealtimeRefresh(true);
+      }else if(['CHANNEL_ERROR','TIMED_OUT','CLOSED'].includes(status)){
+        console.warn('Canal Realtime de planes:',status);
+      }
+    });
+}
+
+async function setupAdvancedRealtime(force=false){
+  if(!sb||!couple?.id||!user?.id)return;
+  if(window.advancedRealtime&&advancedRealtimeCoupleId===couple.id&&!force)return;
+  if(window.advancedRealtime){
+    try{await sb.removeChannel(window.advancedRealtime);}catch(err){console.warn('No se pudo cerrar el canal anterior de contenido:',err);}
+    window.advancedRealtime=null;
+  }
+  advancedRealtimeCoupleId=couple.id;
+  advancedRealtimeStatus='CLOSED';
+  const tables=['memories','love_letters','dreams','challenges','important_dates','goals','places','activity_ideas','private_notes','couple_settings','shared_expenses','budget_recurring_templates','notifications','daily_answers'];
+  const channel=sb.channel('advanced-live-'+couple.id);
+  tables.forEach(table=>{
+    channel.on('postgres_changes',{event:'*',schema:'public',table,filter:'couple_id=eq.'+couple.id},payload=>{
+      if(table==='notifications'&&payload.eventType==='INSERT'&&payload.new?.recipient_user_id===user?.id){
+        const note=payload.new;
+        if(document.visibilityState==='visible')showAppToast(note.title||'Nueva notificación de tu pareja ❤️');
+        if('Notification'in window&&Notification.permission==='granted'&&document.visibilityState!=='visible'){
+          navigator.serviceWorker?.ready.then(reg=>reg.showNotification(note.title||'Nuestro Calendario #21',{
+            body:note.body||'Tu pareja compartió algo contigo.',
+            icon:'/icon-192.png',badge:'/icon-192.png',tag:note.id,
+            data:{url:'/?tab='+encodeURIComponent(note.target_tab||'notifications')}
+          })).catch(()=>{});
+        }
+      }
+      scheduleRealtimeRefresh(false);
+    });
+  });
+  window.advancedRealtime=channel.subscribe(status=>{
+    advancedRealtimeStatus=status;
+    if(status==='SUBSCRIBED'){
+      console.info('Realtime conectado: contenido compartido');
+      scheduleRealtimeRefresh(false);
+    }else if(['CHANNEL_ERROR','TIMED_OUT','CLOSED'].includes(status)){
+      console.warn('Canal Realtime de contenido:',status);
+    }
+  });
+}
+
+async function initAdvanced(){
+  if(!couple)return;
+  await loadProfiles();
+  await advLoadAll();
+  await Promise.all([setupPlanRealtime(),setupAdvancedRealtime()]);
+  $('advModal')?.addEventListener('click',e=>{if(e.target===$('advModal'))closeAdvModal();});
+  $('profileModal')?.addEventListener('click',e=>{if(e.target===$('profileModal'))closeProfilePanel();});
+}
+
+/* Al volver a primer plano, refresca datos y recupera canales que hayan quedado desconectados. */
+async function refreshRealtimeOnResume(){
+  if(document.visibilityState!=='visible'||!user||!couple||!sb)return;
+  scheduleRealtimeRefresh(true);
+  await Promise.all([
+    setupPlanRealtime(plansRealtimeStatus!=='SUBSCRIBED'),
+    setupAdvancedRealtime(advancedRealtimeStatus!=='SUBSCRIBED')
+  ]);
+}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')refreshRealtimeOnResume();});
+window.addEventListener('pageshow',()=>refreshRealtimeOnResume());
+
 $('advModal')?.addEventListener('click',e=>{if(e.target===$('advModal'))closeAdvModal();});$('profileModal')?.addEventListener('click',e=>{if(e.target===$('profileModal'))closeProfilePanel();});
 
 
