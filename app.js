@@ -876,6 +876,7 @@ async function showApp(){
   const requestedTab=new URLSearchParams(location.search).get('tab');
   showAdvancedTab(validAdvancedTabs.has(requestedTab)?requestedTab:advancedTab);
   initAdvanced();
+  void repairPushSubscriptionIfMissing();
   document.body.classList.remove('auth-pending');
 }
 
@@ -2474,7 +2475,24 @@ function renderAdvQuestion(){const q=todayQuestion();const answers=advCache.dail
 async function saveDailyAnswer(){const answer=$('dailyAnswerInput')?.value.trim();if(!answer)return appAlert('Escribe tu respuesta antes de guardarla ❤️');const q=todayQuestion();const {error}=await sb.from('daily_answers').upsert({couple_id:couple.id,user_id:user.id,question_date:q.date,question_text:q.text,answer,updated_at:new Date().toISOString()},{onConflict:'couple_id,user_id,question_date'});if(error)return appAlert('No se pudo guardar la respuesta: '+error.message);await advLoadAll();appAlert('Tu respuesta quedó guardada ❤️');}
 function updateNotificationBadge(){const b=$('notificationsTab'),badge=$('notificationBadge');if(!b||!badge)return;const n=advCache.notifications.filter(x=>!x.read_at).length;badge.hidden=!n;badge.textContent=n>99?'99+':String(n);b.setAttribute('aria-label',n?`Notificaciones, ${n} sin leer`:'Notificaciones');b.title=n?`${n} notificación(es) sin leer`:'Notificaciones';}
 function renderAdvNotifications(){const arr=advCache.notifications;const unread=arr.filter(x=>!x.read_at).length;const names=new Map(coupleProfiles.map(p=>[p.user_id,p.display_name||'Tu pareja']));return advHeader('Notificaciones','Aquí aparecen las novedades que tu pareja comparte en el calendario, recuerdos, sueños y metas.',unread?'✓ Marcar todo leído':'🔄 Actualizar',unread?'markAllNotificationsRead()':'advLoadAll()')+`<div class="advList">${arr.length?arr.map(n=>`<div class="advItem ${n.read_at?'notificationRead':'notificationUnread'}"><div style="flex:1"><div class="advItemTitle">${n.read_at?'':'🔴 '}${esc(n.title)}</div><div class="advMeta">${esc(names.get(n.actor_user_id)||'Tu pareja')} · ${new Date(n.created_at).toLocaleString('es-CO')}</div><p>${esc(n.body||'Hay una novedad en su espacio compartido.')}</p></div><div class="advActions">${n.target_tab?`<button class="btn" onclick="openNotificationTarget('${n.id}','${n.target_tab}')">Ver</button>`:''}${!n.read_at?`<button class="btn" onclick="markNotificationRead('${n.id}')">Marcar leído</button>`:''}</div></div>`).join(''):`<div class="advEmpty">💌 Todavía no hay avisos. Cuando alguno de los dos agregue algo nuevo, aparecerá aquí.</div>`}</div><div class="advCard" style="margin-top:18px"><h3>🔔 Notificaciones del navegador</h3><p>Activa avisos push para este dispositivo. Una vez configurado el servidor, recibirás novedades de tu pareja incluso cuando la PWA no esté abierta.</p><button class="btn primary" onclick="enableBrowserNotifications()">Activar notificaciones del navegador</button></div>`;}
-async function createPartnerNotification({event_type,title,body,target_tab,target_id}){const partner=(coupleProfiles||[]).find(p=>p.user_id&&p.user_id!==user?.id);if(!partner||!user?.id||!couple?.id)return;const {error}=await sb.from('notifications').insert({couple_id:couple.id,recipient_user_id:partner.user_id,actor_user_id:user.id,event_type,title,body,target_tab:target_tab||null,target_id:target_id||null});if(error){console.warn('No se pudo guardar la notificación:',error.message);return;}try{const {data,error:pushError}=await sb.functions.invoke('send-push-notification',{body:{couple_id:couple.id,recipient_user_id:partner.user_id,title,body:body||'Tienes una novedad de pareja. ❤️',target_tab:target_tab||'notifications',event_type}});if(pushError)console.warn('No se pudo enviar la notificación push:',pushError.message);else if(data?.error)console.warn('El servidor push no pudo enviar la notificación:',data.error);}catch(e){console.warn('No se pudo contactar al servidor de notificaciones push:',e?.message||e);}}
+async function createPartnerNotification({event_type,title,body,target_tab,target_id}){
+  const partner=(coupleProfiles||[]).find(p=>p.user_id&&p.user_id!==user?.id);
+  if(!partner||!user?.id||!couple?.id)return;
+  const {error}=await sb.from('notifications').insert({
+    couple_id:couple.id,recipient_user_id:partner.user_id,actor_user_id:user.id,
+    event_type,title,body,target_tab:target_tab||null,target_id:target_id||null
+  });
+  if(error){console.warn('No se pudo guardar la notificación:',error.message);return;}
+  try{
+    const {data,error:pushError}=await sb.functions.invoke('send-push-notification',{
+      body:{couple_id:couple.id,recipient_user_id:partner.user_id,title,
+        body:body||'Tienes una novedad de pareja. ❤️',target_tab:target_tab||'notifications',event_type}
+    });
+    if(pushError)console.warn('No se pudo enviar la notificación push:',pushError.message);
+    else if(!data?.sent)console.warn('La notificación quedó guardada, pero no se confirmó ningún envío push:',data?.message||'sin suscripciones activas');
+    else if(data?.failed)console.warn('La notificación push llegó a '+data.sent+' suscripción(es); fallaron '+data.failed+'.');
+  }catch(e){console.warn('No se pudo contactar al servidor de notificaciones push:',e?.message||e);}
+}
 async function markNotificationRead(id){const {error}=await sb.from('notifications').update({read_at:new Date().toISOString()}).eq('id',id).eq('recipient_user_id',user.id);if(error)return appAlert('No se pudo marcar como leído: '+error.message);await advLoadAll();}
 async function markAllNotificationsRead(){const ids=advCache.notifications.filter(n=>!n.read_at).map(n=>n.id);if(!ids.length)return;const {error}=await sb.from('notifications').update({read_at:new Date().toISOString()}).in('id',ids).eq('recipient_user_id',user.id);if(error)return appAlert('No se pudieron actualizar los avisos: '+error.message);await advLoadAll();}
 async function openNotificationTarget(id,tab){await markNotificationRead(id);if(validAdvancedTabs.has(tab))showAdvancedTab(tab);}
@@ -2486,7 +2504,77 @@ const today=new Date(now.getFullYear(),now.getMonth(),now.getDate());for(const d
 }
 const PUSH_VAPID_PUBLIC_KEY='BB0iqrnyRyEHM5I3OVVs5ZmRiDvDHkqHfGha7wG9QcqaGmpR4jO3KBxtQjQZ99sMjbPLjDX8bqrvzsTNI_xlumI';
 function pushBase64UrlToBytes(value){const pad='='.repeat((4-value.length%4)%4);const base64=(value+pad).replace(/-/g,'+').replace(/_/g,'/');const raw=atob(base64);return Uint8Array.from(raw,c=>c.charCodeAt(0));}
-async function enableBrowserNotifications(){if(!('Notification'in window))return appAlert('Este navegador no admite notificaciones. Prueba Chrome en Android o PC.');if(!('serviceWorker'in navigator)||!('PushManager'in window))return appAlert('Este navegador no admite notificaciones push. Prueba Chrome actualizado o instala la PWA.');if(!user?.id||!couple?.id||!sb)return appAlert('Primero inicia sesión en vuestro espacio.');const permission=await Notification.requestPermission();if(permission!=='granted')return appAlert('No se concedió permiso. Puedes cambiarlo desde los ajustes del navegador.');try{const reg=await navigator.serviceWorker.ready;let subscription=await reg.pushManager.getSubscription();if(!subscription)subscription=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:pushBase64UrlToBytes(PUSH_VAPID_PUBLIC_KEY)});const json=subscription.toJSON();const {error}=await sb.from('push_subscriptions').upsert({couple_id:couple.id,user_id:user.id,endpoint:subscription.endpoint,p256dh:json.keys?.p256dh,auth:json.keys?.auth,user_agent:navigator.userAgent.slice(0,300)},{onConflict:'endpoint'});if(error)throw error;checkLocalReminders();const {data,error:pushError}=await sb.functions.invoke('send-push-notification',{body:{couple_id:couple.id,recipient_user_id:user.id,title:'Nuestro Calendario #21 ❤️',body:'¡Las notificaciones push de este dispositivo están activas!',target_tab:'notifications',test:true}});if(pushError)throw pushError;if(data?.error)throw new Error(data.error);appAlert('¡Notificaciones push activadas! Se envió una prueba real a este dispositivo. Cuando tu pareja agregue un plan, recibirás un aviso aunque la PWA no esté abierta, siempre que el dispositivo tenga conexión. ❤️');}catch(e){console.error('Error activando push:',e);appAlert('No pudimos activar las notificaciones push: '+(e?.message||'error desconocido')+'. Verifica que el servidor push esté configurado y vuelve a intentarlo.');}}
+async function persistPushSubscription(subscription){
+  const json=subscription.toJSON();
+  const {error}=await sb.from('push_subscriptions').upsert({
+    couple_id:couple.id,user_id:user.id,endpoint:subscription.endpoint,
+    p256dh:json.keys?.p256dh,auth:json.keys?.auth,
+    user_agent:navigator.userAgent.slice(0,300)
+  },{onConflict:'endpoint'});
+  if(error)throw error;
+}
+async function requestPushTest(){
+  const {data,error}=await sb.functions.invoke('send-push-notification',{
+    body:{couple_id:couple.id,recipient_user_id:user.id,title:'Nuestro Calendario #21 ❤️',
+      body:'¡Las notificaciones push de este dispositivo están activas!',
+      target_tab:'notifications',test:true}
+  });
+  if(error)throw error;
+  return data||{};
+}
+async function renewPushSubscription(reg,oldSubscription){
+  if(oldSubscription){
+    try{await oldSubscription.unsubscribe();}catch(e){console.warn('No se pudo cancelar la suscripción push anterior:',e);}
+  }
+  const fresh=await reg.pushManager.subscribe({
+    userVisibleOnly:true,
+    applicationServerKey:pushBase64UrlToBytes(PUSH_VAPID_PUBLIC_KEY)
+  });
+  await persistPushSubscription(fresh);
+  return fresh;
+}
+async function repairPushSubscriptionIfMissing(){
+  if(!('Notification'in window)||Notification.permission!=='granted'||!('serviceWorker'in navigator)||!('PushManager'in window)||!user?.id||!couple?.id||!sb)return;
+  try{
+    const reg=await navigator.serviceWorker.ready;
+    let subscription=await reg.pushManager.getSubscription();
+    if(!subscription)return;
+    const {data:known,error}=await sb.from('push_subscriptions').select('endpoint')
+      .eq('user_id',user.id).eq('endpoint',subscription.endpoint).maybeSingle();
+    if(error){console.warn('No se pudo verificar el registro push:',error.message);return;}
+    if(known)return;
+    // El servidor pudo haber eliminado esta suscripción tras recibir 404/410.
+    subscription=await renewPushSubscription(reg,subscription);
+    console.info('Suscripción push recuperada para este dispositivo.');
+  }catch(e){console.warn('No se pudo recuperar automáticamente la suscripción push:',e?.message||e);}
+}
+async function enableBrowserNotifications(){
+  if(!('Notification'in window))return appAlert('Este navegador no admite notificaciones. Prueba Chrome en Android o PC.');
+  if(!('serviceWorker'in navigator)||!('PushManager'in window))return appAlert('Este navegador no admite notificaciones push. Prueba Chrome actualizado o instala la PWA.');
+  if(!user?.id||!couple?.id||!sb)return appAlert('Primero inicia sesión en vuestro espacio.');
+  const permission=await Notification.requestPermission();
+  if(permission!=='granted')return appAlert('No se concedió permiso. Puedes cambiarlo desde los ajustes del navegador.');
+  try{
+    const reg=await navigator.serviceWorker.ready;
+    let subscription=await reg.pushManager.getSubscription();
+    if(!subscription)subscription=await renewPushSubscription(reg,null);
+    else await persistPushSubscription(subscription);
+    checkLocalReminders();
+    let result=await requestPushTest();
+    if(result.renew_subscription===true){
+      subscription=await renewPushSubscription(reg,subscription);
+      result=await requestPushTest();
+    }
+    if(!result.sent||result.sent<1){
+      throw new Error(result.message||'El servidor no confirmó la entrega de la prueba push. Revisa la conexión e inténtalo de nuevo.');
+    }
+    const partial=result.failed?(' Se entregó a '+result.sent+' suscripción(es); '+result.failed+' dispositivo(s) necesita(n) revisar su registro.'):'';
+    appAlert('¡Notificaciones push comprobadas! El servidor aceptó el envío de prueba a '+result.sent+' suscripción(es).'+partial+' Cuando tu pareja comparta algo, el aviso podrá llegar aunque la PWA esté cerrada, si el sistema operativo y la conexión permiten la entrega. ❤️');
+  }catch(e){
+    console.error('Error activando push:',e);
+    appAlert('No pudimos confirmar la entrega de notificaciones push: '+(e?.message||'error desconocido')+'. No basta con que Chrome muestre el permiso como autorizado; vuelve a intentarlo desde Notificaciones.');
+  }
+}
 let deferredInstallPrompt=null;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstallPrompt=e;});
 async function installCalendarApp(){if(deferredInstallPrompt){deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;return;}appAlert('En Android abre este sitio en Chrome, toca el menú ⋮ y elige “Instalar aplicación” o “Añadir a pantalla de inicio”. En PC, busca el icono de instalación en la barra de direcciones.');}
 function budgetProfiles(){const ps=coupleProfiles||[];const ana=ps.find(p=>(p.display_name||'').toLowerCase().includes('ana'))||ps[0];const nico=ps.find(p=>(p.display_name||'').toLowerCase().includes('nicol'))||ps.find(p=>p.user_id!==ana?.user_id)||ps[1];return [{id:ana?.user_id,name:ana?.display_name||'Ana María',key:'ana'},{id:nico?.user_id,name:nico?.display_name||'Nicolás',key:'nicolas'}].filter((p,i,a)=>p.id&&a.findIndex(q=>q.id===p.id)===i);}
