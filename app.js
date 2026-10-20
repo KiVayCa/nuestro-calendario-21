@@ -2740,7 +2740,7 @@ function scheduleRealtimeRefresh(includePlans=false){
 
 async function setupPlanRealtime(force=false){
   if(!sb||!couple?.id)return;
-  if(realtimeChannel&&plansRealtimeCoupleId===couple.id&&!force&&plansRealtimeStatus==='SUBSCRIBED')return;
+  if(realtimeChannel&&plansRealtimeCoupleId===couple.id&&!force)return;
   if(realtimeChannel){
     try{await sb.removeChannel(realtimeChannel);}catch(err){console.warn('No se pudo cerrar el canal anterior de planes:',err);}
     realtimeChannel=null;
@@ -2762,7 +2762,7 @@ async function setupPlanRealtime(force=false){
 
 async function setupAdvancedRealtime(force=false){
   if(!sb||!couple?.id||!user?.id)return;
-  if(window.advancedRealtime&&advancedRealtimeCoupleId===couple.id&&!force&&advancedRealtimeStatus==='SUBSCRIBED')return;
+  if(window.advancedRealtime&&advancedRealtimeCoupleId===couple.id&&!force)return;
   if(window.advancedRealtime){
     try{await sb.removeChannel(window.advancedRealtime);}catch(err){console.warn('No se pudo cerrar el canal anterior de contenido:',err);}
     window.advancedRealtime=null;
