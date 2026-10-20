@@ -105,6 +105,7 @@ Deno.serve(async (req: Request) => {
     });
     let sent = 0;
     let failed = 0;
+    let expired = 0;
     for (const sub of subscriptions) {
       try {
         await webpush.sendNotification({ endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } }, payload);
@@ -113,12 +114,26 @@ Deno.serve(async (req: Request) => {
         failed++;
         const statusCode = Number((error as { statusCode?: number })?.statusCode || 0);
         if (statusCode === 404 || statusCode === 410) {
-          await admin.from("push_subscriptions").delete().eq("endpoint", sub.endpoint).eq("user_id", recipientId);
+          expired++;
+          const { error: deleteError } = await admin.from("push_subscriptions").delete().eq("endpoint", sub.endpoint).eq("user_id", recipientId);
+          if (deleteError) console.error("No se pudo eliminar la suscripción push vencida:", deleteError.message);
         }
         console.error("Push send failed:", statusCode || "unknown");
       }
     }
-    return reply(origin, { ok: true, sent, failed, message: sent ? "Notificación push enviada" : "No se pudo entregar la notificación push" }, sent ? 200 : 502);
+    if (sent === 0 && expired > 0) {
+      // Devolvemos 200 con una instrucción explícita para que el cliente pueda renovar
+      // su suscripción local; de lo contrario, Functions.invoke solo expone un error HTTP.
+      return reply(origin, {
+        ok: false, sent, failed, expired, renew_subscription: true,
+        message: "La suscripción push anterior venció. El dispositivo debe registrarse de nuevo."
+      });
+    }
+    return reply(origin, {
+      ok: sent > 0, sent, failed, expired,
+      message: sent ? "Notificación push aceptada por el servicio de entrega" :
+        "No se entregó ninguna notificación push. Comprueba que el destinatario tenga una suscripción activa."
+    }, sent ? 200 : 502);
   } catch (error) {
     console.error("send-push-notification failed:", error);
     return reply(origin, { error: "Error interno al enviar la notificación push" }, 500);
