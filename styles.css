@@ -1203,3 +1203,62 @@ a{transition:color var(--nc-motion-fast) ease,opacity var(--nc-motion-fast) ease
   }
 }
 
+
+
+/* =====================================================
+   CONTRASTE ACCESIBLE PARA TEMAS OSCUROS
+   Mantiene las superficies y el texto dentro de la misma
+   paleta para evitar tarjetas blancas con texto claro.
+===================================================== */
+:is(body[data-theme="night"],body[data-theme="midnight"],body[data-theme="charcoal"]) #advancedContent
+:is(.advCard,.advItem,.advEmpty,.settingsCard,.settingsNote,.dailyQuestionCard,
+    .profileStat,.homeStat,.homeNext,.recurrenceBox,.achievementCard,
+    .budgetCard,.budgetPersonCard,.budgetListCard,.detailCard,.planOption){
+  background:var(--surface)!important;
+  color:var(--ink)!important;
+  border-color:var(--line)!important;
+}
+:is(body[data-theme="night"],body[data-theme="midnight"],body[data-theme="charcoal"]) #advancedContent
+:is(.advCard,.advItem,.advEmpty,.settingsCard,.settingsNote,.dailyQuestionCard,
+    .profileStat,.homeStat,.homeNext,.recurrenceBox,.achievementCard,
+    .budgetCard,.budgetPersonCard,.budgetListCard,.detailCard,.planOption)
+:is(h1,h2,h3,h4,p,span,label,strong,small,li,.advItemTitle,.advMeta,.muted,.detailTitle){
+  color:var(--ink)!important;
+}
+:is(body[data-theme="night"],body[data-theme="midnight"],body[data-theme="charcoal"]) #advancedContent
+:is(.advCard p,.advCard .advMeta,.advItem .advMeta,.advEmpty,.settingsCard p,
+    .settingsNote,.dailyQuestionCard p,.profileStat span,.homeStat span){
+  color:var(--muted)!important;
+}
+:is(body[data-theme="night"],body[data-theme="midnight"],body[data-theme="charcoal"]) #advancedContent
+:is(input:not([type="checkbox"]):not([type="radio"]):not([type="color"]),
+    textarea,select,.advForm input,.advForm textarea,.advForm select){
+  background:var(--surface)!important;
+  color:var(--ink)!important;
+  border-color:var(--line)!important;
+}
+:is(body[data-theme="night"],body[data-theme="midnight"],body[data-theme="charcoal"]) #advancedContent
+:is(input,textarea,select)::placeholder{
+  color:var(--muted)!important;
+  opacity:1;
+}
+:is(body[data-theme="night"],body[data-theme="midnight"],body[data-theme="charcoal"]) .modalBox{
+  background:var(--surface)!important;
+  color:var(--ink)!important;
+  border-color:var(--line)!important;
+}
+:is(body[data-theme="night"],body[data-theme="midnight"],body[data-theme="charcoal"]) .modalBox
+:is(p,span,label,strong,small,.muted){
+  color:var(--ink);
+}
+:is(body[data-theme="night"],body[data-theme="midnight"],body[data-theme="charcoal"]) .modalBox
+:is(input:not([type="checkbox"]):not([type="radio"]):not([type="color"]),textarea,select){
+  background:var(--surface)!important;
+  color:var(--ink)!important;
+  border-color:var(--line)!important;
+}
+:is(body[data-theme="night"],body[data-theme="midnight"],body[data-theme="charcoal"]) #advancedContent
+:is(.advCard,.advItem,.advEmpty,.settingsCard,.settingsNote,.dailyQuestionCard,
+    .profileStat,.homeStat,.homeNext,.recurrenceBox,.achievementCard,
+    .budgetCard,.budgetPersonCard,.budgetListCard,.detailCard,.planOption)
+a:not(.btn){color:var(--rose)!important}
