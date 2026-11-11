@@ -64,6 +64,7 @@ Deno.serve(async (req: Request) => {
     const allowedTabs = new Set(["home","calendar","story","memories","letters","dreams","challenges","ideas","dates","goals","budget","question","places","achievements","private","settings","notifications"]);
     if (!coupleId || !recipientId) return reply(origin, { error: "Falta la pareja o el destinatario" }, 400);
     if (!allowedTabs.has(tab)) return reply(origin, { error: "Destino no válido" }, 400);
+    if (isTest && recipientId !== user.id) return reply(origin, { error: "La prueba push solo puede enviarse al dispositivo del usuario que la solicita" }, 403);
     if (!isTest && recipientId === user.id) return reply(origin, { error: "El destinatario debe ser tu pareja" }, 400);
 
     const admin = createClient(supabaseUrl, serviceKey, {
