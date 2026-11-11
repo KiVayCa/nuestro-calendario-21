@@ -1262,3 +1262,77 @@ a{transition:color var(--nc-motion-fast) ease,opacity var(--nc-motion-fast) ease
     .profileStat,.homeStat,.homeNext,.recurrenceBox,.achievementCard,
     .budgetCard,.budgetPersonCard,.budgetListCard,.detailCard,.planOption)
 a:not(.btn){color:var(--rose)!important}
+
+
+/* =====================================================
+   CINCO TEMAS NUEVOS
+   Paletas claras con contraste legible y superficies coherentes.
+===================================================== */
+body[data-theme="porcelain"]{--rose:#667085;--soft:#edf0f4;--ink:#29313d;--muted:#737d8b;--line:#dce1e8;--surface:#fff;--bodybg:linear-gradient(135deg,#fff,#e9edf2)}
+body[data-theme="citrus"]{--rose:#718b2e;--soft:#edf4d8;--ink:#30391e;--muted:#78815f;--line:#dce7bf;--surface:#fdfff8;--bodybg:linear-gradient(135deg,#fdfff8,#edf4d8)}
+body[data-theme="denim"]{--rose:#477da8;--soft:#e3eef7;--ink:#243849;--muted:#6b8295;--line:#cedfeb;--surface:#fbfdff;--bodybg:linear-gradient(135deg,#fbfdff,#e3eef7)}
+body[data-theme="cinnamon"]{--rose:#a45f36;--soft:#f4e5d8;--ink:#3d2b21;--muted:#896e5d;--line:#e7d2c2;--surface:#fffaf5;--bodybg:linear-gradient(135deg,#fffaf5,#f4e5d8)}
+body[data-theme="orchid"]{--rose:#9b6aa8;--soft:#f1e6f4;--ink:#392b40;--muted:#806d86;--line:#e2d2e8;--surface:#fffbff;--bodybg:linear-gradient(135deg,#fffbff,#f1e6f4)}
+
+
+/* =====================================================
+   CONTRASTE GLOBAL EN MODALES Y PERFIL — TEMAS OSCUROS
+   Cubre contenido generado dinámicamente fuera de
+   #advancedContent, incluidos Crear algo especial y Perfil.
+===================================================== */
+:is(body[data-theme="night"],body[data-theme="midnight"],body[data-theme="charcoal"])
+:is(#advModal,#profileModal,#modal) .modalBox,
+:is(body[data-theme="night"],body[data-theme="midnight"],body[data-theme="charcoal"])
+#appDialog .appDialogBox{
+  background:var(--surface)!important;
+  color:var(--ink)!important;
+  border-color:var(--line)!important;
+}
+:is(body[data-theme="night"],body[data-theme="midnight"],body[data-theme="charcoal"])
+:is(#advModal,#profileModal,#modal) .modalBox
+:is(h1,h2,h3,h4,p,span,label,strong,small,li,div:not(.btn),legend){
+  color:var(--ink);
+}
+:is(body[data-theme="night"],body[data-theme="midnight"],body[data-theme="charcoal"])
+:is(#advModal,#profileModal,#modal) .modalBox
+:is(.advMeta,.field label,.settingsNote,.profileStat span,.muted,.helpText,.formHint){
+  color:var(--muted)!important;
+}
+:is(body[data-theme="night"],body[data-theme="midnight"],body[data-theme="charcoal"])
+:is(#advModal,#profileModal,#modal) .modalBox
+:is(.advGrid,.advForm,.advFormGrid,.field,.profileHero,.profileGrid,.settingsCard,
+    .profileStat,.advItem,.advEmpty,.recurrenceBox,.detailCard){
+  background-color:var(--surface)!important;
+  color:var(--ink)!important;
+  border-color:var(--line)!important;
+}
+:is(body[data-theme="night"],body[data-theme="midnight"],body[data-theme="charcoal"])
+:is(#advModal,#profileModal,#modal) .modalBox
+:is(input:not([type="checkbox"]):not([type="radio"]):not([type="color"]),
+    textarea,select,.field input,.field textarea,.field select){
+  background:var(--surface)!important;
+  color:var(--ink)!important;
+  border-color:var(--line)!important;
+}
+:is(body[data-theme="night"],body[data-theme="midnight"],body[data-theme="charcoal"])
+:is(#advModal,#profileModal,#modal) .modalBox
+:is(input,textarea)::placeholder{
+  color:var(--muted)!important;
+  opacity:1;
+}
+:is(body[data-theme="night"],body[data-theme="midnight"],body[data-theme="charcoal"])
+#advModal .modalBox .advGrid > .btn:not(.primary),
+:is(body[data-theme="night"],body[data-theme="midnight"],body[data-theme="charcoal"])
+#profileModal .modalBox .btn:not(.primary):not(.danger){
+  background:var(--soft)!important;
+  color:var(--ink)!important;
+  border-color:var(--line)!important;
+}
+:is(body[data-theme="night"],body[data-theme="midnight"],body[data-theme="charcoal"])
+:is(#advModal,#profileModal,#modal) .modalBox a:not(.btn){
+  color:var(--rose)!important;
+}
+:is(body[data-theme="night"],body[data-theme="midnight"],body[data-theme="charcoal"])
+#appDialog .appDialogBox :is(h2,p,label,span){
+  color:var(--ink)!important;
+}
