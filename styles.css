@@ -1336,3 +1336,35 @@ body[data-theme="orchid"]{--rose:#9b6aa8;--soft:#f1e6f4;--ink:#392b40;--muted:#8
 #appDialog .appDialogBox :is(h2,p,label,span){
   color:var(--ink)!important;
 }
+
+/* =====================================================
+   AJUSTE DEFINITIVO DE CONTRASTE — MODALES Y PERFIL
+   Corrige fondos claros heredados y textos con estilos fijos.
+===================================================== */
+:is(body[data-theme="night"],body[data-theme="midnight"],body[data-theme="charcoal"])
+#advancedContent .homeWelcome .homeQuickCreateBtn{
+  background:var(--soft)!important;
+  color:var(--ink)!important;
+  border:1px solid var(--line)!important;
+}
+:is(body[data-theme="night"],body[data-theme="midnight"],body[data-theme="charcoal"])
+#profileModal .modalBox
+:is(.profileHero,.profileStat,.settingsCard,.advItem,.advEmpty,.advCard,.detailCard){
+  background:var(--surface)!important;
+  color:var(--ink)!important;
+  border-color:var(--line)!important;
+}
+:is(body[data-theme="night"],body[data-theme="midnight"],body[data-theme="charcoal"])
+#profileModal .modalBox
+:is(h1,h2,h3,h4,p,span,strong,label,small,li){
+  color:var(--ink)!important;
+}
+:is(body[data-theme="night"],body[data-theme="midnight"],body[data-theme="charcoal"])
+#profileModal .modalBox
+:is(.profileStat span,.advMeta,.muted,.settingsNote,.helpText,.formHint){
+  color:var(--muted)!important;
+}
+:is(body[data-theme="night"],body[data-theme="midnight"],body[data-theme="charcoal"])
+#profileModal .modalBox .profileStat strong{
+  color:var(--ink)!important;
+}
