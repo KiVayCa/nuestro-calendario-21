@@ -693,29 +693,21 @@ async function setup(){
   }
 
 
-  if(
-    user.email ===
-    'nickolasmorales82@gmail.com'
-  ){
+  // La autorización se valida en Supabase. No se identifica al creador
+  // mediante un correo personal incluido en el código del navegador.
+  const {data:c,error} = await sb.rpc('get_or_create_our_couple');
 
-    const {data:c,error} = await sb.rpc('get_or_create_our_couple');
-
-    if(error){
-      console.error('No se pudo obtener el espacio compartido:',error);
-      $('login').classList.add('hidden');
-      $('join').classList.remove('hidden');
-      $('joinMsg').textContent = 'No pudimos preparar el espacio: ' + error.message;
-      return;
-    }
-
+  if(!error && c){
     couple = c;
     $('joinCode').textContent = c.join_code || 'NUESTRO #21';
+    $('joinIntro').textContent = 'Este es el código de invitación de su espacio compartido.';
     $('join').classList.remove('hidden');
     $('login').classList.add('hidden');
-    $('joinMsg').textContent = 'Este es tu código. Compártelo con Ana. ❤️';
+    $('joinMsg').textContent = 'Si es la primera configuración, comparte este código con tu pareja. ❤️';
     return;
-
   }
+
+  console.info('El usuario debe unirse a un espacio existente:',error?.message||'Sin espacio disponible');
 
   $('login')
     .classList
