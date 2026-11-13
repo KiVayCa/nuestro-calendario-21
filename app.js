@@ -408,20 +408,7 @@ async function forgotPassword(){
   }
 
 
-  if(
-    !allowed.includes(email)
-  ){
-
-    setMsg(
-      'Este espacio es privado para Nicolás y Ana María ❤️'
-    );
-
-    return;
-
-  }
-
-
-  try{
+try{
 
     const {
       error
