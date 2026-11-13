@@ -11,21 +11,6 @@ const SUPABASE_KEY =
 'sb_publishable_B7N7E-vcuumKlEsEuyxkhQ_vJAZLnl3';
 
 
-/* =====================================================
-   USUARIOS PERMITIDOS
-===================================================== */
-
-const allowed = [
-
-  'nickolasmorales82@gmail.com',
-
-  'nickodavid@hotmail.com',
-
-  'anamariagarciazapata3@gmail.com'
-
-];
-
-
 let sb = null;
 
 let user = null;
@@ -208,20 +193,7 @@ async function login(){
     }
 
 
-    if(
-      !allowed.includes(email)
-    ){
-
-      setMsg(
-        'Este espacio es privado para Nicolás y Ana María ❤️'
-      );
-
-      return;
-
-    }
-
-
-    if(!sb){
+if(!sb){
 
       setMsg(
         'No se pudo conectar con Supabase. Recarga la página.'
@@ -334,20 +306,7 @@ async function register(){
     }
 
 
-    if(
-      !allowed.includes(email)
-    ){
-
-      setMsg(
-        'Este espacio es privado para Nicolás y Ana María ❤️'
-      );
-
-      return;
-
-    }
-
-
-    $('registerBtn').disabled =
+  $('registerBtn').disabled =
       true;
 
     setMsg(
