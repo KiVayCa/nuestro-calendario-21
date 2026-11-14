@@ -17,7 +17,6 @@
     const saved=JSON.parse(localStorage.getItem('nc21_couple_settings')||'null');
     if(!saved)return;
     if(/^#[0-9a-fA-F]{6}$/.test(saved.accent_color||'')){
-      document.documentElement.style.setProperty('--nc-system-bar',saved.accent_color);
       document.querySelector('meta[name="theme-color"]')?.setAttribute('content',saved.accent_color);
     }
     if(saved.theme){
