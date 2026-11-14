@@ -1,6 +1,6 @@
-// Rebuild preview after configuring branch-specific Supabase TEST credentials.
-const CACHE='calendario21-v37';
-self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['./','./index.html','./styles.css','./app.js','./places-map.js','./manifest.json','./icon-192.png','./icon-512.png','./notification-heart.svg'])).then(()=>self.skipWaiting())));
+// Service worker assets are versioned to refresh Android notification icons.
+const CACHE='calendario21-v38';
+self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['./','./index.html','./styles.css','./app.js','./places-map.js','./manifest.json','./icon-192.png','./icon-512.png','./notification-heart.svg','./notification-badge.svg'])).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',e=>{
  const u=new URL(e.request.url);
@@ -22,7 +22,7 @@ self.addEventListener('push',e=>{
  try{if(e.data)data={...data,...e.data.json()};}catch(_){if(e.data)data.body=e.data.text();}
  e.waitUntil(self.registration.showNotification(data.title||'Nuestro Calendario #21',{
   body:data.body||'Tienes una novedad de pareja. ❤️',
-  icon:'/notification-heart.svg',badge:'/notification-heart.svg',tag:data.tag||('nc21-notification-'+Date.now()),
+  icon:'/notification-heart.svg',badge:'/notification-badge.svg',tag:data.tag||('nc21-notification-'+Date.now()),
   data:{url:data.url||'/'},renotify:false
  }));
 });
