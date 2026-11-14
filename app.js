@@ -713,7 +713,7 @@ async function setup(){
     $('joinMsg').textContent =
       'Hay un problema con el espacio compartido: ' +
       error.message;
-
+    revealAuthDestination();
     return;
 
   }
@@ -748,6 +748,7 @@ async function setup(){
     $('join').classList.remove('hidden');
     $('login').classList.add('hidden');
     $('joinMsg').textContent = 'Si es la primera configuración, comparte este código con tu pareja. ❤️';
+    revealAuthDestination();
     return;
   }
 
@@ -772,7 +773,7 @@ async function setup(){
 
   $('joinMsg').textContent =
     'Pega el código cuando lo tengas. ❤️';
-
+  revealAuthDestination();
 }
 
 
@@ -841,6 +842,14 @@ async()=>{
    MOSTRAR APP
 ===================================================== */
 
+function revealAuthDestination(){
+  // Una sola transición: el loader cubre el destino hasta que el navegador
+  // haya calculado su layout y pueda pintarlo sin mostrar estados intermedios.
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    document.body.classList.remove('auth-pending');
+  }));
+}
+
 async function showApp(){
 
   setLoginLoading(false);
@@ -873,7 +882,7 @@ async function showApp(){
   showAdvancedTab(validAdvancedTabs.has(requestedTab)?requestedTab:advancedTab);
   initAdvanced();
   void repairPushSubscriptionIfMissing();
-  document.body.classList.remove('auth-pending');
+  revealAuthDestination();
 }
 
 
@@ -2978,7 +2987,7 @@ function showTransactionIndicator(){
   indicator.className='ncTransactionIndicator';
   indicator.setAttribute('role','status');
   indicator.setAttribute('aria-label','Guardando');
-  indicator.innerHTML='<span class="ncTransactionHeart" aria-hidden="true">♥</span>';
+  indicator.innerHTML='<div class="ncTransactionHeartScene" aria-hidden="true"><div class="authLoaderHeart">♥</div><div class="authLoaderOrbits"><span></span><span></span><span></span></div></div>';
   document.body.appendChild(indicator);
   ncTransactionIndicator=indicator;
 }
