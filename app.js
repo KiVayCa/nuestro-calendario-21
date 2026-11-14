@@ -4,11 +4,8 @@
    SUPABASE
 ===================================================== */
 
-const SUPABASE_URL =
-'https://vmvfcdtohzdhqatxhxdb.supabase.co';
-
-const SUPABASE_KEY =
-'sb_publishable_B7N7E-vcuumKlEsEuyxkhQ_vJAZLnl3';
+let SUPABASE_URL = '';
+let SUPABASE_KEY = '';
 
 
 let sb = null;
@@ -470,6 +467,29 @@ async function init(){
 
   try{
 
+    const configResponse = await fetch('/api/config', {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' },
+      cache: 'no-store',
+      credentials: 'same-origin'
+    });
+
+    if(!configResponse.ok){
+      throw new Error(
+        configResponse.status === 503
+          ? 'Este entorno no tiene una conexión de pruebas configurada. No se ha conectado a ninguna base de datos.'
+          : 'No se pudo obtener la configuración segura de la aplicación.'
+      );
+    }
+
+    const runtimeConfig = await configResponse.json();
+    if(!runtimeConfig.supabaseUrl || !runtimeConfig.supabaseKey){
+      throw new Error('La configuración de conexión está incompleta.');
+    }
+
+    SUPABASE_URL = runtimeConfig.supabaseUrl;
+    SUPABASE_KEY = runtimeConfig.supabaseKey;
+
     if(!window.supabase){
 
       setMsg(
@@ -593,10 +613,12 @@ async function init(){
 
   }catch(err){
 
-    console.error(err);
+    console.error('No se pudo inicializar la aplicación:', err);
+    document.body.classList.remove('auth-pending');
+    $('login')?.classList.remove('hidden');
 
     setMsg(
-      'No se pudo inicializar la aplicación.'
+      err?.message || 'No se pudo inicializar la aplicación.'
     );
 
   }

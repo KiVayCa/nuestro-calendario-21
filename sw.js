@@ -1,9 +1,11 @@
-const CACHE='calendario21-v34';
+const CACHE='calendario21-v35';
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['./','./index.html','./styles.css','./app.js','./places-map.js','./manifest.json','./icon-192.png','./icon-512.png'])).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',e=>{
  const u=new URL(e.request.url);
  if(e.request.method!=='GET'||u.origin!==self.location.origin)return;
+ // La configuración depende del entorno y nunca debe quedar guardada en caché.
+ if(u.pathname==='/api/config')return;
  e.respondWith((async()=>{
   try{
    // Las navegaciones siempre intentan obtener el HTML vigente; la caché queda solo como respaldo offline.
