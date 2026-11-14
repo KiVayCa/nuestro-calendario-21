@@ -12,6 +12,8 @@ body.auth-pending .authLoader{opacity:1;visibility:visible;pointer-events:auto}
    colores o formularios durante el montaje de la sesión. */
 body.auth-pending #app,body.auth-pending #join{visibility:hidden!important}
 body.auth-pending #app *,body.auth-pending #join *{animation-play-state:paused!important}
+/* Evita el último destello de animaciones de entrada durante el primer pintado. */
+body.nc-auth-reveal #app *,body.nc-auth-reveal #join *{animation:none!important;transition:none!important}
 .authLoaderCard{position:relative;width:min(390px,100%);padding:42px 28px 34px;text-align:center}
 .authLoaderHeart{position:relative;z-index:1;font:76px/1 Georgia,serif;color:#d65f83;text-shadow:0 9px 30px rgba(190,74,112,.22);animation:ncHeartBeat 1.25s ease-in-out infinite}
 .authLoaderOrbits{position:absolute;left:50%;top:77px;width:148px;height:88px;transform:translate(-50%,-50%);pointer-events:none}
@@ -45,7 +47,10 @@ body.auth-pending #app *,body.auth-pending #join *{animation-play-state:paused!i
   opacity:1;transition:opacity .15s ease;pointer-events:all;
 }
 .ncTransactionIndicator.is-hiding{opacity:0}
+.ncTransactionContent{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0}
 .ncTransactionHeartScene{position:relative;width:180px;height:150px;display:grid;place-items:center}
+.ncTransactionLabel{font:italic 19px/1.4 Georgia,serif;color:#81445b;letter-spacing:.03em;animation:ncLoaderFloat 2.4s ease-in-out infinite}
+.ncTransactionDots{display:inline-block;min-width:1.4em;animation:ncLoaderFloat 1.5s ease-in-out infinite}
 .ncTransactionHeartScene .authLoaderHeart{font-size:76px}
 .ncTransactionHeartScene .authLoaderOrbits{top:50%}
-@media(prefers-reduced-motion:reduce){.ncTransactionHeartScene .authLoaderHeart,.ncTransactionHeartScene .authLoaderOrbits span{animation:none}}
+@media(prefers-reduced-motion:reduce){.ncTransactionHeartScene .authLoaderHeart,.ncTransactionHeartScene .authLoaderOrbits span,.ncTransactionLabel,.ncTransactionDots{animation:none}}
