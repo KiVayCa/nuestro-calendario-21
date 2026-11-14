@@ -1,6 +1,6 @@
 {
-  "name": "Nuestro Calendario #21",
-  "short_name": "Calendario #21",
+  "name": "Nuestro Calendario #21 TEST",
+  "short_name": "Calendario TEST",
   "start_url": "./",
   "display": "standalone",
   "icons": [
@@ -17,7 +17,7 @@
       "purpose": "any maskable"
     }
   ],
-  "id": "/",
+  "id": "/nc21-test-android-nav",
   "description": "El calendario compartido de Ana María y Nicolás: planes, recuerdos, sueños y fechas especiales.",
   "scope": "./",
   "orientation": "any"
