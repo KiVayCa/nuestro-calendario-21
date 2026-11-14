@@ -27,7 +27,6 @@ body{
 
 /* No mostrar el formulario de acceso mientras Supabase restaura la sesión. */
 body.auth-pending #login{visibility:hidden}
-body.auth-pending::before{content:"Cargando nuestro espacio ❤️";position:fixed;inset:0;z-index:99999;display:grid;place-items:center;background:linear-gradient(135deg,#fffaf8,#f8e6eb);color:#8d4764;font:italic 24px Georgia,serif}
 
 .center{
   min-height:100vh;

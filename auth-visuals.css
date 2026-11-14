@@ -1,4 +1,3 @@
-body.auth-pending::before{content:none!important;display:none!important}
 /* Experiencia visual de acceso · Nuestro Calendario #21 */
 .authLoader{
   position:fixed;inset:0;z-index:99999;display:grid;place-items:center;
@@ -34,3 +33,17 @@ body.auth-pending .authLoader{opacity:1;visibility:visible;pointer-events:auto}
 @keyframes ncLoaderProgress{0%{transform:translateX(-115%)}55%{transform:translateX(175%)}100%{transform:translateX(290%)}}
 @media(max-width:480px){.authLoaderCard{padding:30px 18px}.authLoader h2{font-size:24px}}
 @media(prefers-reduced-motion:reduce){.authLoaderHeart,.authLoaderOrbits span,.authLoaderMessage,.authLoadingDots i,.authLoaderTrack span,.loginButtonHeart{animation:none!important}.authLoader{transition:none}}
+
+/* Guardado de cualquier elemento: únicamente el corazón, sin texto ni pantalla completa. */
+.ncTransactionIndicator{
+  position:fixed;inset:0;z-index:100001;display:grid;place-items:center;
+  background:rgba(255,248,251,.24);backdrop-filter:blur(1.5px);
+  opacity:1;transition:opacity .15s ease;pointer-events:all;
+}
+.ncTransactionIndicator.is-hiding{opacity:0}
+.ncTransactionHeart{
+  display:block;color:#d65f83;font:64px/1 Georgia,serif;
+  text-shadow:0 8px 28px rgba(190,74,112,.28);
+  animation:ncHeartBeat 1.05s ease-in-out infinite;
+}
+@media(prefers-reduced-motion:reduce){.ncTransactionHeart{animation:none}}

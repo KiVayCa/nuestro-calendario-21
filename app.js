@@ -243,10 +243,13 @@ if(!sb){
     }
 
 
-    user =
-      data.user;
+    user = data.user;
 
-
+    // SIGNED_IN también dispara el listener global. El identificador compartido
+    // garantiza que el arranque del espacio se ejecute una sola vez.
+    if(authSetupUserId===data.user.id)return;
+    authSetupUserId=data.user.id;
+    document.body.classList.add('auth-pending');
     await setup();
 
 
@@ -353,10 +356,12 @@ async function register(){
 
     if(data.session){
 
-      user =
-        data.user;
-
-      await setup();
+      user = data.user;
+      if(authSetupUserId!==data.user.id){
+        authSetupUserId=data.user.id;
+        document.body.classList.add('auth-pending');
+        await setup();
+      }
 
     }else{
 
@@ -466,8 +471,32 @@ let authSetupUserId=null;
    INICIALIZAR
 ===================================================== */
 
-async function init(){
+const authLoadingPhrases=[
+  'Cada día contigo es mi lugar favorito.',
+  'Preparando nuevos recuerdos para los dos.',
+  'Nuestro amor también vive en los pequeños detalles.',
+  'Un espacio, dos corazones y muchos sueños.',
+  'Guardando un rinconcito para nuestra historia.',
+  'Que nunca nos falten motivos para sonreír juntos.',
+  'Organizando los próximos capítulos de nuestra historia.',
+  'Todo listo para seguir construyendo nuestro futuro.',
+  'Los mejores planes empiezan cuando estamos juntos.',
+  'Cuidando cada recuerdo que hace especial lo nuestro.',
+  'Dos caminos, un mismo corazón.',
+  'Preparando nuestro pequeño universo.'
+];
+let lastAuthLoadingPhrase='';
+function setAuthLoaderPhrase(){
+  const message=$('authLoaderMessage');
+  if(!message)return;
+  const options=authLoadingPhrases.filter(x=>x!==lastAuthLoadingPhrase);
+  const phrase=options[Math.floor(Math.random()*options.length)]||authLoadingPhrases[0];
+  lastAuthLoadingPhrase=phrase;
+  message.textContent=phrase;
+}
 
+async function init(){
+  setAuthLoaderPhrase();
   try{
 
     const configResponse = await fetch('/api/config', {
@@ -545,6 +574,7 @@ async function init(){
           // SIGNED_IN puede emitirse al volver a una pestaña o renovar el token.
           // Si este usuario ya está configurado, no reactives la pantalla de carga.
           if(authSetupUserId===session.user.id)return;
+          setAuthLoaderPhrase();
           document.body.classList.add('auth-pending');
           authSetupUserId=session.user.id;
           setup().catch(err=>{
@@ -2933,6 +2963,50 @@ window.addEventListener('pageshow',restoreLastTabOnResume);
 document.addEventListener('visibilitychange',restoreLastTabOnResume);
 
 Object.assign(window,{showAdvancedTab,openQuickCreate,openMemoryForm,openLetterForm,openDreamForm,openChallengeForm,openDateForm,openGoalForm,openPlaceForm,openIdeaForm,openPrivateForm,openAdvancedEdit,saveAdvancedEdit,saveMemory,saveLetter,saveDream,saveChallenge,saveDate,saveGoal,savePlace,saveIdea,savePrivate,deleteAdvanced,toggleFavorite,setDreamStatus,toggleChallenge,toggleGoal,advanceGoal,randomIdea,selectTheme,previewAccent,saveSettingsFromUI,useDefaultCouplePhoto,uploadCouplePhoto,openProfilePanel,closeProfilePanel,saveMyProfile,changePassword,openMemoryPhoto,closeMemoryPhoto,openExpenseForm,saveExpense,deleteExpense,changeBudgetMonth,setBudgetMonth,openRecurringForm,saveRecurringTemplate,toggleRecurringTemplate,saveDailyAnswer,markNotificationRead,markAllNotificationsRead,openNotificationTarget,enableBrowserNotifications,installCalendarApp});
+
+
+/* =====================================================
+   INDICADOR GLOBAL DE GUARDADO
+   Solo muestra el corazón animado; no añade textos ni bloquea la vista.
+===================================================== */
+let ncTransactionDepth=0;
+let ncTransactionIndicator=null;
+function showTransactionIndicator(){
+  ncTransactionDepth++;
+  if(ncTransactionIndicator)return;
+  const indicator=document.createElement('div');
+  indicator.className='ncTransactionIndicator';
+  indicator.setAttribute('role','status');
+  indicator.setAttribute('aria-label','Guardando');
+  indicator.innerHTML='<span class="ncTransactionHeart" aria-hidden="true">♥</span>';
+  document.body.appendChild(indicator);
+  ncTransactionIndicator=indicator;
+}
+function hideTransactionIndicator(){
+  ncTransactionDepth=Math.max(0,ncTransactionDepth-1);
+  if(ncTransactionDepth||!ncTransactionIndicator)return;
+  const indicator=ncTransactionIndicator;
+  ncTransactionIndicator=null;
+  indicator.classList.add('is-hiding');
+  window.setTimeout(()=>indicator.remove(),150);
+}
+function withTransactionIndicator(action){
+  if(typeof action!=='function')return action;
+  return async function(...args){
+    showTransactionIndicator();
+    try{return await action.apply(this,args);}
+    finally{hideTransactionIndicator();}
+  };
+}
+const ncSavingActions=[
+  'savePlan','saveDailyAnswer','saveExpense','saveRecurringTemplate','saveGoalMovement',
+  'saveMemory','saveLetter','saveDream','saveChallenge','saveDate','saveGoal','savePlace',
+  'saveIdea','savePrivate','saveAdvancedEdit','saveMyProfile','saveSettingsFromUI',
+  'saveHomePhotoCrop','uploadCouplePhoto','useDefaultCouplePhoto'
+];
+ncSavingActions.forEach(name=>{
+  if(typeof window[name]==='function')window[name]=withTransactionIndicator(window[name]);
+});
 
 /* =====================================================
    INICIO
