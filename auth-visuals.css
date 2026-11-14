@@ -8,6 +8,10 @@
   transition:opacity .42s ease,visibility .42s ease;
 }
 body.auth-pending .authLoader{opacity:1;visibility:visible;pointer-events:auto}
+/* Mantener el destino invisible hasta el fotograma final evita destellos de pestañas,
+   colores o formularios durante el montaje de la sesión. */
+body.auth-pending #app,body.auth-pending #join{visibility:hidden!important}
+body.auth-pending #app *,body.auth-pending #join *{animation-play-state:paused!important}
 .authLoaderCard{position:relative;width:min(390px,100%);padding:42px 28px 34px;text-align:center}
 .authLoaderHeart{position:relative;z-index:1;font:76px/1 Georgia,serif;color:#d65f83;text-shadow:0 9px 30px rgba(190,74,112,.22);animation:ncHeartBeat 1.25s ease-in-out infinite}
 .authLoaderOrbits{position:absolute;left:50%;top:77px;width:148px;height:88px;transform:translate(-50%,-50%);pointer-events:none}
@@ -41,9 +45,7 @@ body.auth-pending .authLoader{opacity:1;visibility:visible;pointer-events:auto}
   opacity:1;transition:opacity .15s ease;pointer-events:all;
 }
 .ncTransactionIndicator.is-hiding{opacity:0}
-.ncTransactionHeart{
-  display:block;color:#d65f83;font:64px/1 Georgia,serif;
-  text-shadow:0 8px 28px rgba(190,74,112,.28);
-  animation:ncHeartBeat 1.05s ease-in-out infinite;
-}
-@media(prefers-reduced-motion:reduce){.ncTransactionHeart{animation:none}}
+.ncTransactionHeartScene{position:relative;width:180px;height:150px;display:grid;place-items:center}
+.ncTransactionHeartScene .authLoaderHeart{font-size:76px}
+.ncTransactionHeartScene .authLoaderOrbits{top:50%}
+@media(prefers-reduced-motion:reduce){.ncTransactionHeartScene .authLoaderHeart,.ncTransactionHeartScene .authLoaderOrbits span{animation:none}}
