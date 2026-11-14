@@ -153,6 +153,17 @@ setInterval(
    LOGIN
 ===================================================== */
 
+function setLoginLoading(loading){
+  const button=$('loginBtn');
+  if(!button)return;
+  button.classList.toggle('is-loading',loading);
+  button.disabled=loading;
+  button.setAttribute('aria-busy',loading?'true':'false');
+  button.innerHTML=loading
+    ? '<span class="loginButtonHeart" aria-hidden="true">♥</span><span>Ingresando a nuestro espacio…</span>'
+    : 'Entrar ❤️';
+}
+
 async function login(){
 
   try{
@@ -201,13 +212,8 @@ if(!sb){
     }
 
 
-    $('loginBtn').disabled =
-      true;
-
-
-    setMsg(
-      'Entrando a Nuestro Calendario…'
-    );
+    setLoginLoading(true);
+    setMsg('Estamos preparando todo para ustedes…');
 
 
     const {
@@ -223,11 +229,8 @@ if(!sb){
     });
 
 
-    $('loginBtn').disabled =
-      false;
-
-
     if(error){
+      setLoginLoading(false);
 
       console.error(error);
 
@@ -251,7 +254,7 @@ if(!sb){
 
     console.error(err);
 
-    $('loginBtn').disabled =      false;
+    setLoginLoading(false);
 
     setMsg(
       'Ocurrió un error inesperado.'
