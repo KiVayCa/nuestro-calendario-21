@@ -846,7 +846,9 @@ function revealAuthDestination(){
   // Una sola transición: el loader cubre el destino hasta que el navegador
   // haya calculado su layout y pueda pintarlo sin mostrar estados intermedios.
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    document.body.classList.add('nc-auth-reveal');
     document.body.classList.remove('auth-pending');
+    window.setTimeout(()=>document.body.classList.remove('nc-auth-reveal'),500);
   }));
 }
 
@@ -2975,8 +2977,8 @@ Object.assign(window,{showAdvancedTab,openQuickCreate,openMemoryForm,openLetterF
 
 
 /* =====================================================
-   INDICADOR GLOBAL DE GUARDADO
-   Solo muestra el corazón animado; no añade textos ni bloquea la vista.
+   INDICADOR GLOBAL DE PROCESAMIENTO
+   Muestra el corazón original y su etiqueta durante mutaciones.
 ===================================================== */
 let ncTransactionDepth=0;
 let ncTransactionIndicator=null;
@@ -2986,8 +2988,8 @@ function showTransactionIndicator(){
   const indicator=document.createElement('div');
   indicator.className='ncTransactionIndicator';
   indicator.setAttribute('role','status');
-  indicator.setAttribute('aria-label','Guardando');
-  indicator.innerHTML='<div class="ncTransactionHeartScene" aria-hidden="true"><div class="authLoaderHeart">♥</div><div class="authLoaderOrbits"><span></span><span></span><span></span></div></div>';
+  indicator.setAttribute('aria-label','Procesando');
+  indicator.innerHTML='<div class="ncTransactionContent"><div class="ncTransactionHeartScene" aria-hidden="true"><div class="authLoaderHeart">♥</div><div class="authLoaderOrbits"><span></span><span></span><span></span></div></div><span class="ncTransactionLabel">Procesando<span class="ncTransactionDots" aria-hidden="true">...</span></span></div>';
   document.body.appendChild(indicator);
   ncTransactionIndicator=indicator;
 }
@@ -3011,7 +3013,11 @@ const ncSavingActions=[
   'savePlan','saveDailyAnswer','saveExpense','saveRecurringTemplate','saveGoalMovement',
   'saveMemory','saveLetter','saveDream','saveChallenge','saveDate','saveGoal','savePlace',
   'saveIdea','savePrivate','saveAdvancedEdit','saveMyProfile','saveSettingsFromUI',
-  'saveHomePhotoCrop','uploadCouplePhoto','useDefaultCouplePhoto'
+  'saveHomePhotoCrop','uploadCouplePhoto','useDefaultCouplePhoto',
+  'deleteCurrentPlan','confirmDeleteExpense','deleteAdvanced',
+  'toggleLetterLock','toggleFavorite','setDreamStatus','toggleChallenge','toggleGoal',
+  'toggleRecurringTemplate','markNotificationRead','markAllNotificationsRead',
+  'changePassword'
 ];
 ncSavingActions.forEach(name=>{
   if(typeof window[name]==='function')window[name]=withTransactionIndicator(window[name]);
