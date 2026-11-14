@@ -1,5 +1,6 @@
 
 :root{
+  --nc-system-bar:#c96888;
   --rose:#e64d78;
   --soft:#fde8ee;
   --ink:#35262b;
@@ -12,6 +13,11 @@
 
 *{
   box-sizing:border-box;
+}
+
+html{
+  background-color:var(--nc-system-bar);
+  min-height:100%;
 }
 
 body{
