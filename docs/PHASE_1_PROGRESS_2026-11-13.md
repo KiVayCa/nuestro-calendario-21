@@ -39,8 +39,8 @@
 - No se ejecutaron migraciones SQL.
 - No se modificó Supabase.
 - No se cambió la configuración de Vercel.
-- No se abrió PR ni se hizo merge.
-- No se publicó a producción.
+- La fase inicial se integró mediante el PR #31 en main el 13 de noviembre de 2026 (merge commit 3624e8e1a259ecb9b9dbbaff8cfd8868d8bec4ba). Ese merge es anterior a los cambios de configuración descritos en la sección 3.
+- Los cambios de configuración de la sección 3 se añadieron después a esta rama de auditoría; no se han integrado en main mediante un nuevo PR.
 ## 3. Separación de configuración entre Production y Preview
 - Se retiraron del frontend la URL y la clave publishable de Supabase escritas directamente en app.js.
 - Se agregó api/config.js, una función de Vercel que entrega al navegador únicamente la URL y una clave publishable/anon válida.
