@@ -2320,7 +2320,7 @@ async function loadCoupleSettings(){
 }
 function applyCoupleSettings(){
   const root=document.documentElement,body=document.body,theme=coupleSettings.theme||'romance',accent=coupleSettings.accent_color||'#e64d78';
-  body.dataset.theme=theme;body.style.setProperty('--rose',accent);root.style.setProperty('--rose',accent);root.style.setProperty('--bodybg',coupleSettings.background_color||'');root.style.setProperty('--accent',accent);root.style.setProperty('--nc-system-bar',accent);
+  body.dataset.theme=theme;body.style.setProperty('--rose',accent);root.style.setProperty('--rose',accent);root.style.setProperty('--bodybg',coupleSettings.background_color||'');root.style.setProperty('--accent',accent);
   root.removeAttribute('data-nc-theme-boot');
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content',accent);
   try{
