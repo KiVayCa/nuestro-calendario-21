@@ -1,4 +1,4 @@
-// Service worker assets are versioned to refresh Android notification icons.
+// Service worker assets are versioned for Android theme color preview.
 const CACHE='calendario21-v39';
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['./','./index.html','./styles.css','./app.js','./places-map.js','./manifest.json','./icon-192.png','./icon-512.png','./notification-heart.svg','./notification-badge.svg'])).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
