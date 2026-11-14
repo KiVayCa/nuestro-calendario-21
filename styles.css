@@ -1,6 +1,5 @@
 
 :root{
-  --nc-system-bar:#c96888;
   --rose:#e64d78;
   --soft:#fde8ee;
   --ink:#35262b;
@@ -16,7 +15,8 @@
 }
 
 html{
-  background-color:var(--nc-system-bar);
+  /* Fondo neutro para la zona inferior de la PWA; no teñirla con el acento. */
+  background-color:var(--surface,#fff);
   min-height:100%;
 }
 
