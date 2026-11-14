@@ -3,7 +3,7 @@
  * Solo expone URL y clave publishable/anon. Nunca devuelve service_role
  * ni SUPABASE_SECRET_KEY. Si faltan variables, el entorno queda desconectado.
  */
-module.exports = function handler(req, res) {
+export default function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
   res.setHeader('Pragma', 'no-cache');
   res.setHeader('X-Content-Type-Options', 'nosniff');
