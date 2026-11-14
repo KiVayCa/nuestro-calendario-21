@@ -881,8 +881,11 @@ async function showApp(){
   if(appEl && advEl && appEl.firstElementChild!==advEl) appEl.insertBefore(advEl, appEl.firstElementChild);
   const ws=document.querySelector('.workspace'); if(ws) ws.classList.add('tab-hidden');
   const requestedTab=new URLSearchParams(location.search).get('tab');
-  showAdvancedTab(validAdvancedTabs.has(requestedTab)?requestedTab:advancedTab);
-  initAdvanced();
+  showAdvancedTab(validAdvancedTabs.has(requestedTab)?requestedTab:advancedTab,{skipScroll:true});
+  // Mantener la portada de carga hasta que Inicio tenga sus datos y su foto
+  // definitivos. Evita mostrar el collage provisional y cambiar su altura.
+  await initAdvanced();
+  if(advancedTab==='home')await applyHomePhoto();
   void repairPushSubscriptionIfMissing();
   revealAuthDestination();
 }
@@ -2220,7 +2223,7 @@ function showAdvancedTab(tab,options={}){
  }
 }
 function advHeader(title,sub,button,action){return `<div class="advHero"><div style="display:flex;justify-content:space-between;gap:18px;align-items:center;flex-wrap:wrap"><div><div style="font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:#a16a7d;font-weight:800">Nuestro espacio</div><h2 style="font:700 32px Georgia,serif;color:#653449;margin:5px 0">${title}</h2><p style="margin:0;color:#806572">${sub}</p></div>${button?`<button class="btn primary" onclick="${action}">${button}</button>`:''}</div></div>`}
-function renderAdvanced(){const c=$('advancedContent');if(!c)return; const shouldAnimate=animateNextModuleRender;animateNextModuleRender=false;const map={home:renderAdvHome,story:renderAdvStory,memories:renderAdvMemories,letters:renderAdvLetters,dreams:renderAdvDreams,challenges:renderAdvChallenges,ideas:renderAdvIdeas,dates:renderAdvDates,goals:renderAdvGoals,budget:renderAdvBudget,notifications:renderAdvNotifications,question:renderAdvQuestion,places:renderAdvPlaces,achievements:renderAdvAchievements,private:renderAdvPrivate,settings:renderAdvSettings}; c.classList.remove('tab-enter','tab-leave');c.innerHTML=(map[advancedTab]||renderAdvHome)();if(shouldAnimate){void c.offsetWidth;c.classList.add('tab-enter');window.setTimeout(()=>c.classList.remove('tab-enter'),760);} updateNotificationBadge(); if(advancedTab==='home') setTimeout(()=>applyHomePhoto(),0);}
+function renderAdvanced(){const c=$('advancedContent');if(!c)return; const shouldAnimate=animateNextModuleRender;animateNextModuleRender=false;const map={home:renderAdvHome,story:renderAdvStory,memories:renderAdvMemories,letters:renderAdvLetters,dreams:renderAdvDreams,challenges:renderAdvChallenges,ideas:renderAdvIdeas,dates:renderAdvDates,goals:renderAdvGoals,budget:renderAdvBudget,notifications:renderAdvNotifications,question:renderAdvQuestion,places:renderAdvPlaces,achievements:renderAdvAchievements,private:renderAdvPrivate,settings:renderAdvSettings}; c.classList.remove('tab-enter','tab-leave');c.innerHTML=(map[advancedTab]||renderAdvHome)();if(shouldAnimate){void c.offsetWidth;c.classList.add('tab-enter');window.setTimeout(()=>c.classList.remove('tab-enter'),760);} updateNotificationBadge(); if(advancedTab==='home'&&!document.body.classList.contains('auth-pending')) setTimeout(()=>applyHomePhoto(),0);}
 function cachedHomePhotoUrl(){
   const path=coupleSettings.home_photo_path;
   if(!path)return null;
