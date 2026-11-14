@@ -2323,6 +2323,23 @@ function applyCoupleSettings(){
   body.dataset.theme=theme;body.style.setProperty('--rose',accent);root.style.setProperty('--rose',accent);root.style.setProperty('--bodybg',coupleSettings.background_color||'');root.style.setProperty('--accent',accent);
   root.removeAttribute('data-nc-theme-boot');
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content',accent);
+  // TEST Android: offer light/dark system chrome based on actual theme surface.
+  // Web APIs cannot set the Android navigation bar to an arbitrary accent color.
+  try{
+    const surface=getComputedStyle(body).getPropertyValue('--surface').trim();
+    const probe=document.createElement('span');
+    probe.style.color=surface||'#ffffff';
+    probe.style.display='none';
+    body.appendChild(probe);
+    const rgb=getComputedStyle(probe).color.match(/[\\d.]+/g)?.slice(0,3).map(Number);
+    probe.remove();
+    if(rgb?.length===3){
+      const luminance=(0.2126*rgb[0]+0.7152*rgb[1]+0.0722*rgb[2]);
+      const mode=luminance<140?'dark':'light';
+      root.style.colorScheme=mode;
+      document.querySelector('meta[name="color-scheme"]')?.setAttribute('content',mode);
+    }
+  }catch(_){}
   try{
     const css=getComputedStyle(body);
     const palette={soft:css.getPropertyValue('--soft').trim(),ink:css.getPropertyValue('--ink').trim(),muted:css.getPropertyValue('--muted').trim(),line:css.getPropertyValue('--line').trim(),surface:css.getPropertyValue('--surface').trim(),bodybg:css.getPropertyValue('--bodybg').trim()};
