@@ -1066,7 +1066,8 @@ button:active,.btn:active,.advTab:active,.profileChip:active,.notificationBell:a
 button:focus-visible,.btn:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid color-mix(in srgb,var(--rose,#e64d78) 55%,transparent);outline-offset:3px}
 input,textarea,select{transition:border-color var(--nc-motion-base) var(--nc-ease),box-shadow var(--nc-motion-base) var(--nc-ease),background-color var(--nc-motion-base) var(--nc-ease)}
 input:focus,textarea:focus,select:focus{box-shadow:0 0 0 4px color-mix(in srgb,var(--rose,#e64d78) 13%,transparent)}
-.advCard,.advItem,.homeStat,.homeNext,.settingsCard,.profileStat{transform:translateZ(0);backface-visibility:hidden}
+/* Evitar rasterizar texto en una capa 3D: conserva relieve y nitidez. */
+.advCard,.advItem,.homeStat,.homeNext,.settingsCard,.profileStat{backface-visibility:visible}
 @media(hover:hover) and (pointer:fine){
  .advCard:hover,.homeStat:hover,.homeNext:hover,.settingsCard:hover,.profileStat:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(87,40,57,.09)}
  .advItem:hover{border-color:color-mix(in srgb,var(--rose,#e64d78) 30%,var(--line,#eadde2))}
@@ -1109,7 +1110,7 @@ a{transition:color var(--nc-motion-fast) ease,opacity var(--nc-motion-fast) ease
 .advTab:hover::after,.advTab:focus-visible::after{transform:translateX(130%)}
 .advTab.active{transform:translateY(-2px) scale(1.025);box-shadow:0 9px 22px rgba(141,71,100,.2),inset 0 0 0 1px rgba(255,255,255,.7)}
 .advTab:active{transform:scale(.96)}
-#advancedContent{perspective:1200px;transform-style:preserve-3d}
+#advancedContent{transform-style:flat}
 #advancedContent > *{transform-origin:50% 0%;animation:ncModuleSlideIn .62s var(--nc-motion-spring) both;will-change:opacity,transform,filter}
 #advancedContent .advHero,#advancedContent .homeWelcome,#advancedContent .homeNext{animation:ncHeroGlide .72s var(--nc-motion-spring) both}
 #advancedContent .advGrid > *,#advancedContent .advList > *,#advancedContent .achievementGrid > *,#advancedContent .homeStats > *{animation:ncCardLiftIn .55s var(--nc-motion-spring) both}
@@ -1119,7 +1120,7 @@ a{transition:color var(--nc-motion-fast) ease,opacity var(--nc-motion-fast) ease
 #advancedContent .advGrid > *:nth-child(5),#advancedContent .advList > *:nth-child(5),#advancedContent .achievementGrid > *:nth-child(5){animation-delay:.22s}
 #advancedContent .advGrid > *:nth-child(6),#advancedContent .advList > *:nth-child(6),#advancedContent .achievementGrid > *:nth-child(6){animation-delay:.275s}
 .advCard,.advItem,.homeStat,.homeNext,.achievementCard,.planOption,.settingsCard{transition:transform .34s var(--nc-motion-spring),box-shadow .34s ease,border-color .28s ease,background-color .28s ease}
-@media(hover:hover) and (pointer:fine){#advancedContent .advCard:hover,#advancedContent .advItem:hover,#advancedContent .homeStat:hover,#advancedContent .homeNext:hover,#advancedContent .achievementCard:not(.locked):hover,#advancedContent .settingsCard:hover{transform:translateY(-5px) scale(1.008);box-shadow:0 20px 42px rgba(86,35,57,.13);border-color:rgba(230,77,120,.3)}}
+@media(hover:hover) and (pointer:fine){#advancedContent .advCard:hover,#advancedContent .advItem:hover,#advancedContent .homeStat:hover,#advancedContent .homeNext:hover,#advancedContent .achievementCard:not(.locked):hover,#advancedContent .settingsCard:hover{transform:translateY(-5px);box-shadow:0 20px 42px rgba(86,35,57,.13);border-color:rgba(230,77,120,.3)}}
 .modal.show,.modal.is-closing{backdrop-filter:blur(8px) saturate(1.12)}
 .modal.show .modalBox{animation:ncModalBloom .42s var(--nc-motion-spring) both;transform-origin:50% 45%}
 .modal.is-closing .modalBox{animation:ncModalFoldOut .2s ease-in both;pointer-events:none}
