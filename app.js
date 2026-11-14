@@ -2331,7 +2331,7 @@ function applyCoupleSettings(){
     probe.style.color=surface||'#ffffff';
     probe.style.display='none';
     body.appendChild(probe);
-    const rgb=getComputedStyle(probe).color.match(/[\\d.]+/g)?.slice(0,3).map(Number);
+    const rgb=getComputedStyle(probe).color.match(/[\d.]+/g)?.slice(0,3).map(Number);
     probe.remove();
     if(rgb?.length===3){
       const luminance=(0.2126*rgb[0]+0.7152*rgb[1]+0.0722*rgb[2]);
