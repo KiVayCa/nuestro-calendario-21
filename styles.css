@@ -15,13 +15,15 @@
 }
 
 html{
-  /* Fondo neutro para la zona inferior de la PWA; no teñirla con el acento. */
-  background-color:var(--surface,#fff);
+  /* Sin capa blanca propia: dejar que el fondo de la app llegue al borde inferior. */
+  background:transparent;
   min-height:100%;
 }
 
 body{
   margin:0;
+  min-height:100vh;
+  min-height:100dvh;
   background:linear-gradient(135deg,#fffaf8,#f8e6eb);
   color:var(--ink);
   font:15px system-ui,-apple-system,Segoe UI,sans-serif;
