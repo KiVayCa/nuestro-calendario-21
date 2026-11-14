@@ -670,6 +670,7 @@ async function setup(){
   if(error){
 
     console.error(error);
+    setLoginLoading(false);
 
     $('login')
       .classList
@@ -713,6 +714,7 @@ async function setup(){
     couple = c;
     $('joinCode').textContent = c.join_code || 'NUESTRO #21';
     $('joinIntro').textContent = 'Este es el código de invitación de su espacio compartido.';
+    setLoginLoading(false);
     $('join').classList.remove('hidden');
     $('login').classList.add('hidden');
     $('joinMsg').textContent = 'Si es la primera configuración, comparte este código con tu pareja. ❤️';
@@ -811,6 +813,7 @@ async()=>{
 
 async function showApp(){
 
+  setLoginLoading(false);
   $('login')
     .classList
     .add('hidden');
