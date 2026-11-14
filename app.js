@@ -704,9 +704,9 @@ async function setup(){
 
   // La autorización se valida en Supabase. No se identifica al creador
   // mediante un correo personal incluido en el código del navegador.
-  const {data:c,error} = await sb.rpc('get_or_create_our_couple');
+  const {data:c,error:rpcError} = await sb.rpc('get_or_create_our_couple');
 
-  if(!error && c){
+  if(!rpcError && c){
     couple = c;
     $('joinCode').textContent = c.join_code || 'NUESTRO #21';
     $('joinIntro').textContent = 'Este es el código de invitación de su espacio compartido.';
@@ -716,7 +716,7 @@ async function setup(){
     return;
   }
 
-  console.info('El usuario debe unirse a un espacio existente:',error?.message||'Sin espacio disponible');
+  console.info('El usuario debe unirse a un espacio existente:',rpcError?.message||'Sin espacio disponible');
 
   $('login')
     .classList
