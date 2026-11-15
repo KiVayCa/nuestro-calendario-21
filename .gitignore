@@ -1,0 +1,7 @@
+node_modules/
+public/
+.vercel/
+.env*
+playwright-report/
+test-results/
+supabase/.temp/

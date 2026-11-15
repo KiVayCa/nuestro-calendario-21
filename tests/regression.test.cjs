@@ -1,0 +1,161 @@
+const test = require("node:test");
+const assert = require("node:assert/strict");
+const vm = require("node:vm");
+const fs = require("node:fs");
+function context(file, extra = {}) {
+  const sandbox = {
+    console,
+    URL,
+    URLSearchParams,
+    setTimeout,
+    clearTimeout,
+    window: { addEventListener() {} },
+    document: { addEventListener() {} },
+    SUPABASE_URL: "https://example.supabase.co",
+    ...extra,
+  };
+  vm.createContext(sandbox);
+  vm.runInContext(fs.readFileSync(file, "utf8"), sandbox);
+  return sandbox;
+}
+test("old signed URLs and storage paths resolve to the same object", () => {
+  const c = context("src/enhancements.js");
+  assert.equal(
+    c.memoryStoragePath(
+      "https://example.supabase.co/storage/v1/object/sign/couple-media/pair/photo%20one.jpg?token=expired",
+    ),
+    "pair/photo one.jpg",
+  );
+  assert.equal(c.memoryStoragePath("pair/photo.jpg"), "pair/photo.jpg");
+  assert.equal(
+    c.memoryStoragePath(
+      "https://other.example/storage/v1/object/sign/couple-media/pair/photo.jpg",
+    ),
+    null,
+  );
+  assert.equal(
+    c.memoryStoragePath(
+      "https://example.supabase.co/storage/v1/object/sign/other/pair/photo.jpg",
+    ),
+    null,
+  );
+});
+test("simultaneous photo requests share one signing operation", async () => {
+  let calls = 0;
+  const c = context("src/enhancements.js", {
+    user: { id: "one" },
+    sb: {
+      storage: {
+        from: () => ({
+          createSignedUrl: async () => {
+            calls++;
+            return { data: { signedUrl: "https://signed.example/photo" } };
+          },
+        }),
+      },
+    },
+  });
+  const urls = await Promise.all([
+    c.memoryImageUrl("pair/photo.jpg"),
+    c.memoryImageUrl("pair/photo.jpg"),
+  ]);
+  assert.equal(calls, 1);
+  assert.equal(urls[0], urls[1]);
+});
+test("double clicks produce one mutation and allow a subsequent save", async () => {
+  const c = context("src/ui.js");
+  let calls = 0;
+  c.showTransactionIndicator = () => {};
+  c.hideTransactionIndicator = () => {};
+  const save = c.withTransactionIndicator(async () => {
+    calls++;
+    return "saved";
+  });
+  await Promise.all([save(), save()]);
+  assert.equal(calls, 1);
+  await save();
+  assert.equal(calls, 2);
+});
+test("memory search combines text, year and favorites", () => {
+  const c = context("src/enhancements.js", {
+    advCache: {
+      memories: [
+        { title: "Viaje a Salento", memory_date: "2026-04-01", favorite: true },
+        { title: "Viaje a Salento", memory_date: "2025-04-01", favorite: true },
+        { title: "Café", memory_date: "2026-04-01", favorite: false },
+      ],
+    },
+  });
+  vm.runInContext(
+    "memoryFilters={query:'salento',year:'2026',favorites:true}",
+    c,
+  );
+  assert.equal(c.filteredMemories().length, 1);
+});
+test("data refreshes are serialized and skip a signed-out session", async () => {
+  const user = { id: "one" },
+    couple = { id: "pair" };
+  let active = 0,
+    max = 0,
+    calls = 0;
+  const c = context("src/enhancements.js", {
+    user,
+    couple,
+    advTables: { memories: "memories" },
+    loadAdvancedData: async () => {
+      calls++;
+      active++;
+      max = Math.max(max, active);
+      await new Promise((r) => setTimeout(r, 5));
+      active--;
+    },
+  });
+  await Promise.all([c.advLoadAll(), c.advLoadAll()]);
+  assert.equal(max, 1);
+  assert.equal(calls, 2);
+  const queued = c.advLoadAll();
+  c.user = null;
+  await queued;
+  assert.equal(calls, 2);
+});
+test("a failed query preserves the current module data", async () => {
+  const cache = { memories: [{ id: "existing" }] };
+  const chain = {
+    select() {
+      return this;
+    },
+    eq() {
+      return this;
+    },
+    order() {
+      return this;
+    },
+    range: async () => ({ error: { message: "offline" } }),
+  };
+  const c = context("src/data.js", {
+    couple: { id: "pair" },
+    user: { id: "user" },
+    sb: { from: () => chain },
+    advTables: { memories: "memories" },
+    advCache: cache,
+    dataLoadRevision: 0,
+    advancedTab: "memories",
+    setConnectionStatus() {},
+    loadCoupleSettings: async () => {},
+    $: () => ({ children: [{}] }),
+    updateNotificationBadge() {},
+    render() {},
+    renderAdvanced() {},
+    pendingModuleRender: false,
+  });
+  await c.loadAdvancedData();
+  assert.equal(cache.memories[0].id, "existing");
+});
+test("bundle compiles with every feature in the build order", () => {
+  new vm.Script(fs.readFileSync("public/app.js", "utf8"));
+  const manifest = JSON.parse(fs.readFileSync("public/manifest.json", "utf8"));
+  assert.ok(manifest.icons.some((icon) => icon.sizes === "512x512"));
+  assert.ok(
+    fs.readFileSync("public/sw.js", "utf8").includes("/auth-visuals.css"),
+  );
+});
