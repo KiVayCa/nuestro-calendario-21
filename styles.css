@@ -1376,3 +1376,15 @@ body[data-theme="orchid"]{--rose:#9b6aa8;--soft:#f1e6f4;--ink:#392b40;--muted:#8
 #profileModal .modalBox .profileStat strong{
   color:var(--ink)!important;
 }
+
+/* Search controls and network feedback use the active theme. */
+.memoryFilters { display:flex; flex-wrap:wrap; gap:12px; align-items:end; margin:16px 0; }
+.memoryFilters label { display:grid; gap:6px; color:var(--ink); }
+.memoryFilters label:first-child { flex:1; min-width:180px; }
+.memoryFilters input,.memoryFilters select { font:inherit; color:var(--ink); background:var(--card); border:1px solid var(--line); border-radius:12px; padding:10px; }
+.memoryFilters .filterCheck { display:flex; align-items:center; padding:10px 0; }
+.connectionStatus { position:fixed; bottom:max(16px,env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%); z-index:10000; padding:12px 18px; width:max-content; max-width:90vw; border-radius:14px; color:var(--ink); background:var(--card); border:1px solid var(--line); box-shadow:0 6px 25px #0002; }
+.imageUnavailable { min-height:100px; background:var(--soft); }
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible { outline:3px solid var(--rose); outline-offset:3px; }
+@media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.01ms!important; animation-iteration-count:1!important; transition-duration:.01ms!important; scroll-behavior:auto!important; } }
+.testEnvironment { padding:7px 16px; text-align:center; background:#342747; color:white; font:600 12px system-ui; }
