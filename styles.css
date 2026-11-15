@@ -1450,3 +1450,49 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .analysis-bar > div { display:flex; justify-content:space-between; gap:10px; margin-bottom:4px; }
 .analysis-track { display:block; background:color-mix(in srgb,currentColor 12%,transparent); border-radius:8px; overflow:hidden; }
 .analysis-track > span { display:block; height:8px; background:var(--rose,#d66789); border-radius:8px; }
+
+/* Keep foregrounds and surfaces paired with the active palette. */
+body[data-theme] {
+  --theme-secondary-text: color-mix(in srgb, var(--ink) 76%, var(--surface));
+  --theme-action: color-mix(in srgb, var(--rose) 44%, black);
+}
+body:is([data-theme="night"],[data-theme="midnight"],[data-theme="charcoal"]) { color-scheme: dark; }
+body[data-theme] .btn.primary {
+  background: var(--theme-action) !important;
+  color: #fff !important;
+}
+body[data-theme] :is(.advMeta,.detailLabel,.settingsNote,.placesAttribution,.advEmpty,.analysis-heading p) {
+  color: var(--theme-secondary-text) !important;
+}
+body[data-theme] :is(.themeChoice,.settingsNote,.dailyQuestionCard,.notificationUnread,.profileStat) {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--line);
+}
+body[data-theme] :is(.profileStat strong,.dailyQuestionCard h3,.detailValue,.homeNextTitle,#appDialogMessage) {
+  color: var(--ink) !important;
+}
+body[data-theme] :is(.advCard,.modalBox,.settingsCard) :is(input, select, textarea):not([type="color"]) {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--line);
+}
+body[data-theme] .analysis-heading select {
+  background: var(--surface); color: var(--ink); border: 1px solid var(--line);
+  border-radius: 8px; padding: .4rem;
+}
+.analysis-wide { grid-column: 1 / -1; }
+.analysis-trend { width: 100%; max-width: 680px; display: block; margin: 12px auto; }
+.analysis-trend text { fill: var(--ink); font-size: 10px; }
+.analysis-trend path { fill: none; stroke: var(--line); }
+.analysis-trend polyline { fill: none; stroke-width: 2.5px; }
+.analysis-trend .analysis-plans { stroke: var(--rose); }
+.analysis-trend .analysis-memories { stroke: var(--ink); }
+.analysis-trend circle { fill: var(--surface); stroke-width: 2px; }
+.analysis-legend { display:flex; flex-wrap:wrap; gap: 12px; }
+.analysis-legend span:first-child { border-bottom: 3px solid var(--rose); }
+.analysis-legend span:last-child { border-bottom: 3px solid var(--ink); }
+.analysis-donut { position:relative; display:grid; place-items:center; width:135px; aspect-ratio:1; margin:12px auto; border-radius:50%; background:conic-gradient(var(--rose) var(--completed),var(--line) 0); }
+.analysis-donut strong { display:grid; place-items:center; width:74%; aspect-ratio:1; border-radius:50%; background:var(--surface); color:var(--ink); font-size:1.6rem; }
+.analysis-wide table { border-collapse:collapse; width:100%; margin-top:10px; }
+.analysis-wide :is(th,td) { text-align:left; padding:6px; border-bottom:1px solid var(--line); }

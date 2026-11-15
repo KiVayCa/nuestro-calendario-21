@@ -104,6 +104,12 @@ function renderNextPlan() {
   }
 }
 
+function planCompletedOn(plan, date) {
+  return plan.recurrence_enabled
+    ? (plan.completed_occurrences || []).includes(date)
+    : !!plan.completed;
+}
+
 function getPlanOccurrencesForRange(startKey, endKey) {
   const start = parseDateOnly(startKey),
     end = parseDateOnly(endKey),
@@ -155,7 +161,11 @@ function getPlanOccurrencesForRange(startKey, endKey) {
           base.getMonth(),
       );
       let step = Math.floor(monthsDiff / interval) * interval;
-      for (let d = addMonthsSafe(base, step); d <= maxEnd; d = addMonthsSafe(base, step += interval)) {
+      for (
+        let d = addMonthsSafe(base, step);
+        d <= maxEnd;
+        d = addMonthsSafe(base, (step += interval))
+      ) {
         const months =
           (d.getFullYear() - base.getFullYear()) * 12 +
           d.getMonth() -
@@ -186,19 +196,32 @@ function getPlanOccurrencesForRange(startKey, endKey) {
       }
     }
   }
-  return out.sort((a, b) =>
-    (a._occurrenceDate + " " + (a.plan_time || "")).localeCompare(
-      b._occurrenceDate + " " + (b.plan_time || ""),
-    ),
-  );
+  return out
+    .map((plan) => ({
+      ...plan,
+      completed: planCompletedOn(plan, plan._occurrenceDate),
+    }))
+    .sort((a, b) =>
+      (a._occurrenceDate + " " + (a.plan_time || "")).localeCompare(
+        b._occurrenceDate + " " + (b.plan_time || ""),
+      ),
+    );
 }
 
-function planOccurrenceStart(plan, date = plan._occurrenceDate || plan.plan_date) {
+function planOccurrenceStart(
+  plan,
+  date = plan._occurrenceDate || plan.plan_date,
+) {
   return new Date(date + "T" + (plan.plan_time || "23:59:59.999") + "-05:00");
 }
 
 function getUpcomingPlanOccurrences(daysAhead = 730, now = new Date()) {
-  const today = new Intl.DateTimeFormat("sv-SE", {timeZone: "America/Bogota", year: "numeric", month: "2-digit", day: "2-digit"}).format(now);
+  const today = new Intl.DateTimeFormat("sv-SE", {
+    timeZone: "America/Bogota",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(now);
   const end = dateKeyLocal(addDaysDate(parseDateOnly(today), daysAhead));
   return getPlanOccurrencesForRange(today, end)
     .filter((plan) => planOccurrenceStart(plan) > now)
@@ -378,6 +401,7 @@ function closeModal() {
 
 function syncRecurrenceUI() {
   const enabled = $("recurrenceEnabled")?.checked;
+  $("completed").closest(".field").hidden = !!enabled;
   const opts = $("recurrenceOptions");
   if (opts) opts.classList.toggle("hidden", !enabled);
   const type = $("recurrenceType")?.value;
@@ -457,7 +481,8 @@ async function savePlan() {
 
     budget: $("budget").value ? Number($("budget").value) : null,
 
-    completed: $("completed").value === "true",
+    completed:
+      !$("recurrenceEnabled").checked && $("completed").value === "true",
 
     recurrence_enabled: $("recurrenceEnabled").checked,
     recurrence_type: $("recurrenceEnabled").checked
@@ -577,6 +602,8 @@ function openPlanDetail(id, occurrenceDate) {
   if (!plan) return;
 
   currentPlan = plan;
+  const date = occurrenceDate || plan.plan_date;
+  const completed = planCompletedOn(plan, date);
 
   closePlansModal();
 
@@ -586,7 +613,7 @@ function openPlanDetail(id, occurrenceDate) {
 
   $("detailDate").textContent = formatDate(occurrenceDate || plan.plan_date);
 
-  $("detailCompleted").innerHTML = plan.completed
+  $("detailCompleted").innerHTML = completed
     ? '<span class="completedBadge">✓ Plan completado ❤️</span>'
     : "";
 
@@ -729,12 +756,13 @@ function openPlanDetail(id, occurrenceDate) {
     `;
   }
 
-  const date = occurrenceDate || plan.plan_date;
-  if (plan.completed || planOccurrenceStart(plan, date) <= new Date()) {
+  if (completed || planOccurrenceStart(plan, date) <= new Date()) {
     rows += `<button class="btn" data-plan-date="${esc(date)}" onclick="openMemoryFromPlan(this.dataset.planDate)">📸 Guardar como recuerdo</button>`;
   }
-  rows = `<button type="button" class="btn primary" data-plan-date="${esc(date)}"
-    onclick="toggleCurrentPlanCompleted(this)">${plan.completed ? "↩ Reabrir plan" : "✓ Marcar como completado"}</button>` + rows;
+  rows =
+    `<button type="button" class="btn primary" data-plan-date="${esc(date)}"
+    onclick="toggleCurrentPlanCompleted(this)">${completed ? "↩ Reabrir plan" : "✓ Marcar como completado"}</button>` +
+    rows;
   $("detailRows").innerHTML = rows;
 
   $("detailModal").style.display = "grid";
@@ -745,22 +773,28 @@ async function toggleCurrentPlanCompleted(button) {
   const plan = currentPlan;
   const space = couple.id;
   const date = button.dataset.planDate;
-  const completed = !plan.completed;
+  const completed = !planCompletedOn(plan, date);
   button.disabled = true;
   try {
-    const { error } = await sb.from("plans")
-      .update({ completed })
-      .eq("id", plan.id)
-      .eq("couple_id", space)
-      .select("id")
-      .single();
-    if (error) return appAlert("No pudimos actualizar el plan: " + error.message);
+    const { data, error } = plan.recurrence_enabled
+      ? await sb.rpc("set_plan_occurrence_completed", {
+          p_plan: plan.id,
+          p_date: date,
+          p_completed: completed,
+        })
+      : await sb
+          .from("plans")
+          .update({ completed })
+          .eq("id", plan.id)
+          .eq("couple_id", space)
+          .select("id")
+          .single();
+    if (error || !data)
+      return appAlert("No pudimos actualizar el plan. Vuelve a intentarlo.");
     if (couple?.id !== space) return;
-    plan.completed = completed;
-    const cached = plans.find((item) => item.id === plan.id);
-    if (cached) cached.completed = completed;
     await loadPlans();
-    if (currentPlan === plan && couple?.id === space) openPlanDetail(plan.id, date);
+    if (currentPlan === plan && couple?.id === space)
+      openPlanDetail(plan.id, date);
     showAppToast(completed ? "Plan completado ❤️" : "Plan reabierto");
   } finally {
     button.disabled = false;
