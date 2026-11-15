@@ -1496,3 +1496,29 @@ body[data-theme] .analysis-heading select {
 .analysis-donut strong { display:grid; place-items:center; width:74%; aspect-ratio:1; border-radius:50%; background:var(--surface); color:var(--ink); font-size:1.6rem; }
 .analysis-wide table { border-collapse:collapse; width:100%; margin-top:10px; }
 .analysis-wide :is(th,td) { text-align:left; padding:6px; border-bottom:1px solid var(--line); }
+
+/* The three dark palettes share surfaces for navigation and calendar labels. */
+body:is([data-theme="night"], [data-theme="midnight"], [data-theme="charcoal"]) .advancedNav {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--line);
+}
+body:is([data-theme="night"], [data-theme="midnight"], [data-theme="charcoal"])
+:is(.seriesBadge, .completedBadge) {
+  background: var(--soft);
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+body:is([data-theme="night"], [data-theme="midnight"], [data-theme="charcoal"])
+:is(.homeNextMeta, #detailDate, .planOptionMeta) {
+  color: var(--theme-secondary-text);
+}
+body:is([data-theme="night"], [data-theme="midnight"], [data-theme="charcoal"])
+#completed option {
+  background: var(--surface);
+  color: var(--ink);
+}
+.pendingBadge {
+  background: var(--soft);
+  color: var(--ink);
+}

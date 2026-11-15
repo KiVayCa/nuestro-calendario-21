@@ -615,7 +615,7 @@ function openPlanDetail(id, occurrenceDate) {
 
   $("detailCompleted").innerHTML = completed
     ? '<span class="completedBadge">✓ Plan completado ❤️</span>'
-    : "";
+    : '<span class="completedBadge pendingBadge">Pendiente</span>';
 
   let rows = "";
   if (plan.recurrence_enabled) {
