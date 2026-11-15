@@ -26,13 +26,13 @@ function renderAdvMemories() {
       "📸 Nuevo recuerdo",
       "openMemoryForm()",
     ) +
-    memoryFilterToolbar() +
+    memoryFilterToolbar() + '<button type="button" class="btn" onclick="exportMemories(this)">Descargar recuerdos y fotos</button>' +
     `<div class="advList">${
       filteredMemories().length
         ? filteredMemories()
             .map(
               (x) =>
-                `<div class="advItem" data-advanced-id="${x.id}"><div>${x.photo_url ? `<img class="advPhoto" data-memory-path="${esc(x.photo_url)}" loading="lazy" alt="Foto de ${esc(x.title)}" role="button" tabindex="0" title="Pulsa para ampliar" onclick="openMemoryPhoto(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openMemoryPhoto(this)}" style="cursor:zoom-in">` : ""}<div class="advItemTitle">${x.favorite ? "❤️ " : ""}${esc(x.title)}</div><div class="advMeta">${dateES(x.memory_date)} · ${esc(x.category)}${x.place_id && advCache.places.find((p) => p.id === x.place_id) ? " · 📍 " + placeLinkHtml(x.place_id, advCache.places.find((p) => p.id === x.place_id).name) : x.location ? " · 📍 " + esc(x.location) : ""}</div><p>${esc(x.description || "")}</p></div><div class="advActions"><button class="btn" onclick="toggleFavorite('memories','${x.id}',${!x.favorite})">${x.favorite ? "💔 Quitar favorito" : "❤️ Favorito"}</button><button class="btn" onclick="openAdvancedEdit('memories','${x.id}')">✏️ Editar</button><button class="btn danger" onclick="deleteAdvanced('memories','${x.id}')">🗑️</button></div></div>`,
+                `<div class="advItem" data-advanced-id="${x.id}"><div>${x.photo_url ? `<img class="advPhoto" data-memory-path="${esc(x.photo_url)}" loading="lazy" alt="Foto de ${esc(x.title)}" role="button" tabindex="0" title="Pulsa para ampliar" onclick="openMemoryPhoto(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openMemoryPhoto(this)}" style="cursor:zoom-in">` : ""}<div class="advItemTitle">${x.favorite ? "❤️ " : ""}${esc(x.title)}</div><div class="advMeta">${dateES(x.memory_date)} · ${esc(x.category)}${x.place_id && advCache.places.find((p) => p.id === x.place_id) ? " · 📍 " + placeLinkHtml(x.place_id, advCache.places.find((p) => p.id === x.place_id).name) : x.location ? " · 📍 " + esc(x.location) : ""}</div><p>${esc(x.description || "")}</p></div><div class="advActions">${memoryPlanLink(x)}<button class="btn" onclick="toggleFavorite('memories','${x.id}',${!x.favorite})">${x.favorite ? "💔 Quitar favorito" : "❤️ Favorito"}</button><button class="btn" onclick="openAdvancedEdit('memories','${x.id}')">✏️ Editar</button><button class="btn danger" onclick="deleteAdvanced('memories','${x.id}')">🗑️</button></div></div>`,
             )
             .join("")
         : `<div class="advEmpty">${advCache.memories.length ? "No hay recuerdos que coincidan con los filtros." : "📸 Todavía no hay recuerdos. El primero puede ser uno muy especial."}</div>`
@@ -109,6 +109,7 @@ function openMemoryForm(isEdit = false) {
 async function saveMemory() {
   if (advancedEditState.key === "memories" && advancedEditState.id)
     return saveAdvancedEdit();
+  const origin = document.getElementById("memoryOrigin");
   const title = $("adv_title").value.trim();
   if (!title) return appAlert("Escribe un título ❤️");
   let photo_url = null;
@@ -132,9 +133,11 @@ async function saveMemory() {
       memory_date: $("adv_memory_date").value,
       category: $("adv_category").value,
       description: $("adv_description").value,
-      location: selectedPlaceById($("adv_place_id")?.value)?.name || null,
+      location: selectedPlaceById($("adv_place_id")?.value)?.name || origin?.dataset.location || null,
       place_id: $("adv_place_id")?.value || null,
       photo_url,
+      source_plan_id: origin?.dataset.plan || null,
+      source_occurrence_date: origin?.dataset.date || null,
     })
     .select("id")
     .single();

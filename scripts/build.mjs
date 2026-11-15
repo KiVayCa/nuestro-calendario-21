@@ -22,6 +22,7 @@ const sources = [
   "realtime",
   "ui",
   "enhancements",
+  "experience",
   "runtime",
 ];
 const chunks = await Promise.all(

@@ -170,3 +170,18 @@ test("scheduled letters show metadata without recipient edit controls", () => {
   c.user.id = "author";
   assert.match(c.renderAdvLetters(), /openAdvancedEdit/);
 });
+
+test("next chapter selects today's future timed plan in Colombia", () => {
+  const c = context("src/calendar.js", {
+    plans: [
+      {id: "past", plan_date: "2026-11-15", plan_time: "09:00:00"},
+      {id: "today", plan_date: "2026-11-15", plan_time: "18:00:00"},
+      {id: "tomorrow", plan_date: "2026-11-16", plan_time: "08:00:00"},
+    ],
+    parseDateOnly: (date) => new Date(date + "T00:00:00"),
+    addDaysDate: (date, days) => new Date(+date + days * 86400000),
+    dateKeyLocal: (date) => date.toISOString().slice(0, 10),
+  });
+  assert.deepEqual(Array.from(c.getUpcomingPlanOccurrences(730, new Date("2026-11-15T16:00:00Z")), (plan) => plan.id), ["today", "tomorrow"]);
+  assert.deepEqual(Array.from(c.getUpcomingPlanOccurrences(730, new Date("2026-11-15T23:00:00Z")), (plan) => plan.id), ["tomorrow"]);
+});
