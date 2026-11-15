@@ -67,6 +67,7 @@ const wait = () => new Promise((r) => setTimeout(r, 400));
     "notifications",
     "question",
     "places",
+    "analysis",
     "achievements",
     "private",
     "settings",

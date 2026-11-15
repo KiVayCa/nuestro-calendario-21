@@ -99,6 +99,7 @@ function renderAdvanced({ preserveInputs = false } = {}) {
     notifications: renderAdvNotifications,
     question: renderAdvQuestion,
     places: renderAdvPlaces,
+    analysis: renderAdvAnalysis,
     achievements: renderAdvAchievements,
     private: renderAdvPrivate,
     settings: renderAdvSettings,

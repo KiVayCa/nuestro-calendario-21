@@ -733,9 +733,38 @@ function openPlanDetail(id, occurrenceDate) {
   if (plan.completed || planOccurrenceStart(plan, date) <= new Date()) {
     rows += `<button class="btn" data-plan-date="${esc(date)}" onclick="openMemoryFromPlan(this.dataset.planDate)">📸 Guardar como recuerdo</button>`;
   }
+  rows = `<button type="button" class="btn primary" data-plan-date="${esc(date)}"
+    onclick="toggleCurrentPlanCompleted(this)">${plan.completed ? "↩ Reabrir plan" : "✓ Marcar como completado"}</button>` + rows;
   $("detailRows").innerHTML = rows;
 
   $("detailModal").style.display = "grid";
+}
+
+async function toggleCurrentPlanCompleted(button) {
+  if (!currentPlan || !couple || button.disabled) return;
+  const plan = currentPlan;
+  const space = couple.id;
+  const date = button.dataset.planDate;
+  const completed = !plan.completed;
+  button.disabled = true;
+  try {
+    const { error } = await sb.from("plans")
+      .update({ completed })
+      .eq("id", plan.id)
+      .eq("couple_id", space)
+      .select("id")
+      .single();
+    if (error) return appAlert("No pudimos actualizar el plan: " + error.message);
+    if (couple?.id !== space) return;
+    plan.completed = completed;
+    const cached = plans.find((item) => item.id === plan.id);
+    if (cached) cached.completed = completed;
+    await loadPlans();
+    if (currentPlan === plan && couple?.id === space) openPlanDetail(plan.id, date);
+    showAppToast(completed ? "Plan completado ❤️" : "Plan reabierto");
+  } finally {
+    button.disabled = false;
+  }
 }
 
 function editCurrentPlan() {

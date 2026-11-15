@@ -23,7 +23,7 @@ function scheduleRealtimeRefresh(includePlans = false, keys = null) {
       realtimeKeys.clear();
       if (withPlans) await loadPlans();
       await advLoadAll(keys);
-      if (withPlans && advancedTab === "home") renderAdvanced();
+      if (withPlans && ["home", "analysis"].includes(advancedTab)) renderAdvanced();
     } catch (err) {
       console.warn("No se pudo actualizar el calendario en tiempo real:", err);
     } finally {

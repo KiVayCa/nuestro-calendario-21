@@ -160,6 +160,7 @@ const validAdvancedTabs = new Set([
   "notifications",
   "question",
   "places",
+  "analysis",
   "achievements",
   "private",
   "settings",
