@@ -26,7 +26,7 @@ function renderAdvMemories() {
       "📸 Nuevo recuerdo",
       "openMemoryForm()",
     ) +
-    memoryFilterToolbar() + '<button type="button" class="btn" onclick="exportMemories(this)">Descargar recuerdos y fotos</button>' +
+    memoryFilterToolbar() + '<button type="button" class="btn" onclick="openAlbumExport()">Exportar álbum o collage</button>' +
     `<div class="advList">${
       filteredMemories().length
         ? filteredMemories()
