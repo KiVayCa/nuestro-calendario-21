@@ -6,10 +6,9 @@ async function loadAdvancedData(keys = Object.keys(advTables)) {
   const results = await Promise.all(
     requested.map(async (key) => {
       try {
-        let query = sb
-          .from(advTables[key])
-          .select("*")
-          .eq("couple_id", couple.id);
+        let query = key === "letters"
+          ? sb.rpc("list_couple_letters", { p_couple_id: couple.id })
+          : sb.from(advTables[key]).select("*").eq("couple_id", couple.id);
         if (key === "privateNotes") query = query.eq("user_id", user.id);
         if (key === "notifications")
           query = query.eq("recipient_user_id", user.id);

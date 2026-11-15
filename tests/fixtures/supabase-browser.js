@@ -155,7 +155,8 @@
   }
   const client = {
     from: (table) => new Query(table),
-    rpc: async (name, args) => {
+    rpc: (name, args) => {
+      if (name === "list_couple_letters") return new Query("love_letters").eq("couple_id", args.p_couple_id);
       if (name === "record_goal_movement") {
         const goal = db.goals.find((x) => x.id === args.p_goal_id);
         goal.current_amount += args.p_amount;

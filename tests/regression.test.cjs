@@ -159,3 +159,14 @@ test("bundle compiles with every feature in the build order", () => {
     fs.readFileSync("public/sw.js", "utf8").includes("/auth-visuals.css"),
   );
 });
+
+test("scheduled letters show metadata without recipient edit controls", () => {
+  const letter = { id: "scheduled", title: "Para mañana", content: null, created_by: "author", unlock_at: "2099-01-01T00:00:00Z" };
+  const c = context("src/letters.js", { user: {id: "recipient"}, advHeader: () => "", esc: (x) => String(x || ""), advCache: {letters: [letter], places: []} });
+  const html = c.renderAdvLetters();
+  assert.match(html, /Para mañana/);
+  assert.match(html, /Se desbloquea/);
+  assert.doesNotMatch(html, /openAdvancedEdit|toggleLetterLock|deleteAdvanced/);
+  c.user.id = "author";
+  assert.match(c.renderAdvLetters(), /openAdvancedEdit/);
+});

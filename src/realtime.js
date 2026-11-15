@@ -152,6 +152,9 @@ async function setupAdvancedRealtime(force = false) {
           payload.new?.recipient_user_id === user?.id
         ) {
           const note = payload.new;
+          // Future letter rows are hidden by RLS; their safe preview is refreshed via the notification.
+          if (note.target_tab === "letters")
+            scheduleRealtimeRefresh(false, ["letters"]);
           if (document.visibilityState === "visible")
             showAppToast(note.title || "Nueva notificación de tu pareja ❤️");
           if (

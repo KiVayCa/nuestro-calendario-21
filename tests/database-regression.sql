@@ -34,6 +34,7 @@ do $$
 declare balance numeric; events integer;
 begin
  if exists(select 1 from public.love_letters where id='40000000-0000-4000-8000-000000000001') then raise exception 'Scheduled letter leaked to partner'; end if;
+ if not exists(select 1 from public.list_couple_letters('20000000-0000-4000-8000-000000000001') where id='40000000-0000-4000-8000-000000000001' and title='Scheduled test' and content is null and unlock_at>now()) then raise exception 'Scheduled preview missing or content leaked'; end if;
  perform public.record_goal_movement('30000000-0000-4000-8000-000000000001',120,'Partner contribution','50000000-0000-4000-8000-000000000003');
  select current_amount into balance from public.goals where id='30000000-0000-4000-8000-000000000001';
  if balance<>220 then raise exception 'Partner balance failed'; end if;
@@ -47,6 +48,19 @@ do $$ begin
   perform public.record_goal_movement('30000000-0000-4000-8000-000000000001',1,'Unauthorized','50000000-0000-4000-8000-000000000004');
   raise exception 'Unauthorized movement accepted';
  exception when raise_exception then if sqlerrm='Unauthorized movement accepted' then raise; end if; end;
+end; $$;
+do $$ begin
+ begin
+  perform public.list_couple_letters('20000000-0000-4000-8000-000000000001');
+  raise exception 'Unauthorized preview accepted';
+ exception when raise_exception then if sqlerrm='Unauthorized preview accepted' then raise; end if; end;
+end; $$;
+reset role;
+update public.love_letters set unlock_at=now()-interval '1 minute' where id='40000000-0000-4000-8000-000000000001';
+set local role authenticated;
+select set_config('request.jwt.claim.sub','10000000-0000-4000-8000-000000000002',true);
+do $$ begin
+ if not exists(select 1 from public.list_couple_letters('20000000-0000-4000-8000-000000000001') where content='Private content') then raise exception 'Due letter did not unlock'; end if;
 end; $$;
 rollback;
 select 'PASS: retries, overdrafts, balance permissions, two members, scheduled letters, notification deduplication and outsider isolation. Fixtures rolled back.' as result;
