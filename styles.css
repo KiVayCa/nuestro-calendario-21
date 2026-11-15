@@ -1388,3 +1388,43 @@ body[data-theme="orchid"]{--rose:#9b6aa8;--soft:#f1e6f4;--ink:#392b40;--muted:#8
 button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible { outline:3px solid var(--rose); outline-offset:3px; }
 @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.01ms!important; animation-iteration-count:1!important; transition-duration:.01ms!important; scroll-behavior:auto!important; } }
 .testEnvironment { padding:7px 16px; text-align:center; background:#342747; color:white; font:600 12px system-ui; }
+
+.album-options {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 12px 0;
+  padding: 10px;
+  border-radius: 12px;
+}
+.album-options select { max-width: 100%; }
+.album-photo-list {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+  gap: 9px;
+  max-height: 38vh;
+  overflow: auto;
+}
+.album-photo-option {
+  display: grid;
+  min-width: 0;
+  align-content: start;
+  gap: 6px;
+  overflow-wrap: anywhere;
+  font-size: .87rem;
+}
+.album-photo-option img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 8px;
+}
+.album-frame-sample {
+  border: 4px double;
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+  font: italic 1rem Georgia, serif;
+}

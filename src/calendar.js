@@ -71,7 +71,7 @@ function render() {
             (ev) =>
               `<div
                 class="event ${ev.source !== "plan" ? "advanced-event" : ""}"
-                onclick="event.stopPropagation();openCalendarEvent('${ev.source}','${ev.id}')"
+                onclick="event.stopPropagation();openCalendarEvent('${ev.source}','${ev.id}','${ev.date}')"
                 title="${escapeHtml(ev.title)}"
                 role="button"
                 tabindex="0"
@@ -96,7 +96,7 @@ function renderNextPlan() {
   if (next) {
     $("next").innerHTML =
       `<div class="nextTop">${categoryIcon(next.category)}</div><div class="nextBody"><div class="nextDate">${escapeHtml(formatDate(next._occurrenceDate))}${next.plan_time ? " · " + escapeHtml(formatTime(next.plan_time)) : ""}</div><b>${escapeHtml(next.title)}</b><div>${escapeHtml(next.note || "Un nuevo recuerdo para los dos.")}</div>${next.recurrence_enabled ? '<span class="seriesBadge">🔁 Recurrente</span>' : ""}</div>`;
-    $("next").onclick = () => openPlanDetail(next.id);
+    $("next").onclick = () => openPlanDetail(next.id, next._occurrenceDate);
   } else {
     $("next").innerHTML =
       `<div class="nextTop">♡</div><div class="nextBody">Todavía no hay planes futuros.<br>Agreguen el primero ❤️</div>`;
@@ -154,9 +154,8 @@ function getPlanOccurrencesForRange(startKey, endKey) {
           start.getMonth() -
           base.getMonth(),
       );
-      let d = addMonthsSafe(base, Math.floor(monthsDiff / interval) * interval);
-      if (d < start) d = addMonthsSafe(d, interval);
-      for (; d <= maxEnd; d = addMonthsSafe(d, interval)) {
+      let step = Math.floor(monthsDiff / interval) * interval;
+      for (let d = addMonthsSafe(base, step); d <= maxEnd; d = addMonthsSafe(base, step += interval)) {
         const months =
           (d.getFullYear() - base.getFullYear()) * 12 +
           d.getMonth() -
@@ -165,6 +164,7 @@ function getPlanOccurrencesForRange(startKey, endKey) {
           months >= 0 &&
           months % interval === 0 &&
           d >= base &&
+          d >= start &&
           occurrenceAllowed(plan, d)
         )
           out.push({ ...plan, _occurrenceDate: dateKeyLocal(d) });
@@ -176,6 +176,7 @@ function getPlanOccurrencesForRange(startKey, endKey) {
       for (; y <= maxEnd.getFullYear(); y += interval) {
         const d = new Date(y, base.getMonth(), base.getDate());
         if (
+          d.getMonth() === base.getMonth() &&
           d >= start &&
           d <= maxEnd &&
           d >= base &&
@@ -192,20 +193,16 @@ function getPlanOccurrencesForRange(startKey, endKey) {
   );
 }
 
-function getUpcomingPlanOccurrences(daysAhead = 730) {
-  const start = new Date(),
-    end = addDaysDate(start, daysAhead),
-    todayKey = dateKeyLocal(start),
-    arr = getPlanOccurrencesForRange(todayKey, dateKeyLocal(end)),
-    now = new Date();
-  return arr.filter((x) => {
-    const d = parseDateOnly(x._occurrenceDate);
-    if (x._occurrenceDate === todayKey && x.plan_time) {
-      const [h, m] = x.plan_time.split(":").map(Number);
-      d.setHours(h, m || 0, 0, 0);
-    }
-    return d >= now;
-  });
+function planOccurrenceStart(plan, date = plan._occurrenceDate || plan.plan_date) {
+  return new Date(date + "T" + (plan.plan_time || "23:59:59.999") + "-05:00");
+}
+
+function getUpcomingPlanOccurrences(daysAhead = 730, now = new Date()) {
+  const today = new Intl.DateTimeFormat("sv-SE", {timeZone: "America/Bogota", year: "numeric", month: "2-digit", day: "2-digit"}).format(now);
+  const end = dateKeyLocal(addDaysDate(parseDateOnly(today), daysAhead));
+  return getPlanOccurrencesForRange(today, end)
+    .filter((plan) => planOccurrenceStart(plan) > now)
+    .sort((a, b) => planOccurrenceStart(a) - planOccurrenceStart(b));
 }
 
 function getNextUpcomingPlan() {
@@ -271,9 +268,9 @@ function getCalendarEventsForRange(startKey, endKey) {
   );
 }
 
-function openCalendarEvent(source, id) {
+function openCalendarEvent(source, id, date) {
   if (source === "plan") {
-    openPlanDetail(id);
+    openPlanDetail(id, date);
     return;
   }
   const tabMap = {
@@ -553,7 +550,7 @@ function openPlansModal(date) {
   $("plansList").innerHTML = dayPlans
     .map(
       (ev) => `
-          <button class="planOption" onclick="openCalendarEvent('${ev.source}','${ev.id}')">
+          <button class="planOption" onclick="openCalendarEvent('${ev.source}','${ev.id}','${ev.date}')">
             <div class="planOptionTitle">${escapeHtml(ev.icon || "♡")} ${escapeHtml(ev.title)}</div>
             <div class="planOptionMeta">${ev.source === "plan" ? categoryName(ev.category) : "Fecha especial"}${ev.time ? " · " + escapeHtml(formatTime(ev.time)) : ""}${ev.completed ? " · ✓ Completado" : ""}</div>
           </button>
@@ -574,7 +571,7 @@ function closePlansModal() {
   $("plansModal").style.display = "none";
 }
 
-function openPlanDetail(id) {
+function openPlanDetail(id, occurrenceDate) {
   const plan = plans.find((p) => p.id === id);
 
   if (!plan) return;
@@ -587,7 +584,7 @@ function openPlanDetail(id) {
 
   $("detailTitle").textContent = plan.title;
 
-  $("detailDate").textContent = formatDate(plan.plan_date);
+  $("detailDate").textContent = formatDate(occurrenceDate || plan.plan_date);
 
   $("detailCompleted").innerHTML = plan.completed
     ? '<span class="completedBadge">✓ Plan completado ❤️</span>'
@@ -732,6 +729,10 @@ function openPlanDetail(id) {
     `;
   }
 
+  const date = occurrenceDate || plan.plan_date;
+  if (plan.completed || planOccurrenceStart(plan, date) <= new Date()) {
+    rows += `<button class="btn" data-plan-date="${esc(date)}" onclick="openMemoryFromPlan(this.dataset.planDate)">📸 Guardar como recuerdo</button>`;
+  }
   $("detailRows").innerHTML = rows;
 
   $("detailModal").style.display = "grid";

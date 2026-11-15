@@ -148,21 +148,6 @@ function checkLocalReminders() {
   )
     return;
   const now = new Date();
-  for (const p of plans) {
-    if (!p.plan_date) continue;
-    const when = new Date(p.plan_date + "T" + (p.plan_time || "09:00:00"));
-    const mins = (when - now) / 60000;
-    if (mins >= 0 && mins <= 15) {
-      const key =
-        "plan_" + p.id + "_" + p.plan_date + "_" + (p.plan_time || "09");
-      sendLocalReminder(
-        "Próximo plan ❤️",
-        p.title + " comienza en " + Math.max(1, Math.ceil(mins)) + " min.",
-        key,
-        "calendar",
-      );
-    }
-  }
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   for (const d of advCache.dates) {
     if (!d.event_date) continue;

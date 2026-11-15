@@ -140,6 +140,7 @@
             "</div><p>" +
             esc(p.description || "") +
             '</p><div class="advActions" style="justify-content:flex-start">' +
+            placeMemoryButton(p) +
             (p.latitude != null && p.longitude != null
               ? '<button class="btn" onclick="focusSavedPlace(\'' +
                 esc(p.id) +
@@ -231,7 +232,7 @@
         '<a href="' +
         esc(placeMapsUrl(p)) +
         '" target="_blank" rel="noopener noreferrer">Abrir en Google Maps ↗</a></div>';
-      L.marker([lat, lon]).addTo(placesMapInstance).bindPopup(popup);
+      L.marker([lat, lon]).addTo(placesMapInstance).bindPopup(popup + placeMemoryButton(p));
       pts.push([lat, lon]);
     });
     if (pts.length > 1)

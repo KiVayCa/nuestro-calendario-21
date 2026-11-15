@@ -22,6 +22,8 @@ const sources = [
   "realtime",
   "ui",
   "enhancements",
+  "experience",
+  "album-export",
   "runtime",
 ];
 const chunks = await Promise.all(

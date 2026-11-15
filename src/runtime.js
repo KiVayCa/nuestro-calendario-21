@@ -403,7 +403,19 @@ window.addEventListener("error", (e) => {
 
 window.addEventListener("load", init);
 window.addEventListener("focus", checkLocalReminders);
-setInterval(checkLocalReminders, 60000);
+setInterval(() => {
+  checkLocalReminders();
+  if (!user || !couple || document.visibilityState !== "visible") return;
+  if (advancedTab === "home") renderAdvanced({ preserveInputs: true });
+  if (advancedTab === "letters") {
+    const justUnlocked = advCache.letters.some((letter) =>
+      letter.unlock_at && letter.created_by !== user.id && letter.content == null &&
+      new Date(letter.unlock_at) <= new Date(),
+    );
+    if (justUnlocked) advLoadAll(["letters"]);
+    renderAdvanced({ preserveInputs: true });
+  }
+}, 60000);
 
 let appDialogResolver = null,
   appDialogMode = "alert";
