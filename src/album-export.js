@@ -25,6 +25,46 @@ const albumPhrases = [
   "Un mes más escribiendo nuestra historia.",
 ];
 
+const collagePhrases = [
+  ...albumPhrases,
+  "En cualquier lugar, si es contigo.",
+  "Siempre encuentro algo nuevo que amar de ti.",
+  "Mi lugar favorito es a tu lado.",
+  "Y entre tantos días, este se quedó conmigo.",
+  "Así se ve la felicidad cuando la compartimos.",
+  "Lo volvería a vivir, detalle por detalle.",
+  "Si el tiempo pasa rápido, que nos deje estas fotos.",
+  "De todos los caminos, qué alegría que el mío llegara a ti.",
+  "Tu risa es mi parte favorita de estos días.",
+  "Un pedacito de nuestra vida, guardado para siempre.",
+  "Entre planes, risas y abrazos, pasó otro mes.",
+  "Que nunca nos falten ganas de crear más recuerdos.",
+  "El mundo se siente un poco más nuestro cuando vamos juntos.",
+  "Cada foto guarda algo que solo nosotros sabemos.",
+  "Hay días que merecen volver a verse.",
+  "Lo cotidiano también es extraordinario contigo.",
+  "Qué fortuna poder decir: esto lo vivimos juntos.",
+  "Ojalá nunca nos acostumbremos a lo bonito de estar juntos.",
+  "Si pudiera guardar un sonido, sería tu risa de ese día.",
+  "Entre todos los momentos, siempre te elijo a ti.",
+  "Esta foto me recuerda por qué valió la pena salir de casa.",
+  "Algunas aventuras empiezan con un simple «¿vamos?».",
+  "De este mes me quedo con nuestras sobremesas y tus abrazos.",
+  "Nos faltan muchos lugares, pero ya tenemos historias para contar.",
+  "Un mes más para agradecerle a Dios por tu vida.",
+  "Que Dios siga guiando cada paso que demos juntos.",
+  "El amor es paciente, es bondadoso. · 1 Corintios 13:4",
+  "Mejores son dos que uno. · Eclesiastés 4:9",
+  "Tu amor me hace agradecer hasta los días más sencillos.",
+  "Qué bonito crecer contigo y seguir aprendiendo a querernos.",
+  "Que la vida nos encuentre siempre haciendo planes juntos.",
+  "Cada vez que veo estas fotos, vuelvo a sonreír.",
+  "Esto también fue amor: detenernos y disfrutar el momento.",
+  "Un recordatorio de lo bien que se siente ser nosotros.",
+  "El 21 siempre tendrá un lugar en nuestra historia.",
+  "Si este mes tuviera una palabra, sería «contigo».",
+];
+
 function albumMonthLabel(key) {
   return new Intl.DateTimeFormat("es-CO", {
     month: "long",
@@ -76,7 +116,9 @@ function renderAlbumOptions(mode) {
     )
       .map(([id, f]) => `<option value="${id}">${f.name}</option>`)
       .join("")}</select></label>
-    <label>Frase <select id="albumCollagePhrase" onchange="updateCollageFrame()">${albumPhrases.map((p) => `<option>${esc(p)}</option>`).join("")}</select></label></div>
+    <label>Frase <select id="albumCollagePhrase" onchange="updateCollageFrame()"><option value="">Escribir mi propia frase</option>${collagePhrases.map((p, i) => `<option value="${i}" ${i === 0 ? "selected" : ""}>${esc(p)}</option>`).join("")}</select></label></div>
+    <div id="albumCustomPhraseField" hidden><label for="albumCustomPhrase">Tu frase (máximo 100 caracteres)</label>
+      <input id="albumCustomPhrase" type="text" maxlength="100" placeholder="Escribe una frase para este mes…" oninput="updateCollageFrame()"></div>
     <div id="albumFrameSample" class="album-frame-sample"></div>
     <fieldset class="album-options"><legend>Elige de 1 a 12 fotos</legend><div id="albumPhotoList" class="album-photo-list"></div></fieldset>
     <button class="btn primary" type="button" onclick="runAlbumExport('collage')">Descargar collage PNG</button>
@@ -84,7 +126,15 @@ function renderAlbumOptions(mode) {
   renderCollagePhotos();
 }
 
+function selectedCollagePhrase() {
+  const choice = $("albumCollagePhrase").value;
+  return choice === ""
+    ? $("albumCustomPhrase").value.trim()
+    : collagePhrases[Number(choice)];
+}
+
 function updateCollageFrame() {
+  $("albumCustomPhraseField").hidden = $("albumCollagePhrase").value !== "";
   const sample = $("albumFrameSample");
   const frame = albumFrames[$("albumCollageFrame").value];
   sample.style.cssText = `background:${frame.paper};color:${frame.ink};border-color:${frame.trim}`;
@@ -92,7 +142,7 @@ function updateCollageFrame() {
     "Nuestro Calendario #21 · " +
     albumMonthLabel($("albumCollageMonth").value) +
     " · " +
-    $("albumCollagePhrase").value;
+    (selectedCollagePhrase() || "Tu frase aparecerá aquí");
 }
 
 function renderCollagePhotos() {
@@ -182,8 +232,6 @@ function paintAlbumFrame(ctx, frame) {
 }
 
 function paintAlbumImage(ctx, bitmap, x, y, width, height, cover = false) {
-  ctx.fillStyle = "#ffffff";
-  ctx.fillRect(x, y, width, height);
   const scale = (cover ? Math.max : Math.min)(
     width / bitmap.width,
     height / bitmap.height,
@@ -430,7 +478,7 @@ async function buildMemoryCollage(
   const tileHeight = Math.min(1040, tileWidth * 0.87);
   const photoTop = 244;
   const footer = photoTop + rows * (tileHeight + gap) - gap + 118;
-  const canvas = albumCanvas(width, Math.ceil(footer + 188));
+  const canvas = albumCanvas(width, Math.ceil(footer + 238));
   const ctx = canvas.getContext("2d");
   paintAlbumFrame(ctx, frame);
   ctx.textAlign = "center";
@@ -472,7 +520,7 @@ async function buildMemoryCollage(
   ctx.fillRect(width / 2 - 82, footer - 66, 164, 3);
   ctx.fillStyle = frame.ink;
   ctx.font = "italic 49px Georgia, serif";
-  albumText(ctx, phrase, width / 2, footer, width - 180, 62, 2);
+  albumText(ctx, phrase, width / 2, footer, width - 180, 55, 3);
   ctx.globalAlpha = 0.7;
   ctx.font = "26px sans-serif";
   ctx.fillText(
@@ -541,11 +589,13 @@ async function runAlbumExport(mode) {
       );
       if (photos.length !== selected.size)
         throw new Error("La lista de fotos cambió. Elige las fotos de nuevo.");
+      const phrase = selectedCollagePhrase();
+      if (!phrase) throw new Error("Escribe una frase para tu collage.");
       blob = await buildMemoryCollage(
         photos,
         month,
         albumFrames[$("albumCollageFrame").value],
-        $("albumCollagePhrase").value,
+        phrase,
         progress,
         stillSignedIn,
       );

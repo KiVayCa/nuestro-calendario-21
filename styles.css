@@ -1428,3 +1428,17 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   text-align: center;
   font: italic 1rem Georgia, serif;
 }
+
+#albumOptions .album-options label {
+  min-width: 0;
+  max-width: 100%;
+}
+#albumCollagePhrase, #albumCustomPhrase {
+  width: 100%;
+}
+#albumCustomPhraseField {
+  margin-bottom: 12px;
+}
+.album-frame-sample {
+  overflow-wrap: anywhere;
+}
