@@ -1522,3 +1522,6 @@ body:is([data-theme="night"], [data-theme="midnight"], [data-theme="charcoal"])
   background: var(--soft);
   color: var(--ink);
 }
+
+.analysis-point { cursor: pointer; }
+.analysis-point:focus-visible circle { stroke-width: 5px; }

@@ -763,6 +763,7 @@ function openPlanDetail(id, occurrenceDate) {
     `<button type="button" class="btn primary" data-plan-date="${esc(date)}"
     onclick="toggleCurrentPlanCompleted(this)">${completed ? "↩ Reabrir plan" : "✓ Marcar como completado"}</button>` +
     rows;
+  rows += `<div class="modalBtns"><button class="btn" type="button" data-plan-date="${esc(date)}" onclick="openPlanTasks(this)">☑ Pendientes del plan</button></div>`;
   $("detailRows").innerHTML = rows;
 
   $("detailModal").style.display = "grid";

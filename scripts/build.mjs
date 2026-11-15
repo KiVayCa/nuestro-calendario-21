@@ -25,6 +25,7 @@ const sources = [
   "experience",
   "album-export",
   "analysis",
+  "calendar-tools",
   "runtime",
 ];
 const chunks = await Promise.all(

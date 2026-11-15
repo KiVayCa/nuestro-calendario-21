@@ -65,12 +65,18 @@ function analysisTrend(month) {
   );
   const x = (index) => 45 + index * 59;
   const y = (value) => 140 - (112 * value) / max;
+  const pointX = (row, index, key) =>
+    row.completed === row.memories
+      ? x(index) + (key === "completed" ? -6 : 6)
+      : x(index);
   const line = (key, name) =>
-    `<polyline class="${name}" points="${rows.map((row, i) => x(i) + "," + y(row[key])).join(" ")}"/>` +
+    `<polyline class="${name}" points="${rows.map((row, i) => pointX(row, i, key) + "," + y(row[key])).join(" ")}"/>` +
     rows
       .map(
         (row, i) =>
-          `<circle class="${name}" cx="${x(i)}" cy="${y(row[key])}" r="4"><title>${esc(albumMonthLabel(row.key))}: ${row[key]}</title></circle>`,
+          `<g class="analysis-point" tabindex="0" role="button" aria-label="${esc(albumMonthLabel(row.key))} · ${key === "completed" ? "Planes completados" : "Recuerdos"}: ${row[key]}"
+          onclick="openAnalysisMonth('${row.key}','${key}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.dispatchEvent(new MouseEvent('click'))}">
+          <circle class="${name}" cx="${pointX(row, i, key)}" cy="${y(row[key])}" r="5"/><title>${esc(albumMonthLabel(row.key))}: ${row[key]}</title></g>`,
       )
       .join("");
   const latest = rows.at(-1);
@@ -79,7 +85,7 @@ function analysisTrend(month) {
   const table = rows
     .map(
       (row) =>
-        `<tr><th scope="row">${esc(albumMonthLabel(row.key))}</th><td>${row.completed}</td><td>${row.memories}</td></tr>`,
+        `<tr><th scope="row">${esc(albumMonthLabel(row.key))}</th><td><button type="button" class="btn" onclick="openAnalysisMonth('${row.key}','completed')">${row.completed}</button></td><td><button type="button" class="btn" onclick="openAnalysisMonth('${row.key}','memories')">${row.memories}</button></td></tr>`,
     )
     .join("");
   const ticks = [...new Set([0, Math.round(max / 2), max])];
@@ -87,7 +93,7 @@ function analysisTrend(month) {
     <p>${esc(albumMonthLabel(latest.key))} frente a ${esc(albumMonthLabel(previous.key))} ·
     ${delta(latest.completed - previous.completed)} planes completados · ${delta(latest.memories - previous.memories)} recuerdos</p>
     <div class="analysis-legend"><span>● Planes completados</span><span>● Recuerdos</span></div>
-    <svg class="analysis-trend" viewBox="0 0 370 172" role="img" aria-label="Evolución mensual de planes completados y recuerdos">
+    <svg class="analysis-trend" viewBox="0 0 370 172" aria-label="Evolución mensual de planes completados y recuerdos">
     ${ticks.map((value) => `<path d="M40 ${y(value)}H348"/><text x="34" y="${y(value) + 4}" text-anchor="end">${value}</text>`).join("")}
     ${rows.map((row, i) => `<text x="${x(i)}" y="161" text-anchor="middle">${row.key.slice(5)}/${row.key.slice(2, 4)}</text>`).join("")}
     ${line("completed", "analysis-plans")}${line("memories", "analysis-memories")}

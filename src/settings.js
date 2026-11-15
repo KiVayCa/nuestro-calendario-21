@@ -388,7 +388,7 @@ function renderAdvSettings() {
  <div class="photoSetting"><img id="settingsLogoPreview" class="photoPreview" src="pareja.jpeg" alt="Foto secundaria"><div><b>Foto secundaria</b><div class="advMeta">Podremos usarla en tarjetas, perfil y futuras pantallas.</div><input id="settingsLogoPhoto" type="file" accept="image/*" style="margin-top:10px" onchange="uploadCouplePhoto('settingsLogoPhoto','logo_photo_path')"></div></div>
  <div class="settingsNote">🔒 Las fotos se guardan en el almacenamiento privado de su pareja. No se hacen públicas.</div></div>
  <div class="settingsCard"><h3>✨ Vista de Inicio</h3><p>La portada puede usar su foto actual o la que carguen arriba.</p><div class="settingsActions"><button class="btn primary" onclick="useDefaultCouplePhoto()">↩️ Volver a la foto original</button><button class="btn" onclick="showAdvancedTab('home')">🏠 Ver Inicio</button></div></div>
- <div class="settingsCard"><h3>💡 Próximamente</h3><p>Desde aquí también podremos controlar notificaciones, sonidos, vibración, animaciones, privacidad y preferencias individuales cuando pasemos a la app móvil.</p></div>
+ <div class="settingsCard"><h3>🔔 Mis recordatorios</h3><p>Elige con cuánta anticipación quieres recibir tus propios avisos de planes.</p><button class="btn" type="button" onclick="openPersonalReminders()">Configurar mis avisos</button></div>
  </div><div id="settingsSaveMsg" class="settingsNote hidden"></div>`
   );
 }
