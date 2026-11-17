@@ -1,7 +1,13 @@
 node_modules/
+node_modules
 public/
 .vercel/
 .env*
 playwright-report/
 test-results/
 supabase/.temp/
+android/.gradle/
+android/**/build/
+android/local.properties
+*.jks
+*.keystore

@@ -37,6 +37,8 @@ const bundle = chunks
 new Script(bundle, { filename: "app.js" });
 await rm("public", { recursive: true, force: true });
 await mkdir("public", { recursive: true });
+await mkdir("public/.well-known", { recursive: true });
+await copyFile("assetlinks.json", "public/.well-known/assetlinks.json");
 await writeFile("public/app.js", bundle);
 const assets = [
   "index.html",

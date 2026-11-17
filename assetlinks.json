@@ -1,0 +1,10 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "co.calendario21.app",
+      "sha256_cert_fingerprints": ["91:FB:D2:77:66:36:2F:13:86:69:E6:F6:D2:A7:51:80:2B:C6:B3:95:FC:18:30:52:71:D5:EB:75:A6:10:6D:D1"]
+    }
+  }
+]

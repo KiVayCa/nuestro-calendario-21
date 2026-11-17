@@ -1,0 +1,31 @@
+plugins { id 'com.android.application' }
+android {
+    namespace 'co.calendario21.app'
+    compileSdk 36
+    defaultConfig {
+        applicationId 'co.calendario21.app'
+        minSdk 26
+        targetSdk 35
+        versionCode 1
+        versionName '1.0.0-preview.1'
+    }
+    signingConfigs {
+        release {
+            if (System.getenv('ANDROID_KEYSTORE')) {
+                storeFile file(System.getenv('ANDROID_KEYSTORE'))
+                storePassword System.getenv('ANDROID_STORE_PASSWORD')
+                keyAlias 'calendario21'
+                keyPassword System.getenv('ANDROID_KEY_PASSWORD')
+            }
+        }
+    }
+    buildTypes { release { signingConfig signingConfigs.release; minifyEnabled false } }
+    compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+}
+dependencies {
+    implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.6.2'
+    implementation 'androidx.browser:browser:1.9.0'
+    implementation 'androidx.work:work-runtime:2.10.1'
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.json:json:20240303'
+}
