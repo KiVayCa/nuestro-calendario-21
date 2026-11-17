@@ -60,47 +60,81 @@ function openPlaceMemories(id) {
   hydrateMemoryImages();
 }
 
-function goalProjection(goal) {
+function goalProjection(goal, date = countdownToday()) {
   if (!Number(goal.target_amount)) return "";
   const remaining = Math.max(
     0,
     Number(goal.target_amount) - Number(goal.current_amount || 0),
   );
   if (!remaining) return '<div class="advMeta">Monto objetivo alcanzado</div>';
-  let suggestion = "";
-  if (goal.target_date) {
-    const deadline = parseDateOnly(goal.target_date);
-    const today = parseDateOnly(dateKeyLocal(new Date()));
-    const days = Math.round((deadline - today) / 86400000);
-    suggestion =
-      days >= 0
-        ? " · Ahorro mensual sugerido: " +
-          money(Math.ceil(remaining / Math.max(1, Math.ceil(days / 30))))
-        : " · Fecha objetivo vencida";
-  }
+  const days = Math.round(
+    (Date.parse(goal.target_date) - Date.parse(date)) / 86400000,
+  );
+  const suggestion = !goal.target_date
+    ? ""
+    : days < 0
+      ? " · Fecha objetivo vencida"
+      : " · Ahorro mensual sugerido: " +
+        money(Math.ceil(remaining / Math.max(1, Math.ceil(days / 30))));
   return `<div class="advMeta">Faltan ${money(remaining)}${suggestion}</div>`;
 }
 
-function monthlyRecapCard() {
-  const month = dateKeyLocal(new Date()).slice(0, 7);
-  const completed = plans.filter(
-    (plan) => plan.completed && plan.plan_date?.startsWith(month),
+function monthlyRecapCard(showDetails = true) {
+  const month = countdownToday().slice(0, 7);
+  const completed = analysisOccurrences(month).filter(
+    (plan) => plan.completed && !plan.cancelled,
   );
   const memories = advCache.memories.filter((memory) =>
     memory.memory_date?.startsWith(month),
   );
-  const goals = advCache.goals.filter(
-    (goal) => goal.completed && goal.updated_at?.startsWith(month),
-  );
+  const featured =
+    memories.find((memory) => memory.favorite && memory.photo_url) ||
+    memories.find((memory) => memory.photo_url);
   return `<section class="advCard"><h3>Así va nuestro mes</h3>
-    <p>${completed.length} planes completados · ${memories.length} recuerdos · ${goals.length} metas cumplidas actualizadas</p>
-    ${memories
-      .slice(0, 3)
-      .map(
-        (memory) => `<button class="btn" data-memory="${esc(memory.id)}"
-      onclick="navigateToItem('memories',this.dataset.memory)">${esc(memory.title)}</button>`,
-      )
-      .join(" ")}</section>`;
+    <p>${completed.length} planes completados · ${memories.length} recuerdos</p>
+    ${
+      featured
+        ? `<button class="btn" data-memory="${esc(featured.id)}" onclick="closeAdvModal();navigateToItem('memories',this.dataset.memory)">
+      <img class="advPhoto" data-memory-path="${esc(featured.photo_url)}" alt="" loading="lazy">
+      ${esc(featured.title)}</button>`
+        : ""
+    }
+    ${showDetails ? '<button class="btn" type="button" onclick="openMonthlyRecap()">Ver resumen del mes</button>' : ""}
+  </section>`;
+}
+
+async function openMonthlyRecap() {
+  const month = countdownToday().slice(0, 7);
+  const account = user?.id;
+  const space = couple?.id;
+  if (!space) return;
+  openAdvModal(
+    albumMonthLabel(month),
+    `${monthlyRecapCard(false)}
+    <section class="advCard"><h3>Avance de las metas este mes</h3><div id="monthlyGoalProgress" aria-live="polite">Cargando…</div></section>`,
+  );
+  hydrateMemoryImages();
+  const container = $("monthlyGoalProgress");
+  const { data, error } = await sb.rpc("monthly_goal_progress", {
+    p_couple: space,
+    p_start: month + "-01",
+  });
+  if (!container.isConnected || account !== user?.id || space !== couple?.id)
+    return;
+  if (error) {
+    container.textContent = "No se pudo cargar el avance de las metas.";
+    return;
+  }
+  const changes = new Map(data.map((row) => [row.goal_id, Number(row.change)]));
+  container.innerHTML =
+    advCache.goals
+      .map((goal) => {
+        const change = changes.get(goal.id) || 0;
+        return `<div class="advItem"><div><strong>${esc(goal.title)}</strong>
+      <div class="advMeta">Cambio neto del mes: ${change > 0 ? "+" : ""}${money(change)}</div>
+      ${goalProjection(goal)}</div></div>`;
+      })
+      .join("") || "<p>Todavía no hay metas.</p>";
 }
 
 function outingMemories(id, date) {

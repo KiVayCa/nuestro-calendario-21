@@ -97,6 +97,7 @@ function openPlanTasks(button) {
       <div class="field"><label for="taskTitle">Nueva tarea · ${esc(dateES(date))}</label><input id="taskTitle" required maxlength="140"></div>
       <div class="field"><label for="taskAssignee">Asignar a</label><select id="taskAssignee"><option value="">Sin asignar</option>
         ${coupleProfiles.map((profile) => `<option value="${esc(profile.user_id)}">${esc(profile.display_name || (profile.user_id === user?.id ? "Yo" : "Mi pareja"))}</option>`).join("")}</select></div>
+      <div class="field"><label for="taskDueDate">Fecha límite (opcional)</label><input id="taskDueDate" type="date"><small>Si asignas la tarea, esa persona recibe un aviso el día del vencimiento.</small></div>
       <button class="btn primary" type="submit">Añadir tarea</button>
       <button class="btn" type="button" onclick="closeAdvModal();openPlanDetail(this.form.dataset.plan,this.form.dataset.date)">Volver al plan</button>
     </form>`,
@@ -141,7 +142,7 @@ async function loadPlanTasks(container, planId, date) {
             ? assignee.display_name ||
               (assignee.user_id === user?.id ? "Yo" : "Mi pareja")
             : "Sin asignar";
-          return `<div class="advItem"><div><strong>${task.completed ? "✓ " : ""}${esc(task.title)}</strong><div class="advMeta">${esc(name)}${task.completed_at ? " · " + esc(coupleProfiles.find((p) => p.user_id === task.completed_by)?.display_name || "Completada") + " · " + esc(new Date(task.completed_at).toLocaleString("es-CO", { timeZone: "America/Bogota" })) : ""}</div></div>
+          return `<div class="advItem"><div><strong>${task.completed ? "✓ " : ""}${esc(task.title)}</strong><div class="advMeta">${esc(name)}${task.due_date ? " · Vence " + esc(dateES(task.due_date)) : ""}${task.completed_at ? " · " + esc(coupleProfiles.find((p) => p.user_id === task.completed_by)?.display_name || "Completada") + " · " + esc(new Date(task.completed_at).toLocaleString("es-CO", { timeZone: "America/Bogota" })) : ""}</div></div>
       <div class="advActions"><button class="btn" type="button" data-id="${esc(task.id)}" onclick="changePlanTask(this, ${!task.completed})">${task.completed ? "Reabrir" : "Completar"}</button>
       <button class="btn danger" type="button" data-id="${esc(task.id)}" onclick="changePlanTask(this, null)">Eliminar</button></div></div>`;
         })
@@ -159,6 +160,7 @@ async function addPlanTask(form) {
       plan_id: plan,
       occurrence_date: date,
       title,
+      due_date: form.querySelector("#taskDueDate").value || null,
       assigned_to: form.querySelector("#taskAssignee").value || null,
     });
     if (error) return appAlert("No se pudo añadir la tarea.");
@@ -255,7 +257,7 @@ function openCountdownSettings() {
   const pinned = resolveCountdown();
   const choices = [
     ...getPlanOccurrencesForRange(today, end)
-      .filter((plan) => !plan.completed)
+      .filter((plan) => !plan.completed && !plan.cancelled)
       .map((plan) => ({
         title: plan.title,
         date: plan._occurrenceDate,
@@ -443,4 +445,37 @@ async function saveOccurrenceReschedule(form) {
       showAppToast("Fecha del plan actualizada");
     },
   );
+}
+
+async function togglePlanCancellation(button) {
+  const plan = currentPlan;
+  const date = button.dataset.date;
+  if (!plan || !date) return;
+  const cancelling = !planCancelledOn(plan, date);
+  if (
+    cancelling &&
+    !(await appConfirm(
+      "¿Cancelar el plan del " +
+        dateES(date) +
+        "? Seguirá visible en el calendario.",
+    ))
+  )
+    return;
+  const account = user?.id;
+  const space = couple?.id;
+  await runCalendarTool(button, async () => {
+    const { data, error } = await sb.rpc("set_plan_cancelled", {
+      p_plan: plan.id,
+      p_date: date,
+      p_cancelled: cancelling,
+    });
+    if (error || !data)
+      return appAlert("No se pudo cambiar el estado del plan.");
+    if (account !== user?.id || space !== couple?.id) return;
+    await loadPlans();
+    if (currentPlan?.id === plan.id && button.isConnected)
+      openPlanDetail(plan.id, date);
+    if (advancedTab === "home" || advancedTab === "analysis") renderAdvanced();
+    showAppToast(cancelling ? "Fecha cancelada" : "Fecha reactivada");
+  });
 }

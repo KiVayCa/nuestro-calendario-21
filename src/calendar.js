@@ -70,13 +70,13 @@ function render() {
           .map(
             (ev) =>
               `<div
-                class="event ${ev.source !== "plan" ? "advanced-event" : ""}"
+                class="event ${ev.cancelled ? "event-cancelled" : ""} ${ev.source !== "plan" ? "advanced-event" : ""}"
                 onclick="event.stopPropagation();openCalendarEvent('${ev.source}','${ev.id}','${ev.date}')"
                 title="${escapeHtml(ev.title)}"
                 role="button"
                 tabindex="0"
               >
-                ${escapeHtml(ev.icon || "♡")} ${escapeHtml(ev.title)}
+                ${escapeHtml(ev.icon || "♡")} ${escapeHtml(ev.title)}${ev.cancelled ? " · Cancelada" : ""}
               </div>`,
           )
           .join("")}
@@ -108,6 +108,10 @@ function planCompletedOn(plan, date) {
   return plan.recurrence_enabled
     ? (plan.completed_occurrences || []).includes(date)
     : !!plan.completed;
+}
+
+function planCancelledOn(plan, date) {
+  return (plan.cancelled_occurrences || []).includes(date);
 }
 
 function getPlanOccurrencesForRange(startKey, endKey) {
@@ -200,6 +204,7 @@ function getPlanOccurrencesForRange(startKey, endKey) {
     .map((plan) => ({
       ...plan,
       completed: planCompletedOn(plan, plan._occurrenceDate),
+      cancelled: planCancelledOn(plan, plan._occurrenceDate),
     }))
     .sort((a, b) =>
       (a._occurrenceDate + " " + (a.plan_time || "")).localeCompare(
@@ -224,7 +229,7 @@ function getUpcomingPlanOccurrences(daysAhead = 730, now = new Date()) {
   }).format(now);
   const end = dateKeyLocal(addDaysDate(parseDateOnly(today), daysAhead));
   return getPlanOccurrencesForRange(today, end)
-    .filter((plan) => planOccurrenceStart(plan) > now)
+    .filter((plan) => !plan.cancelled && planOccurrenceStart(plan) > now)
     .sort((a, b) => planOccurrenceStart(a) - planOccurrenceStart(b));
 }
 
@@ -279,6 +284,7 @@ function getCalendarEventsForRange(startKey, endKey) {
       category: p.category,
       time: p.plan_time,
       completed: p.completed,
+      cancelled: p.cancelled,
     }),
   );
   return [
@@ -576,8 +582,8 @@ function openPlansModal(date) {
     .map(
       (ev) => `
           <button class="planOption" onclick="openCalendarEvent('${ev.source}','${ev.id}','${ev.date}')">
-            <div class="planOptionTitle">${escapeHtml(ev.icon || "♡")} ${escapeHtml(ev.title)}</div>
-            <div class="planOptionMeta">${ev.source === "plan" ? categoryName(ev.category) : "Fecha especial"}${ev.time ? " · " + escapeHtml(formatTime(ev.time)) : ""}${ev.completed ? " · ✓ Completado" : ""}</div>
+            <div class="planOptionTitle">${escapeHtml(ev.icon || "♡")} ${escapeHtml(ev.title)}${ev.cancelled ? " · Cancelada" : ""}</div>
+            <div class="planOptionMeta">${ev.source === "plan" ? categoryName(ev.category) : "Fecha especial"}${ev.time ? " · " + escapeHtml(formatTime(ev.time)) : ""}${ev.cancelled ? " · Cancelada" : ev.completed ? " · ✓ Completado" : ""}</div>
           </button>
         `,
     )
@@ -604,6 +610,7 @@ function openPlanDetail(id, occurrenceDate) {
   currentPlan = plan;
   const date = occurrenceDate || plan.plan_date;
   const completed = planCompletedOn(plan, date);
+  const cancelled = planCancelledOn(plan, date);
 
   closePlansModal();
 
@@ -613,9 +620,11 @@ function openPlanDetail(id, occurrenceDate) {
 
   $("detailDate").textContent = formatDate(occurrenceDate || plan.plan_date);
 
-  $("detailCompleted").innerHTML = completed
-    ? '<span class="completedBadge">✓ Plan completado ❤️</span>'
-    : '<span class="completedBadge pendingBadge">Pendiente</span>';
+  $("detailCompleted").innerHTML = cancelled
+    ? '<span class="completedBadge pendingBadge">Cancelada</span>'
+    : completed
+      ? '<span class="completedBadge">✓ Plan completado ❤️</span>'
+      : '<span class="completedBadge pendingBadge">Pendiente</span>';
 
   let rows = "";
   if (plan.recurrence_enabled) {
@@ -759,13 +768,23 @@ function openPlanDetail(id, occurrenceDate) {
   if (completed || planOccurrenceStart(plan, date) <= new Date()) {
     rows += `<button class="btn" data-plan-date="${esc(date)}" onclick="openMemoryFromPlan(this.dataset.planDate)">📸 Álbum de la salida</button>`;
   }
-  rows =
-    `<button type="button" class="btn primary" data-plan-date="${esc(date)}"
+  if (!cancelled)
+    rows =
+      `<button type="button" class="btn primary" data-plan-date="${esc(date)}"
     onclick="toggleCurrentPlanCompleted(this)">${completed ? "↩ Reabrir plan" : "✓ Marcar como completado"}</button>` +
-    rows;
+      rows;
   rows += `<div class="modalBtns"><button class="btn" type="button" data-plan-date="${esc(date)}" onclick="openPlanTasks(this)">☑ Pendientes del plan</button></div>`;
-  if (plan.recurrence_enabled && !completed && date >= countdownToday() && !(plan.skipped_occurrences || []).includes(date)) {
+  if (
+    plan.recurrence_enabled &&
+    !cancelled &&
+    !completed &&
+    date >= countdownToday() &&
+    !(plan.skipped_occurrences || []).includes(date)
+  ) {
     rows += `<button class="btn" type="button" data-date="${esc(date)}" onclick="openOccurrenceReschedule(this.dataset.date)">Mover solo esta fecha</button>`;
+  }
+  if (!completed && !(plan.skipped_occurrences || []).includes(date)) {
+    rows += `<button class="btn ${cancelled ? "" : "danger"}" type="button" data-date="${esc(date)}" onclick="togglePlanCancellation(this)">${cancelled ? "Reactivar esta fecha" : "Cancelar esta fecha"}</button>`;
   }
   $("detailRows").innerHTML = rows;
 
@@ -777,6 +796,7 @@ async function toggleCurrentPlanCompleted(button) {
   const plan = currentPlan;
   const space = couple.id;
   const date = button.dataset.planDate;
+  if (planCancelledOn(plan, date)) return;
   const completed = !planCompletedOn(plan, date);
   button.disabled = true;
   try {

@@ -43,7 +43,7 @@ Deno.serve(async (request) => {
       failed++;
       continue;
     }
-    const date = /^plan:[^:]+:(\d{4}-\d{2}-\d{2}):/.exec(
+    const date = /^(?:plan|task):[^:]+:(\d{4}-\d{2}-\d{2}):/.exec(
       reminder.reminder_key,
     )?.[1];
     const payload = JSON.stringify({

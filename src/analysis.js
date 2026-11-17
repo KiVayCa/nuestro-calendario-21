@@ -174,7 +174,8 @@ function renderAdvAnalysis() {
       : analysisOccurrences(analysisPeriod);
   const memories = within(advCache.memories, "memory_date");
   const expenses = within(advCache.expenses, "spent_on");
-  const done = selectedPlans.filter((p) => p.completed).length;
+  const activePlans = selectedPlans.filter((plan) => !plan.cancelled);
+  const done = activePlans.filter((p) => p.completed).length;
   const income = expenses
     .filter((e) => e.entry_type === "income")
     .reduce((sum, e) => sum + Number(e.amount || 0), 0);
@@ -204,7 +205,7 @@ function renderAdvAnalysis() {
         name === "Planes" ? selectedPlans.length : within(items, key).length,
       ]),
     )}
-    ${analysisPlanStatus(done, selectedPlans.length)}
+    ${analysisPlanStatus(done, activePlans.length)}
     ${analysisChart("Planes por categoría", analysisCounts(selectedPlans, "category"))}
     ${analysisChart("Recuerdos por categoría", analysisCounts(memories, "category"))}
     ${analysisChart(

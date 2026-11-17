@@ -1525,3 +1525,9 @@ body:is([data-theme="night"], [data-theme="midnight"], [data-theme="charcoal"])
 
 .analysis-point { cursor: pointer; }
 .analysis-point:focus-visible circle { stroke-width: 5px; }
+
+.event.event-cancelled {
+  text-decoration: line-through;
+  opacity: .76;
+  border-style: dashed;
+}

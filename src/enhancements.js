@@ -131,8 +131,10 @@ function clearMemoryFilters() {
 }
 
 function reminderOccurrenceDate(note) {
-  return note?.event_type === "plan_reminder"
-    ? /^plan:[^:]+:(\d{4}-\d{2}-\d{2}):/.exec(note.reminder_key || "")?.[1]
+  return ["plan_reminder", "task_reminder"].includes(note?.event_type)
+    ? /^(?:plan|task):[^:]+:(\d{4}-\d{2}-\d{2}):/.exec(
+        note.reminder_key || "",
+      )?.[1]
     : undefined;
 }
 
@@ -230,6 +232,34 @@ async function openGoalHistory(id) {
     )
     .join("");
   container.innerHTML = `<p>Saldo actual <strong>${money(goal.current_amount)}</strong></p>${summary ? `<h3>Aportes por persona</h3><ul>${summary}</ul>` : ""}<div class="advList">${data.length ? data.map((row) => `<div class="advItem"><div><strong>${row.kind === "opening" ? "Saldo inicial" : Number(row.amount) > 0 ? "Aporte" : "Retiro"} · ${money(Math.abs(row.amount))}</strong><div class="advMeta">${esc(names.get(row.created_by) || "Integrante")} · ${new Date(row.created_at).toLocaleString("es-CO")}</div><p>${esc(row.note || "")}</p><span>Saldo después del movimiento ${money(row.balance_after)}</span></div></div>`).join("") : "<p>Todavía no hay movimientos.</p>"}</div>${data.length === 200 ? "<p>Se muestran los 200 movimientos más recientes.</p>" : ""}`;
+  const history = document.createElement("section");
+  history.className = "advCard";
+  history.innerHTML = `<h3>Proyección de ahorro</h3>${goalProjection(goal)}
+    <div aria-live="polite">Cargando historial…</div>`;
+  container.prepend(history);
+  const snapshots = await sb
+    .from("goal_projection_history")
+    .select("current_amount,target_amount,target_date,captured_at")
+    .eq("goal_id", id)
+    .order("captured_at", { ascending: false })
+    .order("id", { ascending: false })
+    .limit(50);
+  if (!history.isConnected || account !== user?.id || space !== couple?.id)
+    return;
+  const details = history.lastElementChild;
+  details.innerHTML = snapshots.error
+    ? "<p>No pudimos cargar las proyecciones anteriores.</p>"
+    : `<details><summary>Ver cambios de la proyección</summary><p>Registro disponible desde que se activó esta función.</p>
+    ${
+      snapshots.data
+        .map(
+          (snapshot) => `<div class="advItem"><div>
+      <strong>${esc(new Date(snapshot.captured_at).toLocaleString("es-CO", { timeZone: "America/Bogota" }))}</strong>
+      ${goalProjection(snapshot, new Intl.DateTimeFormat("sv-SE", { timeZone: "America/Bogota", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(snapshot.captured_at)))}
+      </div></div>`,
+        )
+        .join("") || "<p>Aún no hay cambios guardados.</p>"
+    }</details>`;
 }
 
 function setConnectionStatus(message) {
