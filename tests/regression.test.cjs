@@ -161,8 +161,19 @@ test("bundle compiles with every feature in the build order", () => {
 });
 
 test("scheduled letters show metadata without recipient edit controls", () => {
-  const letter = { id: "scheduled", title: "Para mañana", content: null, created_by: "author", unlock_at: "2099-01-01T00:00:00Z" };
-  const c = context("src/letters.js", { user: {id: "recipient"}, advHeader: () => "", esc: (x) => String(x || ""), advCache: {letters: [letter], places: []} });
+  const letter = {
+    id: "scheduled",
+    title: "Para mañana",
+    content: null,
+    created_by: "author",
+    unlock_at: "2099-01-01T00:00:00Z",
+  };
+  const c = context("src/letters.js", {
+    user: { id: "recipient" },
+    advHeader: () => "",
+    esc: (x) => String(x || ""),
+    advCache: { letters: [letter], places: [] },
+  });
   const html = c.renderAdvLetters();
   assert.match(html, /Para mañana/);
   assert.match(html, /Se desbloquea/);
@@ -174,14 +185,90 @@ test("scheduled letters show metadata without recipient edit controls", () => {
 test("next chapter selects today's future timed plan in Colombia", () => {
   const c = context("src/calendar.js", {
     plans: [
-      {id: "past", plan_date: "2026-11-15", plan_time: "09:00:00"},
-      {id: "today", plan_date: "2026-11-15", plan_time: "18:00:00"},
-      {id: "tomorrow", plan_date: "2026-11-16", plan_time: "08:00:00"},
+      { id: "past", plan_date: "2026-11-15", plan_time: "09:00:00" },
+      { id: "today", plan_date: "2026-11-15", plan_time: "18:00:00" },
+      { id: "tomorrow", plan_date: "2026-11-16", plan_time: "08:00:00" },
     ],
     parseDateOnly: (date) => new Date(date + "T00:00:00"),
     addDaysDate: (date, days) => new Date(+date + days * 86400000),
     dateKeyLocal: (date) => date.toISOString().slice(0, 10),
   });
-  assert.deepEqual(Array.from(c.getUpcomingPlanOccurrences(730, new Date("2026-11-15T16:00:00Z")), (plan) => plan.id), ["today", "tomorrow"]);
-  assert.deepEqual(Array.from(c.getUpcomingPlanOccurrences(730, new Date("2026-11-15T23:00:00Z")), (plan) => plan.id), ["tomorrow"]);
+  assert.deepEqual(
+    Array.from(
+      c.getUpcomingPlanOccurrences(730, new Date("2026-11-15T16:00:00Z")),
+      (plan) => plan.id,
+    ),
+    ["today", "tomorrow"],
+  );
+  assert.deepEqual(
+    Array.from(
+      c.getUpcomingPlanOccurrences(730, new Date("2026-11-15T23:00:00Z")),
+      (plan) => plan.id,
+    ),
+    ["tomorrow"],
+  );
+});
+
+test("calendar widget links select their month and reject impossible dates", () => {
+  let renders = 0;
+  const c = context("src/enhancements.js", {
+    validAdvancedTabs: new Set(["calendar"]),
+    showAdvancedTab() {},
+    view: new Date(2026, 0, 1),
+    parseDateOnly: (date) => new Date(date + "T00:00:00"),
+    dateKeyLocal: (date) =>
+      date.getFullYear() +
+      "-" +
+      String(date.getMonth() + 1).padStart(2, "0") +
+      "-" +
+      String(date.getDate()).padStart(2, "0"),
+    render() {
+      renders++;
+    },
+  });
+  c.navigateToItem("calendar", null, "2027-02-12");
+  assert.equal(c.view.getFullYear(), 2027);
+  assert.equal(c.view.getMonth(), 1);
+  assert.equal(c.view.getDate(), 12);
+  c.navigateToItem("calendar", null, "2027-02-31");
+  assert.equal(renders, 1);
+  assert.equal(c.view.getDate(), 12);
+});
+
+test("monthly important dates keep their anchor after a short month", () => {
+  const c = context("src/features.js", {
+    advCache: {
+      dates: [
+        {
+          id: "month-end",
+          event_date: "2026-01-31",
+          recurrence_type: "monthly",
+          recurrence_interval: 1,
+        },
+      ],
+    },
+    dateKeyLocal: (date) =>
+      date.getFullYear() +
+      "-" +
+      String(date.getMonth() + 1).padStart(2, "0") +
+      "-" +
+      String(date.getDate()).padStart(2, "0"),
+    addMonthsSafe: (date, count) => {
+      const result = new Date(date.getFullYear(), date.getMonth() + count, 1);
+      result.setDate(
+        Math.min(
+          date.getDate(),
+          new Date(result.getFullYear(), result.getMonth() + 1, 0).getDate(),
+        ),
+      );
+      return result;
+    },
+  });
+  assert.deepEqual(
+    Array.from(
+      c.getImportantDateOccurrencesForRange("2026-02-01", "2026-04-30"),
+      (item) => item.date,
+    ),
+    ["2026-02-28", "2026-03-31", "2026-04-30"],
+  );
 });

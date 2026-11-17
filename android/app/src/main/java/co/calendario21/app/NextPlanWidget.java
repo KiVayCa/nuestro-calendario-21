@@ -2,9 +2,17 @@ package co.calendario21.app;
 
 import android.appwidget.*;
 import android.content.*;
+import android.os.Bundle;
 
 public class NextPlanWidget extends AppWidgetProvider {
   static final String REFRESH = "co.calendario21.app.REFRESH";
+  static final String MONTH = "co.calendario21.app.MONTH";
+
+  @Override
+  public void onAppWidgetOptionsChanged(
+      Context c, AppWidgetManager manager, int id, Bundle options) {
+    WidgetRenderer.updateAll(c);
+  }
 
   @Override
   public void onUpdate(Context c, AppWidgetManager manager, int[] ids) {
@@ -19,6 +27,25 @@ public class NextPlanWidget extends AppWidgetProvider {
       WidgetRenderer.updateAll(c);
       WidgetWorker.refresh(c);
     }
+    if (MONTH.equals(i.getAction())) {
+      int id = i.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
+      if (id < 0) return;
+      int old = c.getSharedPreferences("appearance", 0).getInt("month_" + id, 0);
+      int step = i.getIntExtra("step", 0);
+      int offset = step == 0 ? 0 : Math.max(-24, Math.min(24, old + Integer.signum(step)));
+      c.getSharedPreferences("appearance", 0).edit().putInt("month_" + id, offset).apply();
+      WidgetRenderer.updateAll(c);
+    }
+  }
+
+  @Override
+  public void onDeleted(Context c, int[] ids) {
+    android.content.SharedPreferences.Editor edit = c.getSharedPreferences("appearance", 0).edit();
+    for (int id : ids) {
+      edit.remove("month_" + id);
+      edit.remove("text_" + id);
+    }
+    edit.apply();
   }
 
   @Override

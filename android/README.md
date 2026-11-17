@@ -6,9 +6,19 @@ Android 8.0+ (`minSdk 26`). La interfaz sigue siendo la web publicada; Android B
 
 1. Instalar el APK release firmado entregado para pruebas. Abrir el icono del calendario.
 2. Mantener pulsada la pantalla de inicio → Widgets → Nuestro Calendario #21.
-3. Arrastrar **Próximo plan** o **Cuenta regresiva** y conectar la misma cuenta del calendario. Esta autenticación de widgets es independiente de la sesión de Chrome: puede requerir iniciar sesión una vez adicional.
+3. Arrastrar **Próximo plan**, **Cuenta regresiva**, **Nuestro mes**, **Nuestra historia** o **Nuestra semana** y conectar la misma cuenta del calendario. Esta autenticación de widgets es independiente de la sesión de Chrome: puede requerir iniciar sesión una vez adicional.
 4. Elegir marco rosa, noche azul o salvia. El marco y la sesión se comparten entre todos los widgets de la instalación.
 5. Tocar el cuerpo para abrir el calendario (el plan abre su fecha y detalle), ↻ para solicitar actualización o ⚙ para cambiar marco/desconectar.
+
+### Novedades de preview 2
+
+- Instalar como actualización del primer APK: mismo paquete y misma firma, `versionCode 2`. No desinstalar la versión anterior; así se conservan sesión y widgets existentes.
+- Mantener pulsado un widget y arrastrar los bordes para cambiar tamaño. Se redibuja al cambiar dimensiones y ofrece variantes para orientación vertical/horizontal. En versiones compactas se reducen etiquetas y líneas secundarias para dar prioridad al contenido principal.
+- ⚙ → Texto principal: Destacado, Grande o Extra grande. La preferencia se guarda por widget. Los números tienen mayor tamaño que los títulos; los textos secundarios mantienen su tamaño menor. El espacio disponible limita el tamaño máximo.
+- **Nuestro mes:** calendario de lunes a domingo con 42 celdas, hoy destacado y puntos en días con planes o fechas importantes. Mantiene planes completados como parte del calendario y omite cancelaciones/reprogramaciones. Flechas para navegar hasta 24 meses hacia cada lado; tocar el nombre del mes vuelve al actual. Tocar un día abre ese mes en la app. No se abre automáticamente el formulario para crear un plan.
+- **Nuestra historia:** dos contadores con las mismas fechas de Inicio: juntos desde 21/01/2026 y novios desde 21/04/2026. Días transcurridos según la fecha de Bogotá, sin sumar un día artificialmente. Se recalculan cuando Android actualiza el widget.
+- **Nuestra semana:** planes pendientes de hoy y los siguientes seis días, ordenados por fecha/hora, con más filas al ampliar la tarjeta. Omite planes pasados, completados, cancelados y fechas reprogramadas.
+- Los nuevos widgets también respetan cifrado, desconexión y validación de acceso de la primera versión. El calendario no muestra información de una caché que supere 24 horas al redibujarse.
 
 La PWA instalada puede coexistir durante la prueba. El icono Android permite usar el mismo calendario sin mantener dos bases de datos. No eliminar ni desactivar todavía las notificaciones de la PWA: validar primero que el navegador usado por la TWA comparte su sesión y suscripción push.
 

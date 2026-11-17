@@ -62,6 +62,23 @@ public class WidgetSettingsActivity extends Activity {
     String current = getSharedPreferences("appearance", 0).getString("frame", "rose");
     for (int i = 0; i < frames.length; i++) if (frames[i].equals(current)) frame.setSelection(i);
     box.addView(frame);
+    text(box, "Texto principal de este widget", 16);
+    Spinner textSize = new Spinner(this);
+    textSize.setAdapter(
+        new ArrayAdapter<>(
+            this,
+            android.R.layout.simple_spinner_dropdown_item,
+            new String[] {"Destacado", "Grande", "Extra grande"}));
+    int[] sizes = {28, 34, 40};
+    int selectedSize = getSharedPreferences("appearance", 0).getInt("text_" + widgetId, 34);
+    for (int i = 0; i < sizes.length; i++) if (sizes[i] == selectedSize) textSize.setSelection(i);
+    box.addView(textSize);
+    text(
+        box,
+        "Para cambiar el tamaño de la tarjeta: mantén pulsado el widget en Inicio y arrastra sus"
+            + " bordes. El texto se adapta al espacio. En Nuestro mes, toca el nombre del mes para"
+            + " volver a hoy.",
+        14);
     status = new TextView(this);
     status.setPadding(0, pad, 0, pad);
     box.addView(status);
@@ -110,9 +127,10 @@ public class WidgetSettingsActivity extends Activity {
                                     : result instanceof WidgetApi.AuthException
                                         ? "Tu cuenta necesita un calendario compartido activo."
                                         : "No pudimos sincronizar. Comprueba tu conexión e"
-                                              + " inténtalo de nuevo.");
+                                            + " inténtalo de nuevo.");
                           else {
                             saveFrame(frames[frame.getSelectedItemPosition()]);
+                            saveTextSize(sizes[textSize.getSelectedItemPosition()]);
                             WidgetWorker.schedule(this);
                             finishSetup();
                           }
@@ -121,7 +139,7 @@ public class WidgetSettingsActivity extends Activity {
             });
     button(
         box,
-        "Guardar marco / usar sesión existente",
+        "Guardar diseño / usar sesión existente",
         v -> {
           if (busy) return;
           boolean loggedIn = false;
@@ -134,6 +152,7 @@ public class WidgetSettingsActivity extends Activity {
             return;
           }
           saveFrame(frames[frame.getSelectedItemPosition()]);
+          saveTextSize(sizes[textSize.getSelectedItemPosition()]);
           WidgetWorker.schedule(this);
           finishSetup();
         });
@@ -163,7 +182,8 @@ public class WidgetSettingsActivity extends Activity {
     text(
         box,
         "Después de guardar: mantén pulsada la pantalla de inicio → Widgets → Nuestro Calendario"
-            + " #21. Elige Próximo plan o Cuenta regresiva. Toca ⚙ para volver aquí.",
+            + " #21. Elige Próximo plan, Cuenta regresiva, Nuestro mes, Nuestra historia o Nuestra"
+            + " semana. Toca ⚙ para volver aquí.",
         15);
     text(
         box,
@@ -176,6 +196,11 @@ public class WidgetSettingsActivity extends Activity {
 
   private void saveFrame(String frame) {
     getSharedPreferences("appearance", 0).edit().putString("frame", frame).apply();
+    WidgetRenderer.updateAll(this);
+  }
+
+  private void saveTextSize(int size) {
+    getSharedPreferences("appearance", 0).edit().putInt("text_" + widgetId, size).apply();
     WidgetRenderer.updateAll(this);
   }
 

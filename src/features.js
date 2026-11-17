@@ -50,12 +50,10 @@ function getImportantDateOccurrencesForRange(startKey, endKey) {
         (start.getFullYear() - base.getFullYear()) * 12 +
         start.getMonth() -
         base.getMonth();
-      let d = addMonthsSafe(
-        base,
-        Math.max(0, Math.floor(months / interval) * interval),
-      );
-      if (d < start) d = addMonthsSafe(d, interval);
-      for (; d <= end; d = addMonthsSafe(d, interval)) {
+      let step = Math.max(0, Math.floor(months / interval) * interval);
+      let d = addMonthsSafe(base, step);
+      if (d < start) d = addMonthsSafe(base, (step += interval));
+      for (; d <= end; d = addMonthsSafe(base, (step += interval))) {
         if (d >= base)
           out.push({
             source: "date",
@@ -703,7 +701,8 @@ async function saveAdvancedEdit() {
       content: $("adv_content").value.trim(),
       category: $("adv_category").value,
       place_id: $("adv_place_id")?.value || null,
-      notify_on_unlock: !!$("adv_unlock_at").value && $("adv_notify_on_unlock").checked,
+      notify_on_unlock:
+        !!$("adv_unlock_at").value && $("adv_notify_on_unlock").checked,
       unlock_at: $("adv_unlock_at").value
         ? new Date($("adv_unlock_at").value).toISOString()
         : null,

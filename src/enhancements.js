@@ -143,6 +143,14 @@ function navigateToItem(tab, id, date) {
   if (tab === "memories" && id)
     memoryFilters = { query: "", year: "", favorites: false };
   showAdvancedTab(tab);
+  if (tab === "calendar" && !id && /^\d{4}-\d{2}-\d{2}$/.test(date || "")) {
+    const selected = parseDateOnly(date);
+    if (!Number.isNaN(selected.getTime()) && dateKeyLocal(selected) === date) {
+      view = selected;
+      render();
+    }
+    return;
+  }
   if (!id) return;
   if (tab === "calendar") {
     if (plans.some((plan) => plan.id === id))

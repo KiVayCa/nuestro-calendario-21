@@ -149,6 +149,12 @@ final class WidgetApi {
                 + filter
                 + "&order=couple_id");
     JSONObject countdown = settings.length() > 0 ? settings.getJSONObject(0) : new JSONObject();
+    JSONArray importantDates =
+        rows(
+            "important_dates",
+            "select=id,title,event_date,recurring,recurrence_type,recurrence_interval"
+                + filter
+                + "&order=event_date,id");
     String source = countdown.optString("countdown_source");
     String id = countdown.optString("countdown_source_id");
     if (source.equals("plan")) {
@@ -161,14 +167,10 @@ final class WidgetApi {
         }
       }
     } else if (source.equals("date") && id.matches("[0-9a-fA-F-]{36}")) {
-      JSONArray dates =
-          rows(
-              "important_dates",
-              "select=id,title,event_date,recurring,recurrence_type"
-                  + filter
-                  + "&id=eq."
-                  + id
-                  + "&order=id");
+      JSONArray dates = new JSONArray();
+      for (int i = 0; i < importantDates.length(); i++)
+        if (id.equals(importantDates.getJSONObject(i).optString("id")))
+          dates.put(importantDates.getJSONObject(i));
       if (dates.length() > 0) {
         JSONObject date = dates.getJSONObject(0);
         countdown.put("countdown_title", date.optString("title"));
@@ -180,6 +182,7 @@ final class WidgetApi {
     }
     return new JSONObject()
         .put("plans", plans)
+        .put("dates", importantDates)
         .put("countdown", countdown)
         .put("updated_at", System.currentTimeMillis());
   }
