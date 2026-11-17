@@ -26,6 +26,7 @@ const sources = [
   "album-export",
   "analysis",
   "calendar-tools",
+  "android-updates",
   "runtime",
 ];
 const chunks = await Promise.all(
@@ -40,6 +41,7 @@ await mkdir("public", { recursive: true });
 await mkdir("public/.well-known", { recursive: true });
 await copyFile("assetlinks.json", "public/.well-known/assetlinks.json");
 await writeFile("public/app.js", bundle);
+await copyFile("android-release.json", "public/android-release.json");
 const assets = [
   "index.html",
   "styles.css",

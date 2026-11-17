@@ -1,0 +1,16 @@
+{
+  "format": 1,
+  "packageName": "co.calendario21.app",
+  "versionCode": 3,
+  "versionName": "1.0.0-preview.3",
+  "apkUrl": "https://vz4dp1vu2kie6kny.public.blob.vercel-storage.com/android/nuestro-calendario-21-v3.apk",
+  "sha256": "7ec7a8865c5a8176da6c01f9d41e999a717dc6479ad35f99415845c6ca777850",
+  "bytes": 3996587,
+  "minSdk": 26,
+  "publishedAt": "2026-11-17T22:04:26.142Z",
+  "notes": [
+    "Actualizaciones Android desde la aplicación: aviso de nueva versión al abrirla.",
+    "Descarga verificada del APK e instalación con la confirmación de Android.",
+    "Acceso al instalador y a las novedades desde Configuración."
+  ]
+}

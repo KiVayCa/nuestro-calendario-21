@@ -158,6 +158,10 @@ public class WidgetSettingsActivity extends Activity {
         });
     button(
         box,
+        "Actualizaciones de Android",
+        v -> startActivity(new Intent(this, UpdateActivity.class)));
+    button(
+        box,
         "Desconectar los widgets",
         v -> {
           if (busy) return;

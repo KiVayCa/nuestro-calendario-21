@@ -272,3 +272,88 @@ test("monthly important dates keep their anchor after a short month", () => {
     ["2026-02-28", "2026-03-31", "2026-04-30"],
   );
 });
+
+test("Android release metadata rejects foreign download links and renders no desktop installer", () => {
+  const c = context("src/android-updates.js", {
+    navigator: { userAgent: "Desktop browser" },
+    location: { search: "?ncAndroidVersion=3" },
+  });
+  const manifest = JSON.parse(fs.readFileSync("android-release.json", "utf8"));
+  assert.equal(c.androidInstallCard(), "");
+  assert.ok(c.validateAndroidRelease(manifest));
+  assert.equal(
+    c.validateAndroidRelease({
+      ...manifest,
+      apkUrl: "https://evil.example/app.apk",
+    }),
+    null,
+  );
+  assert.equal(
+    c.validateAndroidRelease({ ...manifest, sha256: "invalid" }),
+    null,
+  );
+  assert.equal(
+    c.validateAndroidRelease({ ...manifest, bytes: 999999999 }),
+    null,
+  );
+});
+
+test("Android release checks share one fetch and never reuse a failed request", async () => {
+  let count = 0;
+  const manifest = JSON.parse(fs.readFileSync("android-release.json", "utf8"));
+  const c = context("src/android-updates.js", {
+    navigator: { userAgent: "Android" },
+    location: { search: "" },
+    AbortSignal,
+    fetch: async () => {
+      count++;
+      return { ok: count !== 2, text: async () => JSON.stringify(manifest) };
+    },
+  });
+  await Promise.all([c.fetchAndroidRelease(), c.fetchAndroidRelease()]);
+  assert.equal(count, 1);
+  await assert.rejects(c.fetchAndroidRelease());
+  await c.fetchAndroidRelease();
+  assert.equal(count, 3);
+});
+
+test("a newer Android release shows one dismissible notice with escaped text", async () => {
+  const { JSDOM } = require("jsdom");
+  const dom = new JSDOM("<!doctype html><body></body>", {
+    pretendToBeVisual: true,
+  });
+  const manifest = JSON.parse(fs.readFileSync("android-release.json", "utf8"));
+  manifest.versionName = "<img src=x onerror=bad()>";
+  let requests = 0;
+  const c = context("src/android-updates.js", {
+    window: dom.window,
+    document: dom.window.document,
+    navigator: { userAgent: "Android" },
+    location: { search: "?ncAndroidVersion=1" },
+    AbortSignal,
+    $: (id) => dom.window.document.getElementById(id),
+    esc: (value) =>
+      String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;"),
+    fetch: async () => {
+      requests++;
+      return { ok: true, text: async () => JSON.stringify(manifest) };
+    },
+  });
+  await c.checkAndroidAppUpdate();
+  await c.checkAndroidAppUpdate();
+  const notice = dom.window.document.getElementById("androidUpdateNotice");
+  assert.ok(notice);
+  assert.equal(requests, 1);
+  assert.equal(notice.querySelector("img"), null);
+  assert.equal(
+    notice.querySelector("a").getAttribute("href"),
+    "calendario21://updates",
+  );
+  notice.querySelector("button").click();
+  assert.equal(dom.window.document.getElementById("androidUpdateNotice"), null);
+  dom.window.close();
+});

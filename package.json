@@ -9,6 +9,7 @@
   },
   "devDependencies": {
     "@supabase/supabase-js": "2.119.0",
+    "@vercel/blob": "2.9.0",
     "jsdom": "26.1.0",
     "leaflet": "1.9.4",
     "prettier": "3.6.2"

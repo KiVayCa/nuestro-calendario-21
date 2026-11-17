@@ -1,5 +1,31 @@
 # Nuestro Calendario #21 · Android preview
 
+## Actualizaciones desde la app · preview 3
+
+El APK estable está alojado en el almacén público de versiones Android de Vercel Blob. Únicamente se publican instaladores; la sesión, las fotos y los datos de la pareja mantienen su acceso privado en Supabase.
+
+Android → Configuración → **Aplicación Android y widgets** permite descargar el último APK. A partir de preview 3, al entrar desde el icono o un widget se consulta `/android-release.json` y se compara con la versión que devuelve Android PackageManager. Si existe una versión superior, se ofrecen **Actualizar** y **Más tarde**. El calendario continúa abriendo cuando no hay conexión o falla el servidor de versiones. Las versiones 1 y 2 necesitan esta primera actualización manual para incorporar el actualizador.
+
+El actualizador descarga un archivo inmutable por `versionCode`, comprueba tamaño y SHA-256 y valida el paquete, la versión y la firma contra la aplicación instalada. No admite enlaces a otros servidores ni redirecciones. Después abre el instalador oficial: Android solicita permiso para instalar desde esta aplicación y la confirmación del usuario. No hay instalación silenciosa. El FileProvider solo comparte el directorio de caché `updates/`; no expone sesiones ni preferencias. No se desinstala la app ni se borran sus datos.
+
+El acceso directo original `MainActivity` se conserva. La web abierta por Android recibe la versión instalada como parámetro informativo para mostrar un aviso al volver al primer plano y un botón para abrir el actualizador. El parámetro no autoriza descargas ni instalaciones: la comprobación nativa siempre usa PackageManager y la firma del APK. El instalador se ofrece en la web únicamente en dispositivos Android.
+
+### Publicar la siguiente versión
+
+1. Incrementar `versionCode` y `versionName`, compilar y probar `assembleRelease` con la misma firma privada.
+2. Actualizar `android/release-notes.json` con las novedades.
+3. Con `ANDROID_HOME` y `BLOB_READ_WRITE_TOKEN` disponibles **solo en el entorno de publicación**, ejecutar:
+
+```sh
+node scripts/publish-android-release.mjs android/app/build/outputs/apk/release/app-release.apk android/release-notes.json
+```
+
+El script verifica certificado y paquete, aloja el APK sin sobrescribir archivos previos, descarga y comprueba el archivo remoto y solo entonces genera `android-release.json`. Impide retroceder de versión o cambiar el binario de una versión ya publicada. El token de escritura no se añade al repositorio, la web ni el APK.
+
+4. Ejecutar el build web y sus pruebas; subir los cambios a Git para que Vercel publique el descriptor. Verificar que la URL pública devuelve la versión esperada y que el APK coincide con su hash. No modificar a mano el descriptor para anunciar un APK que aún no está publicado.
+
+El descriptor usa `Cache-Control: no-store` y queda fuera del service worker. Los APK con nombres por versión se pueden almacenar en caché sin confundir versiones. La primera publicación de preview 3 y una futura actualización real deben verificarse también en el celular: las pruebas de código no sustituyen la confirmación de instalación del sistema.
+
 Android 8.0+ (`minSdk 26`). La interfaz sigue siendo la web publicada; Android Browser Helper la abre como Trusted Web Activity con el navegador compatible del dispositivo. Esto conserva sesiones web, service worker, avisos push y descargas existentes. Si falla la asociación de dominio o el navegador no soporta TWA, puede aparecer la barra del navegador como alternativa segura. No usamos WebView ni un puente que exponga tokens a JavaScript.
 
 ## Uso
