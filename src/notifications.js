@@ -103,7 +103,11 @@ async function markAllNotificationsRead() {
 async function openNotificationTarget(id, tab) {
   const notification = advCache.notifications.find((item) => item.id === id);
   await markNotificationRead(id);
-  navigateToItem(tab, notification?.target_id);
+  navigateToItem(
+    tab,
+    notification?.target_id,
+    reminderOccurrenceDate(notification),
+  );
 }
 
 function reminderWasSent(key) {

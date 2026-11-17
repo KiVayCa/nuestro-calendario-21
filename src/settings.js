@@ -1,25 +1,35 @@
+const settingsPhotoUrls = new Map();
+
+function settingsPhotoKey(path) {
+  return user?.id && couple?.id && path
+    ? JSON.stringify([user.id, couple.id, path])
+    : null;
+}
+
 function cachedHomePhotoUrl() {
-  const path = coupleSettings.home_photo_path;
-  if (!path) return null;
-  try {
-    const cached = JSON.parse(
-      localStorage.getItem("nc21_signed_photo_" + encodeURIComponent(path)) ||
-        "null",
-    );
-    if (cached?.url && cached.expiresAt > Date.now() + 10 * 60 * 1000)
-      return cached.url;
-  } catch (_) {}
-  return null;
+  const cached = settingsPhotoUrls.get(
+    settingsPhotoKey(coupleSettings.home_photo_path),
+  );
+  return cached?.expiresAt > Date.now() + 60000 ? cached.url : null;
 }
 
 async function loadCoupleSettings() {
+  const space = couple?.id;
+  const account = user?.id;
+  if (!space || !account) return;
   const { data } = await sb
     .from("couple_settings")
     .select("*")
-    .eq("couple_id", couple.id)
+    .eq("couple_id", space)
     .maybeSingle();
+  if (space !== couple?.id || account !== user?.id) return;
+  const countdownChanged =
+    !!data &&
+    (data.countdown_date !== coupleSettings.countdown_date ||
+      data.countdown_title !== coupleSettings.countdown_title);
   if (data) coupleSettings = { ...coupleSettings, ...data };
   applyCoupleSettings();
+  return countdownChanged;
 }
 
 function applyCoupleSettings() {
@@ -48,7 +58,12 @@ function applyCoupleSettings() {
     };
     localStorage.setItem(
       "nc21_couple_settings",
-      JSON.stringify({ ...coupleSettings, palette }),
+      JSON.stringify({
+        theme,
+        accent_color: accent,
+        background_color: coupleSettings.background_color,
+        palette,
+      }),
     );
   } catch (_) {}
   body.classList.add("nc-theme-ready");
@@ -97,7 +112,6 @@ async function applyHomePhoto() {
 
 async function saveCoupleSettings(patch) {
   const payload = {
-    ...coupleSettings,
     ...patch,
     couple_id: couple.id,
     updated_by: user.id,
@@ -151,27 +165,18 @@ async function uploadCouplePhoto(inputId, field) {
 }
 
 async function signedPhoto(path) {
-  if (!path) return null;
-  const cacheKey = "nc21_signed_photo_" + encodeURIComponent(path);
-  const now = Date.now();
-  try {
-    const cached = JSON.parse(localStorage.getItem(cacheKey) || "null");
-    if (cached?.url && cached.expiresAt > now + 10 * 60 * 1000)
-      return cached.url;
-  } catch (_) {}
+  const key = settingsPhotoKey(path);
+  if (!key) return null;
+  const cached = settingsPhotoUrls.get(key);
+  if (cached?.expiresAt > Date.now() + 60000) return cached.url;
   const { data, error } = await sb.storage
     .from("couple-media")
-    .createSignedUrl(path, 60 * 60 * 24 * 7);
-  if (error || !data?.signedUrl) return null;
-  try {
-    localStorage.setItem(
-      cacheKey,
-      JSON.stringify({
-        url: data.signedUrl,
-        expiresAt: now + 6 * 24 * 60 * 60 * 1000,
-      }),
-    );
-  } catch (_) {}
+    .createSignedUrl(path, 900);
+  if (error || !data?.signedUrl || key !== settingsPhotoKey(path)) return null;
+  settingsPhotoUrls.set(key, {
+    url: data.signedUrl,
+    expiresAt: Date.now() + 840000,
+  });
   return data.signedUrl;
 }
 

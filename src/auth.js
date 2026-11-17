@@ -167,6 +167,16 @@ async function init() {
         if (realtimeRefreshTimer) clearTimeout(realtimeRefreshTimer);
         $("advancedContent").replaceChildren();
         mediaUrls.clear();
+        settingsPhotoUrls.clear();
+        homePhotoApplyToken++;
+        delete document.documentElement.dataset.ncHomePhotoPending;
+        for (const key of Object.keys(localStorage)) {
+          if (
+            key.startsWith("nc21_signed_photo_") ||
+            key === "nc21_couple_settings"
+          )
+            localStorage.removeItem(key);
+        }
         if (realtimeChannel) {
           await sb.removeChannel(realtimeChannel);
 

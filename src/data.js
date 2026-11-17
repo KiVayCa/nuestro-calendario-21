@@ -6,9 +6,10 @@ async function loadAdvancedData(keys = Object.keys(advTables)) {
   const results = await Promise.all(
     requested.map(async (key) => {
       try {
-        let query = key === "letters"
-          ? sb.rpc("list_couple_letters", { p_couple_id: couple.id })
-          : sb.from(advTables[key]).select("*").eq("couple_id", couple.id);
+        let query =
+          key === "letters"
+            ? sb.rpc("list_couple_letters", { p_couple_id: couple.id })
+            : sb.from(advTables[key]).select("*").eq("couple_id", couple.id);
         if (key === "privateNotes") query = query.eq("user_id", user.id);
         if (key === "notifications")
           query = query.eq("recipient_user_id", user.id);
@@ -50,11 +51,24 @@ async function loadAdvancedData(keys = Object.keys(advTables)) {
     (requested.includes("expenses") || requested.includes("recurring"))
   ) {
     await ensureRecurringBudgetMovements(budgetSelectedMonth);
-    const { data, error } = await sb
-      .from("shared_expenses")
-      .select("*")
-      .eq("couple_id", couple.id)
-      .order("created_at", { ascending: false });
+    const data = [];
+    let error;
+    for (let offset = 0; ; offset += 500) {
+      const page = await sb
+        .from("shared_expenses")
+        .select("*")
+        .eq("couple_id", couple.id)
+        .order("created_at", { ascending: false })
+        .order("id")
+        .range(offset, offset + 499);
+      if (context !== couple?.id + ":" + user?.id) return;
+      if (page.error) {
+        error = page.error;
+        break;
+      }
+      data.push(...page.data);
+      if (page.data.length < 500) break;
+    }
     if (
       context !== couple?.id + ":" + user?.id ||
       revision !== dataLoadRevision
@@ -65,10 +79,14 @@ async function loadAdvancedData(keys = Object.keys(advTables)) {
       changed = true;
     }
   }
-  await loadCoupleSettings();
+  const countdownChanged = await loadCoupleSettings();
   if (context !== couple?.id + ":" + user?.id || revision !== dataLoadRevision)
     return;
-  if (changed || !$("advancedContent")?.children.length) {
+  if (
+    changed ||
+    (countdownChanged && advancedTab === "home") ||
+    !$("advancedContent")?.children.length
+  ) {
     if (
       document.activeElement?.closest(
         "#advancedContent input, #advancedContent textarea, #advancedContent select",

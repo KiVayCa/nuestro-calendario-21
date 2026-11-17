@@ -101,7 +101,19 @@ function openPlanTasks(button) {
       <button class="btn" type="button" onclick="closeAdvModal();openPlanDetail(this.form.dataset.plan,this.form.dataset.date)">Volver al plan</button>
     </form>`,
   );
-  loadPlanTasks($("planTaskList"), plan.id, date);
+  const list = $("planTaskList");
+  loadPlanTasks(list, plan.id, date);
+  const refresh = setInterval(() => {
+    if (!list.isConnected || !$("advModal").classList.contains("show")) {
+      clearInterval(refresh);
+      return;
+    }
+    if (
+      document.visibilityState === "visible" &&
+      !list.contains(document.activeElement)
+    )
+      loadPlanTasks(list, plan.id, date);
+  }, 8000);
 }
 
 async function loadPlanTasks(container, planId, date) {
@@ -116,6 +128,9 @@ async function loadPlanTasks(container, planId, date) {
     container.textContent = "No se pudieron cargar las tareas.";
     return;
   }
+  const revision = JSON.stringify(data);
+  if (container.dataset.revision === revision) return;
+  container.dataset.revision = revision;
   container.innerHTML = data.length
     ? `<div class="advList">${data
         .map((task) => {
@@ -126,7 +141,7 @@ async function loadPlanTasks(container, planId, date) {
             ? assignee.display_name ||
               (assignee.user_id === user?.id ? "Yo" : "Mi pareja")
             : "Sin asignar";
-          return `<div class="advItem"><div><strong>${task.completed ? "✓ " : ""}${esc(task.title)}</strong><div class="advMeta">${esc(name)}</div></div>
+          return `<div class="advItem"><div><strong>${task.completed ? "✓ " : ""}${esc(task.title)}</strong><div class="advMeta">${esc(name)}${task.completed_at ? " · " + esc(coupleProfiles.find((p) => p.user_id === task.completed_by)?.display_name || "Completada") + " · " + esc(new Date(task.completed_at).toLocaleString("es-CO", { timeZone: "America/Bogota" })) : ""}</div></div>
       <div class="advActions"><button class="btn" type="button" data-id="${esc(task.id)}" onclick="changePlanTask(this, ${!task.completed})">${task.completed ? "Reabrir" : "Completar"}</button>
       <button class="btn danger" type="button" data-id="${esc(task.id)}" onclick="changePlanTask(this, null)">Eliminar</button></div></div>`;
         })
@@ -191,9 +206,35 @@ function countdownToday() {
   }).format(new Date());
 }
 
-function homeCountdownCard() {
+function resolveCountdown() {
+  const { countdown_source: source, countdown_source_id: id } = coupleSettings;
   const date = coupleSettings.countdown_date;
-  const title = coupleSettings.countdown_title;
+  if (source === "plan") {
+    const plan = plans.find((item) => item.id === id);
+    if (plan)
+      return {
+        date: plan.recurrence_enabled ? date : plan.plan_date,
+        title: plan.title,
+      };
+  }
+  if (source === "date") {
+    const event = advCache.dates.find((item) => item.id === id);
+    if (event)
+      return {
+        date:
+          event.recurring ||
+          (event.recurrence_type && event.recurrence_type !== "none")
+            ? date
+            : event.event_date,
+        title: event.title,
+      };
+  }
+  return { date, title: coupleSettings.countdown_title };
+}
+
+function homeCountdownCard() {
+  const pinned = resolveCountdown();
+  const { date, title } = pinned;
   const days = Math.round(
     (Date.parse(date) - Date.parse(countdownToday())) / 86400000,
   );
@@ -211,10 +252,16 @@ function homeCountdownCard() {
 function openCountdownSettings() {
   const today = countdownToday();
   const end = dateKeyLocal(addDaysDate(parseDateOnly(today), 366));
+  const pinned = resolveCountdown();
   const choices = [
     ...getPlanOccurrencesForRange(today, end)
       .filter((plan) => !plan.completed)
-      .map((plan) => ({ title: plan.title, date: plan._occurrenceDate })),
+      .map((plan) => ({
+        title: plan.title,
+        date: plan._occurrenceDate,
+        source: "plan",
+        id: plan.id,
+      })),
     ...getImportantDateOccurrencesForRange(today, end),
   ]
     .sort((a, b) => a.date.localeCompare(b.date))
@@ -224,10 +271,10 @@ function openCountdownSettings() {
     `<div class="advForm">
     <div class="field"><label for="countdownSource">Usar un plan o fecha especial</label><select id="countdownSource" onchange="applyCountdownChoice(this)">
       <option value="">Elegir o escribir una fecha</option>
-      ${choices.map((item) => `<option value="${esc(item.date)}" data-title="${esc(item.title)}">${esc(item.date)} · ${esc(item.title)}</option>`).join("")}
+      ${choices.map((item) => `<option value="${esc(item.date)}" data-title="${esc(item.title)}" data-source="${esc(item.source)}" data-id="${esc(item.id)}">${esc(item.date)} · ${esc(item.title)}</option>`).join("")}
     </select></div>
-    <div class="field"><label for="countdownTitle">Nombre</label><input id="countdownTitle" maxlength="120" value="${esc(coupleSettings.countdown_title || "")}"></div>
-    <div class="field"><label for="countdownDate">Fecha</label><input id="countdownDate" type="date" min="${today}" value="${esc(coupleSettings.countdown_date || "")}"></div>
+    <div class="field"><label for="countdownTitle">Nombre</label><input id="countdownTitle" maxlength="120" value="${esc(pinned.title || "")}"></div>
+    <div class="field"><label for="countdownDate">Fecha</label><input id="countdownDate" type="date" min="${today}" value="${esc(pinned.date || "")}"></div>
     <div class="advActions"><button class="btn primary" type="button" onclick="saveCountdown(this)">Fijar en Inicio</button>
     ${coupleSettings.countdown_date ? '<button class="btn" type="button" onclick="saveCountdown(this,true)">Quitar</button>' : ""}</div></div>`,
   );
@@ -245,20 +292,155 @@ async function saveCountdown(button, remove = false) {
   const date = $("countdownDate").value;
   if (!remove && (!title || !date || date < countdownToday()))
     return appAlert("Escribe un nombre y elige una fecha de hoy en adelante.");
+  const option = $("countdownSource").selectedOptions[0];
+  const followsSelection =
+    !remove && date === option.value && title === option.dataset.title;
+  const pinned = resolveCountdown();
+  const keepsLink =
+    !remove && !option.value && date === pinned.date && title === pinned.title;
+  const source = followsSelection
+    ? option.dataset.source
+    : keepsLink
+      ? coupleSettings.countdown_source
+      : null;
+  const id = followsSelection
+    ? option.dataset.id
+    : keepsLink
+      ? coupleSettings.countdown_source_id
+      : null;
   await runCalendarTool(button, async () => {
     const { error } = await sb.from("couple_settings").upsert(
       {
         couple_id: couple.id,
         updated_by: user.id,
+        countdown_source: source || null,
+        countdown_source_id: id || null,
         countdown_title: remove ? null : title,
         countdown_date: remove ? null : date,
       },
       { onConflict: "couple_id" },
     );
     if (error) return appAlert("No se pudo guardar la cuenta regresiva.");
+    coupleSettings.countdown_source = source || null;
+    coupleSettings.countdown_source_id = id || null;
     coupleSettings.countdown_title = remove ? null : title;
     coupleSettings.countdown_date = remove ? null : date;
     closeAdvModal();
     renderAdvanced();
   });
+}
+
+async function openWeeklySummary() {
+  const today = countdownToday();
+  const last = dateKeyLocal(addDaysDate(parseDateOnly(today), 6));
+  const upcoming = getPlanOccurrencesForRange(today, last).filter(
+    (plan) => !plan.completed,
+  );
+  const dates = getImportantDateOccurrencesForRange(today, last);
+  openAdvModal(
+    "Los próximos siete días",
+    `
+    <h3>Planes</h3><div class="advList">${
+      upcoming
+        .map(
+          (plan) => `<button class="btn" type="button"
+      data-id="${esc(plan.id)}" data-date="${esc(plan._occurrenceDate)}"
+      onclick="openAnalysisItem(this,true)">${esc(dateES(plan._occurrenceDate))} · ${esc(plan.title)}</button>`,
+        )
+        .join("") || "<p>Sin planes pendientes.</p>"
+    }</div>
+    <h3>Fechas especiales</h3><div class="advList">${
+      dates
+        .map(
+          (event) => `<button class="btn" type="button"
+      data-id="${esc(event.id)}" onclick="closeAdvModal();navigateToItem('dates',this.dataset.id)">${esc(dateES(event.date))} · ${esc(event.title)}</button>`,
+        )
+        .join("") || "<p>Sin fechas especiales.</p>"
+    }</div>
+    <h3>Tareas asignadas a mí</h3><div id="weeklyTasks" class="advList" aria-live="polite">Cargando…</div>`,
+  );
+  const container = $("weeklyTasks");
+  const account = user?.id;
+  const space = couple?.id;
+  const ids = [...new Set(upcoming.map((plan) => plan.id))];
+  if (!ids.length) {
+    container.textContent = "Sin tareas pendientes.";
+    return;
+  }
+  const { data, error } = await sb
+    .from("plan_tasks")
+    .select("plan_id,occurrence_date,title")
+    .eq("assigned_to", account)
+    .eq("completed", false)
+    .in("plan_id", ids)
+    .gte("occurrence_date", today)
+    .lte("occurrence_date", last)
+    .order("occurrence_date")
+    .limit(100);
+  if (!container.isConnected || user?.id !== account || couple?.id !== space)
+    return;
+  if (error) {
+    container.textContent = "No se pudieron cargar las tareas.";
+    return;
+  }
+  const valid = new Set(
+    upcoming.map((plan) => plan.id + ":" + plan._occurrenceDate),
+  );
+  container.innerHTML =
+    data
+      .filter((task) => valid.has(task.plan_id + ":" + task.occurrence_date))
+      .map(
+        (
+          task,
+        ) => `<button type="button" class="btn" data-id="${esc(task.plan_id)}" data-date="${esc(task.occurrence_date)}"
+    onclick="openAnalysisItem(this,true)">${esc(dateES(task.occurrence_date))} · ${esc(task.title)}</button>`,
+      )
+      .join("") || "<p>Sin tareas pendientes.</p>";
+}
+
+function openOccurrenceReschedule(date) {
+  const plan = currentPlan;
+  if (!plan?.recurrence_enabled) return;
+  closeDetailModal();
+  openAdvModal(
+    "Mover fecha · " + plan.title,
+    `<form class="advForm"
+    data-plan="${esc(plan.id)}" data-date="${esc(date)}" onsubmit="event.preventDefault();saveOccurrenceReschedule(this)">
+    <div class="field"><label for="rescheduleDate">Nueva fecha</label>
+      <input id="rescheduleDate" type="date" required min="${countdownToday()}" value="${esc(date)}"></div>
+    <div class="field"><label for="rescheduleTime">Hora</label>
+      <input id="rescheduleTime" type="time" value="${esc(plan.plan_time?.slice(0, 5) || "")}"></div>
+    <button class="btn primary" type="submit">Mover solo este plan</button>
+  </form>`,
+  );
+}
+
+async function saveOccurrenceReschedule(form) {
+  const date = form.querySelector("#rescheduleDate").value;
+  const time = form.querySelector("#rescheduleTime").value || null;
+  const { plan, date: oldDate } = form.dataset;
+  const original = plans.find((item) => item.id === plan);
+  if (
+    !original ||
+    (date === oldDate && time === (original.plan_time?.slice(0, 5) || null))
+  )
+    return;
+  await runCalendarTool(
+    form.querySelector('button[type="submit"]'),
+    async () => {
+      const { data, error } = await sb.rpc("reschedule_plan_occurrence", {
+        p_plan: plan,
+        p_date: oldDate,
+        p_new_date: date,
+        p_new_time: time,
+      });
+      if (error || !data)
+        return appAlert("No pudimos mover esta fecha del plan.");
+      await loadPlans();
+      await advLoadAll(["memories", "dates"]);
+      closeAdvModal();
+      openPlanDetail(data, date);
+      showAppToast("Fecha del plan actualizada");
+    },
+  );
 }

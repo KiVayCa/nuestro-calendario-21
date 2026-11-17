@@ -232,8 +232,10 @@ function addMonthsSafe(d, n) {
 }
 
 function occurrenceAllowed(plan, d) {
+  const date = dateKeyLocal(d);
   return (
-    !plan.recurrence_end_date || dateKeyLocal(d) <= plan.recurrence_end_date
+    !(plan.skipped_occurrences || []).includes(date) &&
+    (!plan.recurrence_end_date || date <= plan.recurrence_end_date)
   );
 }
 

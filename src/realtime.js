@@ -23,7 +23,8 @@ function scheduleRealtimeRefresh(includePlans = false, keys = null) {
       realtimeKeys.clear();
       if (withPlans) await loadPlans();
       await advLoadAll(keys);
-      if (withPlans && ["home", "analysis"].includes(advancedTab)) renderAdvanced();
+      if (withPlans && ["home", "analysis"].includes(advancedTab))
+        renderAdvanced();
     } catch (err) {
       console.warn("No se pudo actualizar el calendario en tiempo real:", err);
     } finally {
@@ -175,6 +176,9 @@ async function setupAdvancedRealtime(force = false) {
                       encodeURIComponent(note.target_tab || "notifications") +
                       (note.target_id
                         ? "&item=" + encodeURIComponent(note.target_id)
+                        : "") +
+                      (reminderOccurrenceDate(note)
+                        ? "&date=" + reminderOccurrenceDate(note)
                         : ""),
                   },
                 }),
@@ -207,7 +211,11 @@ async function initAdvanced() {
   await Promise.all([setupPlanRealtime(), setupAdvancedRealtime()]);
   const tab = pendingDeepLink.get("tab");
   if (tab) {
-    navigateToItem(tab, pendingDeepLink.get("item"));
+    navigateToItem(
+      tab,
+      pendingDeepLink.get("item"),
+      pendingDeepLink.get("date"),
+    );
     pendingDeepLink = new URLSearchParams();
     history.replaceState(null, "", location.pathname);
   }

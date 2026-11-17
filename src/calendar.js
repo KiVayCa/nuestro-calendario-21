@@ -757,13 +757,16 @@ function openPlanDetail(id, occurrenceDate) {
   }
 
   if (completed || planOccurrenceStart(plan, date) <= new Date()) {
-    rows += `<button class="btn" data-plan-date="${esc(date)}" onclick="openMemoryFromPlan(this.dataset.planDate)">📸 Guardar como recuerdo</button>`;
+    rows += `<button class="btn" data-plan-date="${esc(date)}" onclick="openMemoryFromPlan(this.dataset.planDate)">📸 Álbum de la salida</button>`;
   }
   rows =
     `<button type="button" class="btn primary" data-plan-date="${esc(date)}"
     onclick="toggleCurrentPlanCompleted(this)">${completed ? "↩ Reabrir plan" : "✓ Marcar como completado"}</button>` +
     rows;
   rows += `<div class="modalBtns"><button class="btn" type="button" data-plan-date="${esc(date)}" onclick="openPlanTasks(this)">☑ Pendientes del plan</button></div>`;
+  if (plan.recurrence_enabled && !completed && date >= countdownToday() && !(plan.skipped_occurrences || []).includes(date)) {
+    rows += `<button class="btn" type="button" data-date="${esc(date)}" onclick="openOccurrenceReschedule(this.dataset.date)">Mover solo esta fecha</button>`;
+  }
   $("detailRows").innerHTML = rows;
 
   $("detailModal").style.display = "grid";

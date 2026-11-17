@@ -330,7 +330,12 @@ function albumHeading(ctx, title, y) {
   return y + Math.min(3, lines.length) * 61;
 }
 
-async function buildMemoryAlbum(groups, progress, stillSignedIn) {
+async function buildMemoryAlbum(
+  groups,
+  progress,
+  stillSignedIn,
+  title = "Todo lo que vivimos",
+) {
   const canvas = albumCanvas(900, 1273);
   const ctx = canvas.getContext("2d");
   const pages = [];
@@ -349,7 +354,7 @@ async function buildMemoryAlbum(groups, progress, stillSignedIn) {
   ctx.font = "96px Georgia, serif";
   ctx.fillText("♡", 70, 405);
   ctx.fillStyle = albumFrames.rose.ink;
-  albumHeading(ctx, "Todo lo que vivimos", 510);
+  albumHeading(ctx, title, 510);
   ctx.font = "30px Georgia, serif";
   albumText(
     ctx,

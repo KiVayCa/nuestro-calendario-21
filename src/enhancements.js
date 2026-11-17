@@ -130,14 +130,24 @@ function clearMemoryFilters() {
   renderAdvanced();
 }
 
-function navigateToItem(tab, id) {
+function reminderOccurrenceDate(note) {
+  return note?.event_type === "plan_reminder"
+    ? /^plan:[^:]+:(\d{4}-\d{2}-\d{2}):/.exec(note.reminder_key || "")?.[1]
+    : undefined;
+}
+
+function navigateToItem(tab, id, date) {
   if (!validAdvancedTabs.has(tab)) tab = "notifications";
   if (tab === "memories" && id)
     memoryFilters = { query: "", year: "", favorites: false };
   showAdvancedTab(tab);
   if (!id) return;
   if (tab === "calendar") {
-    if (plans.some((plan) => plan.id === id)) openPlanDetail(id);
+    if (plans.some((plan) => plan.id === id))
+      openPlanDetail(
+        id,
+        /^\d{4}-\d{2}-\d{2}$/.test(date || "") ? date : undefined,
+      );
     else showAppToast("Este plan ya no está disponible.");
     return;
   }
@@ -178,8 +188,11 @@ async function openGoalHistory(id) {
   if (!goal) return;
   openAdvModal(
     "Movimientos de " + goal.title,
-    '<p role="status">Cargando movimientos…</p>',
+    '<div id="goalHistoryContent" role="status">Cargando movimientos…</div>',
   );
+  const container = $("goalHistoryContent");
+  const account = user?.id;
+  const space = couple.id;
   const { data, error } = await sb
     .from("goal_movements")
     .select("*")
@@ -187,16 +200,36 @@ async function openGoalHistory(id) {
     .eq("couple_id", couple.id)
     .order("created_at", { ascending: false })
     .limit(200);
+  if (!container.isConnected || account !== user?.id || space !== couple?.id)
+    return;
   if (error) {
-    $("advModalBody").textContent =
+    container.textContent =
       "No pudimos consultar el historial. Inténtalo de nuevo.";
     return;
   }
   const names = new Map(
     coupleProfiles.map((profile) => [profile.user_id, profile.display_name]),
   );
-  $("advModalBody").innerHTML =
-    `<p>Saldo actual <strong>${money(goal.current_amount)}</strong></p><div class="advList">${data.length ? data.map((row) => `<div class="advItem"><div><strong>${row.kind === "opening" ? "Saldo inicial" : Number(row.amount) > 0 ? "Aporte" : "Retiro"} · ${money(Math.abs(row.amount))}</strong><div class="advMeta">${esc(names.get(row.created_by) || "Integrante")} · ${new Date(row.created_at).toLocaleString("es-CO")}</div><p>${esc(row.note || "")}</p><span>Saldo después del movimiento ${money(row.balance_after)}</span></div></div>`).join("") : "<p>Todavía no hay movimientos.</p>"}</div>${data.length === 200 ? "<p>Se muestran los 200 movimientos más recientes.</p>" : ""}`;
+  const month = countdownToday().slice(0, 7);
+  const byPerson = new Map();
+  for (const row of data) {
+    if (row.kind === "opening" || Number(row.amount) <= 0) continue;
+    const totals = byPerson.get(row.created_by) || { total: 0, month: 0 };
+    totals.total += Number(row.amount);
+    const localDate = new Date(
+      new Date(row.created_at).getTime() - 5 * 3600000,
+    );
+    if (localDate.toISOString().startsWith(month))
+      totals.month += Number(row.amount);
+    byPerson.set(row.created_by, totals);
+  }
+  const summary = [...byPerson]
+    .map(
+      ([id, totals]) =>
+        `<li>${esc(names.get(id) || "Integrante")} · este mes ${money(totals.month)} · total visible ${money(totals.total)}</li>`,
+    )
+    .join("");
+  container.innerHTML = `<p>Saldo actual <strong>${money(goal.current_amount)}</strong></p>${summary ? `<h3>Aportes por persona</h3><ul>${summary}</ul>` : ""}<div class="advList">${data.length ? data.map((row) => `<div class="advItem"><div><strong>${row.kind === "opening" ? "Saldo inicial" : Number(row.amount) > 0 ? "Aporte" : "Retiro"} · ${money(Math.abs(row.amount))}</strong><div class="advMeta">${esc(names.get(row.created_by) || "Integrante")} · ${new Date(row.created_at).toLocaleString("es-CO")}</div><p>${esc(row.note || "")}</p><span>Saldo después del movimiento ${money(row.balance_after)}</span></div></div>`).join("") : "<p>Todavía no hay movimientos.</p>"}</div>${data.length === 200 ? "<p>Se muestran los 200 movimientos más recientes.</p>" : ""}`;
 }
 
 function setConnectionStatus(message) {
