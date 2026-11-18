@@ -50,3 +50,5 @@ El historial del chat ayuda con decisiones; Git y este archivo conservan el esta
 ## Android v5 en pruebas
 
 Los cinco proveedores se crean sin actividad de configuración. Al abrir la aplicación, un canal postMessage de la TWA validado con Digital Asset Links autoriza la lectura desde la sesión activa mediante el intercambio de un solo uso. La v4 conserva el vínculo manual. Un dispositivo desconectado o revocado no se vincula otra vez de forma automática. Pendiente prueba de instalación release y aceptación en teléfono. El descriptor público sigue en v4.
+
+Validación de la v5: build web y 19 pruebas aprobadas. GitHub Actions completó pruebas JVM, lintDebug, assembleDebug y assembleRelease. El APK release se firmó y se verificó con el certificado de la v4. Pendientes publicación coordinada de web y APK, y aceptación en dispositivo.
