@@ -105,12 +105,24 @@ self.addEventListener("notificationclick", (event) => {
     self.clients
       .matchAll({ type: "window", includeUncontrolled: true })
       .then(async (clients) => {
-        const client = clients.find(
-          (item) => new URL(item.url).origin === self.location.origin,
+        const androidClient = clients.find((item) =>
+          new URL(item.url).searchParams.has("ncAndroidVersion"),
         );
+        const client = androidClient || clients[0];
+        if (androidClient) {
+          const current = new URL(androidClient.url);
+          for (const key of ["ncAndroidVersion", "ncAndroidName"]) {
+            if (current.searchParams.has(key))
+              target.searchParams.set(key, current.searchParams.get(key));
+          }
+        }
         if (client) {
-          await client.navigate(target.href);
-          return client.focus();
+          try {
+            const navigated = await client.navigate(target.href);
+            if (navigated) return await navigated.focus();
+          } catch {
+            // The tab may have closed while the notification was being handled.
+          }
         }
         return self.clients.openWindow(target.href);
       }),

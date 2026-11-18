@@ -68,3 +68,9 @@ Cada persona puede elegir, cambiar o quitar su reacción en una carta abierta. L
 ## Android v7 RC2 · canal de actualización
 
 El descriptor anuncia la v7 RC2 (`1.0.0-preview.7`) para probar el arranque desde el icono. El APK alojado tiene 4.102.038 bytes y SHA-256 `24cc328ed1b37c453ad3172cd3ddb0072dd72d75c7ad38e24c77a0e35e69f433`. Se verificaron la descarga, la firma existente y el paquete. Queda pendiente confirmar la apertura y el resultado de Play Protect en el Motorola. Este cambio activa el descriptor del APK RC2 ya alojado.
+
+Nicolás confirmó en su teléfono que la RC2 abre desde el icono y que Play Protect dejó de mostrar el aviso.
+
+## Apertura de avisos push
+
+Al tocar un aviso, el service worker prioriza una instancia abierta desde el APK y conserva la información de versión al abrir el destino. Si la instancia ya se cerró, el navegador decide dónde abrir el enlace web. Pendiente comprobar la apertura en el teléfono con la app en segundo plano y estudiar el arranque en frío.

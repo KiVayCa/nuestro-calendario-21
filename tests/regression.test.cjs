@@ -448,3 +448,39 @@ test("Android checks on every return and only confirms an equal published versio
   assert.equal(messages[1], messages[0]);
   assert.match(messages[2], /No pudimos comprobar/);
 });
+
+test("push click prefers the installed calendar over a browser tab", async () => {
+  const origin = "https://calendar.example";
+  const listeners = {};
+  let navigated;
+  let focused = false;
+  const androidClient = {
+    url: origin + "/?ncAndroidVersion=7&ncAndroidName=preview.7",
+    async navigate(url) {
+      navigated = new URL(url);
+      return this;
+    },
+    async focus() {
+      focused = true;
+    },
+  };
+  context("sw.js", {
+    self: {
+      location: { origin },
+      addEventListener(name, listener) { listeners[name] = listener; },
+      clients: {
+        async matchAll() { return [{ url: origin + "/" }, androidClient]; },
+        async openWindow() { assert.fail("unexpected browser window"); },
+      },
+    },
+  });
+  let completion;
+  listeners.notificationclick({
+    notification: { close() {}, data: { url: "/?tab=plans&item=123" } },
+    waitUntil(promise) { completion = promise; },
+  });
+  await completion;
+  assert.equal(focused, true);
+  assert.equal(navigated.searchParams.get("item"), "123");
+  assert.equal(navigated.searchParams.get("ncAndroidVersion"), "7");
+});

@@ -218,7 +218,9 @@ async function initAdvanced() {
       pendingDeepLink.get("date"),
     );
     pendingDeepLink = new URLSearchParams();
-    history.replaceState(null, "", location.pathname);
+    const cleanUrl = new URL(location.href);
+    for (const key of ["tab", "item", "date"]) cleanUrl.searchParams.delete(key);
+    history.replaceState(null, "", cleanUrl.href);
   }
   maybeOfferWidgetLink();
   $("advModal")?.addEventListener("click", (e) => {
