@@ -99,3 +99,22 @@ CI construye y comprueba un APK de desarrollo sin claves privadas. Para distribu
 ## Validación pendiente en dispositivos
 
 Antes de sustituir la instalación PWA: comprobar instalación y apertura sin barra de direcciones; ambas cuentas; login y desconexión de widgets; marcos y tamaños; cita hoy y mañana; cancelación/completado/reprogramación; cuenta regresiva y paso de medianoche de Bogotá; modo avión/recuperación; ahorro de batería; descargas PDF/collage y recepción real de push. Las pruebas de JVM y lint no reemplazan estas comprobaciones.
+
+### Publicación desde GitHub Actions
+
+La rama `release/android-v<N>` solicita una publicación del APK. Su
+`versionCode` debe coincidir con `<N>` y superar la versión anunciada en
+producción. El flujo compila, ejecuta las pruebas y firma con la clave de
+Android existente. Después sube el APK al mismo Vercel Blob de producción,
+comprueba la descarga y genera el artefacto `android-release-descriptor`.
+
+Se configuran una sola vez los siguientes secretos de GitHub Actions:
+
+- `ANDROID_SIGNING_JSON` con los campos `keystore_base64`, `store_password`
+  y `key_password` del respaldo de firma existente. El alias es `calendario21`.
+- `BLOB_READ_WRITE_TOKEN` del almacén Blob que ya sirve al actualizador.
+- `FIREBASE_ANDROID_CONFIG` con `google-services.json` para versiones con FCM.
+
+Cuando el flujo termina, incorporar el descriptor verificado a `main` junto
+con los cambios de la versión. Vercel lo publica cuando despliega `main`.
+Comprobar el descriptor de producción y la descarga antes de anunciarla.

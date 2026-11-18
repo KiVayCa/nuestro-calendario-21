@@ -78,3 +78,10 @@ Al tocar un aviso, el service worker prioriza una instancia abierta desde el APK
 ## Instalación en Configuración
 
 Se retiró la tarjeta «Instalar en este dispositivo». «Aplicación Android y widgets» sigue disponible para instalar y consultar actualizaciones del APK.
+
+## Canal de publicación de APK
+
+El flujo `publish-android.yml` prepara el APK y el descriptor desde ramas
+`release/android-v<N>`. Requiere configurar en GitHub Actions el respaldo de
+firma y el acceso de escritura al almacén Blob actual. La v7 sigue anunciada
+en producción mientras se valida la primera publicación automatizada.

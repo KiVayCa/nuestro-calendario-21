@@ -1,0 +1,100 @@
+name: Publicar APK de Android
+on:
+  push:
+    branches: ['release/android-v*']
+permissions:
+  contents: read
+concurrency:
+  group: android-blob-publication
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Validate release version
+        shell: bash
+        run: |
+          set -eu
+          VERSION="${GITHUB_REF_NAME#release/android-v}"
+          [[ "$VERSION" =~ ^[1-9][0-9]*$ ]]
+          BUILD_VERSION="$(awk '$1 == "versionCode" { print $2 }' android/app/build.gradle)"
+          test "$VERSION" = "$BUILD_VERSION"
+          curl --fail --silent --show-error --max-time 20 \
+            https://nuestrocalendario21.vercel.app/android-release.json > "$RUNNER_TEMP/current-release.json"
+          CURRENT_VERSION="$(jq -er '.versionCode | numbers' "$RUNNER_TEMP/current-release.json")"
+          test "$VERSION" -gt "$CURRENT_VERSION"
+      - name: Configure Firebase when required
+        env:
+          FIREBASE_ANDROID_CONFIG: ${{ secrets.FIREBASE_ANDROID_CONFIG }}
+        run: |
+          if grep -q 'com.google.firebase:firebase-messaging' android/app/build.gradle; then
+            if [ -z "$FIREBASE_ANDROID_CONFIG" ]; then
+              echo "::error::Falta FIREBASE_ANDROID_CONFIG"
+              exit 1
+            fi
+            umask 077
+            printf '%s' "$FIREBASE_ANDROID_CONFIG" > android/app/google-services.json
+          fi
+      - name: Install dependencies and validate web
+        run: |
+          npm ci
+          npm run build
+          npm test
+      - name: Build and validate Android
+        working-directory: android
+        run: |
+          sdkmanager 'platforms;android-36' 'build-tools;35.0.0'
+          gradle --no-daemon testDebugUnitTest lintDebug assembleRelease
+      - name: Sign with the existing Android certificate
+        env:
+          ANDROID_SIGNING_JSON: ${{ secrets.ANDROID_SIGNING_JSON }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "$ANDROID_SIGNING_JSON" ]; then
+            echo "::error::Falta ANDROID_SIGNING_JSON"
+            exit 1
+          fi
+          umask 077
+          KEYSTORE="$(mktemp "${RUNNER_TEMP}/calendario21.XXXXXX")"
+          trap 'rm -f "$KEYSTORE"' EXIT
+          jq -er '.keystore_base64 | strings | select(length > 0)' <<< "$ANDROID_SIGNING_JSON" | base64 --decode > "$KEYSTORE"
+          STORE_PASSWORD="$(jq -er '.store_password | strings | select(length > 0)' <<< "$ANDROID_SIGNING_JSON")"
+          KEY_PASSWORD="$(jq -er '.key_password | strings | select(length > 0)' <<< "$ANDROID_SIGNING_JSON")"
+          export STORE_PASSWORD KEY_PASSWORD
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" sign \
+            --ks "$KEYSTORE" --ks-key-alias calendario21 \
+            --ks-pass env:STORE_PASSWORD --key-pass env:KEY_PASSWORD \
+            --out "$RUNNER_TEMP/calendario21-release.apk" \
+            android/app/build/outputs/apk/release/app-release-unsigned.apk
+      - name: Upload and validate the public APK
+        env:
+          BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
+        shell: bash
+        run: |
+          set -eu
+          if [ -z "$BLOB_READ_WRITE_TOKEN" ]; then
+            echo "::error::Falta BLOB_READ_WRITE_TOKEN"
+            exit 1
+          fi
+          cp "$RUNNER_TEMP/current-release.json" android-release.json
+          node scripts/publish-android-release.mjs \
+            "$RUNNER_TEMP/calendario21-release.apk" android/release-notes.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-release-descriptor
+          path: android-release.json
+          if-no-files-found: error
+          retention-days: 14
