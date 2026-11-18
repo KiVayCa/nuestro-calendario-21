@@ -85,3 +85,5 @@ El flujo `publish-android.yml` prepara el APK y el descriptor desde ramas
 `release/android-v<N>`. Requiere configurar en GitHub Actions el respaldo de
 firma y el acceso de escritura al almacén Blob actual. La v7 sigue anunciada
 en producción mientras se valida la primera publicación automatizada.
+
+GitHub Actions validó la primera publicación automatizada en la ejecución 44387420011. El APK v8 quedó alojado en el mismo Blob que la v7. Se verificaron la descarga de 5.413.570 bytes, el SHA-256 `4abc5f8e563aa820cbe3d51689b370a0e634dd0272cdd5c9b29a7322440a1719` y el certificado existente. El descriptor verificado está disponible como artefacto de la ejecución. El actualizador sigue anunciando v7 hasta activar el registro y el envío de notificaciones en producción.
