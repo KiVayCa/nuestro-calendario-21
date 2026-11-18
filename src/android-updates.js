@@ -5,7 +5,7 @@ const nativeAndroidCode = /Android/i.test(navigator.userAgent || "")
   : 0;
 const nativeAndroidName = nativeAndroidParams.get("ncAndroidName") || "";
 let androidReleaseRequest = null;
-let androidReleaseLastCheck = 0;
+let androidForegroundCheck = 0;
 let androidReleaseDismissed = 0;
 
 function androidDevice() {
@@ -101,12 +101,17 @@ async function checkAndroidAppUpdate() {
     document.visibilityState === "hidden"
   )
     return;
-  if (Date.now() - androidReleaseLastCheck < 60000) return;
-  androidReleaseLastCheck = Date.now();
+  const check = ++androidForegroundCheck;
   try {
     const release = await fetchAndroidRelease();
+    if (check !== androidForegroundCheck || document.visibilityState === "hidden") return;
+    if (release.versionCode === nativeAndroidCode) {
+      $("androidUpdateNotice")?.remove();
+      showAppToast("Ya tienes la última versión de Nuestro Calendario #21.");
+      return;
+    }
     if (
-      release.versionCode <= nativeAndroidCode ||
+      release.versionCode < nativeAndroidCode ||
       release.versionCode === androidReleaseDismissed ||
       $("androidUpdateNotice")
     )
@@ -123,9 +128,17 @@ async function checkAndroidAppUpdate() {
     };
     document.body.appendChild(banner);
   } catch {
-    /* An update-server outage must never prevent access to the calendar. */
+    if (check === androidForegroundCheck && document.visibilityState !== "hidden")
+      showAppToast("No pudimos comprobar las actualizaciones. Revisa tu conexión.", "error");
   }
 }
 
 window.addEventListener("load", checkAndroidAppUpdate);
-document.addEventListener("visibilitychange", checkAndroidAppUpdate);
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden") {
+    androidForegroundCheck++;
+    androidReleaseDismissed = 0;
+  } else {
+    checkAndroidAppUpdate();
+  }
+});

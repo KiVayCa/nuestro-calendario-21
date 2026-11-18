@@ -347,7 +347,7 @@ test("a newer Android release shows one dismissible notice with escaped text", a
   await c.checkAndroidAppUpdate();
   const notice = dom.window.document.getElementById("androidUpdateNotice");
   assert.ok(notice);
-  assert.equal(requests, 1);
+  assert.equal(requests, 2);
   assert.equal(notice.querySelector("img"), null);
   assert.equal(
     notice.querySelector("a").getAttribute("href"),
@@ -430,4 +430,20 @@ test("all five Android widgets may be placed before a session exists", () => {
   assert.equal(providers.length, 5);
   for (const name of providers)
     assert.doesNotMatch(fs.readFileSync(xml + "/" + name, "utf8"), /android:configure=/);
+});
+
+test("Android checks on every return and only confirms an equal published version", async () => {
+  const release = JSON.parse(fs.readFileSync("android-release.json", "utf8"));
+  const messages = [];
+  let requests = 0;
+  const c = context("src/android-updates.js", {
+    navigator: {userAgent:"Android"}, location:{search:"?ncAndroidVersion="+release.versionCode},
+    AbortSignal, $: () => null, showAppToast: message => messages.push(message),
+    fetch: async () => ({ok: ++requests !== 3, text: async () => JSON.stringify(release)})
+  });
+  await c.checkAndroidAppUpdate(); await c.checkAndroidAppUpdate(); await c.checkAndroidAppUpdate();
+  assert.equal(requests, 3);
+  assert.match(messages[0], /Ya tienes la última versión/);
+  assert.equal(messages[1], messages[0]);
+  assert.match(messages[2], /No pudimos comprobar/);
 });

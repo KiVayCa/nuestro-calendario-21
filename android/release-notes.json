@@ -1,4 +1,5 @@
 [
   "Los cinco widgets se agregan directamente desde la pantalla de inicio.",
-  "Al abrir el calendario en Android, los widgets se conectan a la sesión iniciada."
+  "Al abrir el calendario en Android, los widgets se conectan a la sesión iniciada.",
+  "Al abrir o volver a la app, comprueba si hay actualizaciones y avisa cuando tienes la última versión."
 ]
