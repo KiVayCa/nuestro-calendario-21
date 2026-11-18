@@ -15,7 +15,11 @@ Sincronización automática al abrir la app y mediante WorkManager cada 15 minut
 
 La migración `supabase/migrations/20261117230000_widget_link.sql` es necesaria en cada backend que use esta versión. Los RPC de claim/read/revoke son puntos de entrada de capacidades: su ejecución por anon es deliberada y requieren códigos/verificadores o tokens aleatorios de 256 bits. Nunca conceder acceso directo a los hashes. Las alertas de SECURITY DEFINER del asesor deben evaluarse con esta autorización explícita; las pruebas SQL cubren sus límites.
 
-## Actualizaciones desde la app · preview 3
+## Android v7
+
+La pantalla nativa consulta la versión publicada y muestra las novedades. El APK deja de solicitar el permiso de instalación de paquetes, de abrir el instalador y de compartir archivos con un proveedor dedicado. La publicación exige verificar el APK firmado y revisar la clasificación de Play Protect.
+
+## Flujo histórico del actualizador · v3 a v6
 
 El APK estable está alojado en el almacén público de versiones Android de Vercel Blob. Únicamente se publican instaladores; la sesión, las fotos y los datos de la pareja mantienen su acceso privado en Supabase.
 

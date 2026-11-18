@@ -51,7 +51,7 @@ public class GateActivity extends Activity {
                             + latest.notesText()
                             + "\n\nPuedes actualizar conservando tu sesión y tus widgets.")
                     .setPositiveButton(
-                        "Actualizar",
+                        "Ver versión",
                         (dialog, which) -> {
                           startActivity(
                               new Intent(this, UpdateActivity.class)
