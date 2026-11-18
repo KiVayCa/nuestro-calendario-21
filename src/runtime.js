@@ -348,6 +348,7 @@ Object.assign(window, {
   openRecurringForm,
   saveRecurringTemplate,
   toggleRecurringTemplate,
+  openDailyAnswerEdit,
   saveDailyAnswer,
   markNotificationRead,
   markAllNotificationsRead,
@@ -407,6 +408,10 @@ setInterval(() => {
   checkLocalReminders();
   if (!user || !couple || document.visibilityState !== "visible") return;
   if (advancedTab === "home") renderAdvanced({ preserveInputs: true });
+  if (advancedTab === "question" && !window.__nc21SelectedQuestionDate) {
+    const shownDate = $("dailyQuestionDate")?.dataset.date;
+    if (shownDate && shownDate !== todayQuestion().date) renderAdvanced();
+  }
   if (advancedTab === "letters") {
     const justUnlocked = advCache.letters.some((letter) =>
       letter.unlock_at && letter.created_by !== user.id && letter.content == null &&

@@ -1716,3 +1716,16 @@ body[data-theme] #modal .recurrenceBox .dayCheck input:focus-visible + span {
   outline: 2px solid var(--rose);
   outline-offset: 2px;
 }
+
+/* Validation and confirmation dialogs must remain usable during a save. */
+body:has(#appDialog.show) .ncTransactionIndicator {
+  visibility: hidden;
+  pointer-events: none;
+}
+.dailyAnswerText, .dailyAnswerHistory p {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.dailyAnswerHistory summary {
+  cursor: pointer;
+}

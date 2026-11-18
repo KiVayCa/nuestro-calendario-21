@@ -430,8 +430,8 @@ function openDateForm(isEdit = false) {
   openAdvModal(
     "Nueva fecha importante 📅",
     formShell(
-      input("title", "Nombre") +
-        `<div class="advFormGrid">${input("event_date", "Fecha", "date")}${select(
+      input("title", "Nombre", "text", "required") +
+        `<div class="advFormGrid">${input("event_date", "Fecha", "date", "required")}${select(
           "category",
           "Categoría",
           [
@@ -459,7 +459,18 @@ function openDateForm(isEdit = false) {
   );
 }
 
+function validateImportantDateForm() {
+  const name = $("adv_title");
+  const date = $("adv_event_date");
+  name.setCustomValidity(
+    name.value.trim() ? "" : "Escribe el nombre de la fecha.",
+  );
+  if (!name.reportValidity()) return false;
+  return date.reportValidity();
+}
+
 async function saveDate() {
+  if (!validateImportantDateForm()) return;
   if (advancedEditState.key === "dates" && advancedEditState.id)
     return saveAdvancedEdit();
   const title = $("adv_title").value.trim(),
@@ -469,8 +480,7 @@ async function saveDate() {
       1,
       Number($("adv_recurrence_interval").value || 1),
     );
-  if (!title) return appAlert("Escribe el nombre");
-  if (!eventDate) return appAlert("Selecciona una fecha");
+
   const { data: created, error } = await sb
     .from("important_dates")
     .insert({
@@ -675,6 +685,7 @@ function openAdvancedEdit(key, id) {
 async function saveAdvancedEdit() {
   const { key, id } = advancedEditState;
   if (!key || !id) return;
+  if (key === "dates" && !validateImportantDateForm()) return;
   let patch = {};
   let letterAudio;
   let priorLetterAudio;

@@ -158,3 +158,9 @@ como al completarlo, reabrirlo o eliminarlo. También avisa si se completa,
 reabre, cancela, reactiva o mueve una fecha de un plan. El enlace conserva la
 fecha exacta de la ocurrencia. Se verificaron el destinatario y la fecha en
 TEST y pasaron las 21 pruebas web.
+
+Las fechas importantes requieren nombre y fecha antes del guardado. Los
+diálogos de validación quedan accesibles aunque haya un guardado pendiente.
+La pregunta diaria usa la fecha de Bogotá, una respuesta por persona y una
+edición explícita. El servidor guarda el antes, el después y la fecha de cada
+edición. Se verificaron la interfaz, la unicidad y el historial en TEST.

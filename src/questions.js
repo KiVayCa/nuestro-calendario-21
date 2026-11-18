@@ -1,5 +1,5 @@
 function todayQuestion() {
-  const today = localISODate();
+  const today = countdownToday();
   const seed = Number(today.replaceAll("-", ""));
   return {
     date: today,
@@ -87,44 +87,18 @@ function renderAdvQuestion() {
         })
         .join("")
     : '<div class="advEmpty">Aquí aparecerán las preguntas anteriores cuando alguno de los dos guarde una respuesta. ❤️</div>';
-  const answerHtml = isHistory
-    ? (mine
-        ? '<div class="advItem"><div><div class="advItemTitle">💗 ' +
-          esc(myName) +
-          " · Tu respuesta</div><p>" +
-          esc(mine.answer) +
-          "</p></div></div>"
-        : "") +
-      (partner
-        ? '<div class="advItem"><div><div class="advItemTitle">💞 ' +
-          esc(partnerName) +
-          "</div><p>" +
-          esc(partner.answer) +
-          "</p></div></div>"
-        : "") +
-      (!mine && !partner
-        ? '<div class="advEmpty">No hay respuestas guardadas para esta fecha.</div>'
-        : "")
-    : '<div class="field"><label>Tu respuesta · ' +
-      esc(myName) +
-      '</label><textarea id="dailyAnswerInput" rows="4" placeholder="Escribe con sinceridad ❤️">' +
-      esc(mine?.answer || "") +
-      '</textarea></div><button class="btn primary" onclick="saveDailyAnswer()">Guardar mi respuesta ❤️</button><div class="advList" style="margin-top:18px">' +
-      (mine
-        ? '<div class="advItem"><div><div class="advItemTitle">💗 ' +
-          esc(myName) +
-          " · Tu respuesta</div><p>" +
-          esc(mine.answer) +
-          "</p></div></div>"
-        : "") +
-      (partner
-        ? '<div class="advItem"><div><div class="advItemTitle">💞 ' +
-          esc(partnerName) +
-          "</div><p>" +
-          esc(partner.answer) +
-          "</p></div></div>"
-        : '<div class="advEmpty">La respuesta de tu pareja aparecerá aquí cuando la guarde. No hay afán. ❤️</div>') +
-      "</div>";
+  const answerHtml =
+    (!isHistory && !mine
+      ? `<form onsubmit="event.preventDefault();saveDailyAnswer()"><div class="field"><label for="dailyAnswerInput">Tu respuesta · ${esc(myName)}</label><textarea id="dailyAnswerInput" data-date="${esc(q.date)}" rows="4" required placeholder="Escribe con sinceridad ❤️"></textarea></div><button class="btn primary" type="submit">Guardar mi respuesta ❤️</button></form>`
+      : "") +
+    (mine ? dailyAnswerCard(mine, myName, true) : "") +
+    (partner ? dailyAnswerCard(partner, partnerName, false) : "") +
+    (!isHistory && !partner
+      ? '<div class="advEmpty">La respuesta de tu pareja aparecerá aquí cuando la guarde. ❤️</div>'
+      : "") +
+    (isHistory && !mine && !partner
+      ? '<div class="advEmpty">No hay respuestas guardadas para esta fecha.</div>'
+      : "");
   return (
     advHeader(
       "La pregunta de hoy",
@@ -133,7 +107,7 @@ function renderAdvQuestion() {
       "showAdvancedTab('home')",
     ) +
     '<div class="advCard dailyQuestionCard" style="margin-top:18px">' +
-    '<div class="advMeta">' +
+    `<div class="advMeta" id="dailyQuestionDate" data-date="${esc(q.date)}">` +
     dateES(q.date) +
     " · " +
     (isHistory ? "PREGUNTA ANTERIOR" : "PREGUNTA COMPARTIDA") +
@@ -153,31 +127,106 @@ function renderAdvQuestion() {
   );
 }
 
-async function saveDailyAnswer() {
-  const answer = $("dailyAnswerInput")?.value.trim();
+function dailyAnswerCard(answer, name, mine) {
+  const history = Array.isArray(answer.answer_history)
+    ? answer.answer_history
+    : [];
+  const revisions = history.length
+    ? `<details class="dailyAnswerHistory"><summary>Historial de cambios (${history.length})</summary>${history
+        .slice()
+        .reverse()
+        .map(
+          (edit) =>
+            `<div><small>${esc(new Date(edit.edited_at).toLocaleString("es-CO", { timeZone: "America/Bogota" }))}</small><p><b>Antes:</b> ${esc(edit.before)}</p><p><b>Después:</b> ${esc(edit.after)}</p></div>`,
+        )
+        .join("")}</details>`
+    : "";
+  return `<div class="advItem"><div><div class="advItemTitle">${mine ? "💗 " : "💞 "}${esc(name)}${mine ? " · Tu respuesta" : ""}</div><p class="dailyAnswerText">${esc(answer.answer)}</p>${revisions}</div>${mine ? `<button class="btn" type="button" data-id="${esc(answer.id)}" onclick="openDailyAnswerEdit(this.dataset.id)">Editar respuesta</button>` : ""}</div>`;
+}
+
+function openDailyAnswerEdit(id) {
+  const row = advCache.dailyAnswers.find(
+    (item) => item.id === id && item.user_id === user?.id,
+  );
+  if (!row) return;
+  openAdvModal(
+    "Editar tu respuesta",
+    `<form onsubmit="event.preventDefault();saveDailyAnswer(this.dataset.id)" data-id="${esc(id)}"><div class="field"><label for="dailyAnswerEditInput">Respuesta</label><textarea id="dailyAnswerEditInput" rows="5" required>${esc(row.answer)}</textarea></div><div class="advActions"><button class="btn primary" type="submit">Guardar cambios</button><button class="btn" type="button" onclick="closeAdvModal()">Cancelar</button></div></form>`,
+  );
+  $("dailyAnswerEditInput").dataset.previous = row.answer;
+}
+
+async function saveDailyAnswer(editId) {
+  const account = user?.id,
+    space = couple?.id;
+  if (!account || !space) return;
+  const input = $(editId ? "dailyAnswerEditInput" : "dailyAnswerInput");
+  const answer = input?.value.trim();
   if (!answer) return appAlert("Escribe tu respuesta antes de guardarla ❤️");
   const q = todayQuestion();
-  const { error } = await sb.from("daily_answers").upsert(
-    {
-      couple_id: couple.id,
-      user_id: user.id,
-      question_date: q.date,
-      question_text: q.text,
-      answer,
-      updated_at: new Date().toISOString(),
-    },
-    { onConflict: "couple_id,user_id,question_date" },
+  const existing = advCache.dailyAnswers.find(
+    (row) =>
+      row.user_id === account &&
+      (editId ? row.id === editId : row.question_date === q.date),
   );
-  if (error)
-    return appAlert("No se pudo guardar la respuesta: " + error.message);
+  if (!editId && (input.dataset.date !== q.date || existing)) {
+    await advLoadAll(["dailyAnswers"]);
+    renderAdvanced();
+    return;
+  }
+  if (editId && (!existing || existing.answer !== input.dataset.previous))
+    return appAlert(
+      "La respuesta cambió en otro dispositivo. Vuelve a abrirla para editarla.",
+    );
+  if (editId && answer === existing.answer) {
+    closeAdvModal();
+    return;
+  }
+  const mutation = editId
+    ? sb
+        .from("daily_answers")
+        .update({ answer })
+        .eq("id", editId)
+        .eq("user_id", account)
+        .eq("couple_id", space)
+        .eq("updated_at", existing.updated_at)
+    : sb.from("daily_answers").insert({
+        couple_id: space,
+        user_id: account,
+        question_date: q.date,
+        question_text: q.text,
+        answer,
+      });
+  const { data, error } = await mutation.select("*").maybeSingle();
+  if (user?.id !== account || couple?.id !== space) return;
+  if (error?.code === "23505") {
+    await advLoadAll(["dailyAnswers"]);
+    return appAlert("Ya tienes una respuesta guardada para esta pregunta.");
+  }
+  if (error || !data)
+    return appAlert(
+      "No se pudo guardar la respuesta. Vuelve a abrir la pregunta e inténtalo de nuevo.",
+    );
+  advCache.dailyAnswers = [
+    data,
+    ...advCache.dailyAnswers.filter((item) => item.id !== data.id),
+  ];
+  if (editId) closeAdvModal();
+  if (advancedTab === "question") renderAdvanced();
   await createPartnerNotification({
-    event_type: "daily_answer_saved",
-    title: "Respondió la pregunta del día 💭",
+    event_type: editId ? "daily_answer_edited" : "daily_answer_saved",
+    title: editId
+      ? "Editó una respuesta 💭"
+      : "Respondió la pregunta del día 💭",
     body:
       (myProfile?.display_name || defaultDisplayName()) +
-      " compartió su respuesta a la pregunta de hoy.",
+      (editId
+        ? " actualizó una respuesta. Puedes ver qué cambió en el historial."
+        : " compartió su respuesta a la pregunta de hoy."),
     target_tab: "question",
   });
-  await advLoadAll();
-  appAlert("Tu respuesta quedó guardada ❤️");
+  await advLoadAll(["dailyAnswers"]);
+  showAppToast(
+    editId ? "Cambios guardados." : "Tu respuesta quedó guardada ❤️",
+  );
 }
