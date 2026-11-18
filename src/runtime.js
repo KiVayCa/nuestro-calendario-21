@@ -169,6 +169,7 @@ if (!validAdvancedTabs.has(advancedTab)) advancedTab = "home";
 let advCache = {
   memories: [],
   letters: [],
+  letterReactions: [],
   dreams: [],
   challenges: [],
   dates: [],
@@ -188,6 +189,7 @@ let budgetSelectedMonth =
 const advTables = {
   memories: "memories",
   letters: "love_letters",
+  letterReactions: "letter_reactions",
   dreams: "dreams",
   challenges: "challenges",
   dates: "important_dates",
