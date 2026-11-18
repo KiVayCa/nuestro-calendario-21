@@ -46,3 +46,11 @@ Aplicación privada de pareja; evitar convertir los gastos en deudas entre los d
 
 Indicación breve recomendada: «Continúa Nuestro Calendario #21. Lee AGENTS.md y docs/PROJECT_STATE.md del repositorio; verifica main y la versión publicada antes de editar. La nueva tarea es: …».
 El historial del chat ayuda con decisiones; Git y este archivo conservan el estado técnico verificable. Actualizar este documento con cada entrega.
+
+## Android v5 en pruebas
+
+Los cinco proveedores se crean sin actividad de configuración. Al abrir la aplicación, un canal postMessage de la TWA validado con Digital Asset Links autoriza la lectura desde la sesión activa mediante el intercambio de un solo uso. La v4 conserva el vínculo manual. Un dispositivo desconectado o revocado no se vincula otra vez de forma automática. Pendiente prueba de instalación release y aceptación en teléfono. El descriptor público sigue en v4.
+
+Validación de la v5: build web y 19 pruebas aprobadas. GitHub Actions completó pruebas JVM, lintDebug, assembleDebug y assembleRelease. El APK release se firmó y se verificó con el certificado de la v4. Pendientes publicación coordinada de web y APK, y aceptación en dispositivo.
+
+Publicación v5: APK firmado de 4.106.190 bytes, SHA-256 bc47a04e5caff89b336835c4e0045d749da64098b3c39eb3059902d8bc453acb. El descriptor adjunto anuncia v5. La web comprueba la versión al cargar y al volver al primer plano y distingue actualización disponible, versión actual y fallo de conexión. Build web y 20 pruebas aprobadas. Verificar producción tras el despliegue y los widgets en dispositivo.

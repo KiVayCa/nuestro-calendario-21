@@ -10,7 +10,38 @@ function validWidgetLinkRequest() {
   );
 }
 
+let nativeWidgetRequest = null;
+window.addEventListener("message", event => {
+  if (window !== window.top || event.origin !== location.origin || !event.ports[0] ||
+      typeof event.data !== "string") return;
+  let message;
+  try { message = JSON.parse(event.data); } catch { return; }
+  if (message?.type !== "nc21-widget-link" || !/^[a-f0-9]{64}$/.test(message.challenge) ||
+      !/^[a-f0-9]{32}$/.test(message.state)) return;
+  nativeWidgetRequest = { ...message, port: event.ports[0] };
+  completeNativeWidgetLink();
+});
+
+async function completeNativeWidgetLink() {
+  const request = nativeWidgetRequest;
+  if (!request || request.busy || !user?.id || !couple?.id) return;
+  const account = user.id, space = couple.id;
+  request.busy = true;
+  try {
+    const {data, error} = await sb.rpc("create_widget_pair_code", {
+      p_couple_id: space, p_challenge: request.challenge, p_state: request.state
+    });
+    if (!error && /^[a-f0-9]{64}$/.test(data) && user?.id === account &&
+        couple?.id === space && request === nativeWidgetRequest) {
+      request.port.postMessage(JSON.stringify({code: data, state: request.state}));
+      nativeWidgetRequest = null;
+    }
+  } catch { /* A later signed-in refresh can retry while the channel is open. */ }
+  finally { request.busy = false; }
+}
+
 function maybeOfferWidgetLink() {
+  completeNativeWidgetLink();
   if (
     widgetLinkOffered ||
     !user?.id ||
@@ -57,7 +88,7 @@ async function createWidgetLink(button) {
 }
 
 function widgetDevicesCard() {
-  return '<div class="settingsCard" style="margin-bottom:16px"><h3>🔗 Widgets vinculados</h3><p>Vincúlalos desde ⚙ en el widget usando la sesión abierta, sin repetir contraseña. Se sincronizan automáticamente y pueden usar el mismo tema de la app.</p><button class="btn" onclick="openWidgetDevices()">Ver dispositivos y permisos</button></div>';
+  return '<div class="settingsCard" style="margin-bottom:16px"><h3>🔗 Widgets vinculados</h3><p>En Android v5 se conectan al abrir la app con tu cuenta. En versiones anteriores puedes vincularlos desde ⚙. Se sincronizan automáticamente y pueden usar el mismo tema de la app.</p><button class="btn" onclick="openWidgetDevices()">Ver dispositivos y permisos</button></div>';
 }
 
 async function openWidgetDevices() {

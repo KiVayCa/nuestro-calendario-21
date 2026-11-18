@@ -61,6 +61,8 @@
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
         </receiver>
+        <service android:name="androidx.browser.customtabs.PostMessageService" android:exported="true" />
+        <activity android:name=".WidgetSessionActivity" android:exported="false" />
         <activity android:name=".CalendarActivity" android:exported="false">
             <meta-data android:name="android.support.customtabs.trusted.DEFAULT_URL" android:value="https://nuestrocalendario21.vercel.app/" />
             <meta-data android:name="android.support.customtabs.trusted.STATUS_BAR_COLOR" android:resource="@color/rose" />

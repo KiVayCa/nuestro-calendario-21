@@ -18,20 +18,6 @@ public class CalendarActivity extends LauncherActivity {
 
   @Override
   protected Uri getLaunchingUrl() {
-    Uri base = UpdateSupport.safeUrl(getIntent().getData());
-    try {
-      android.content.pm.PackageInfo info = UpdateSupport.installed(this);
-      Uri.Builder builder = base.buildUpon().clearQuery();
-      for (String key : base.getQueryParameterNames()) {
-        if (key.equals("ncAndroidVersion") || key.equals("ncAndroidName")) continue;
-        for (String value : base.getQueryParameters(key)) builder.appendQueryParameter(key, value);
-      }
-      return builder
-          .appendQueryParameter("ncAndroidVersion", "" + UpdateSupport.code(info))
-          .appendQueryParameter("ncAndroidName", info.versionName)
-          .build();
-    } catch (Exception ignored) {
-      return base;
-    }
+    return UpdateSupport.launchUrl(this, getIntent().getData());
   }
 }

@@ -347,7 +347,7 @@ test("a newer Android release shows one dismissible notice with escaped text", a
   await c.checkAndroidAppUpdate();
   const notice = dom.window.document.getElementById("androidUpdateNotice");
   assert.ok(notice);
-  assert.equal(requests, 1);
+  assert.equal(requests, 2);
   assert.equal(notice.querySelector("img"), null);
   assert.equal(
     notice.querySelector("a").getAttribute("href"),
@@ -388,4 +388,62 @@ test("widget pairing does not render a code after the active account changes", a
   });
   const pending=c.createWidgetLink({disabled:false}); c.user={id:"two"};
   resolve({data:"c".repeat(64)}); await pending; assert.equal(node.innerHTML,"");
+});
+
+test("Android widget links wait for login and return a one-use code only to the verified origin's port", async () => {
+  const origin = "https://nuestrocalendario21.vercel.app";
+  let receive;
+  const host = {addEventListener(type, handler) { if (type === "message") receive = handler; }};
+  host.top = host;
+  const replies = [];
+  const challenge = "a".repeat(64), state = "b".repeat(32), code = "c".repeat(64);
+  let calls = 0;
+  const c = context("src/widget-link.js", {
+    window: host, location: {origin, search: ""}, user: null, couple: null,
+    sb: {async rpc(name, args) {
+      calls++;
+      assert.equal(name, "create_widget_pair_code");
+      assert.equal(args.p_challenge, challenge);
+      assert.equal(args.p_state, state);
+      return {data: code};
+    }}
+  });
+  const event = {data: JSON.stringify({type:"nc21-widget-link", challenge, state}),
+    origin, ports:[{postMessage: text => replies.push(JSON.parse(text))}]};
+  receive({...event, origin:"https://unrelated.example"});
+  c.user = {id:"user"}; c.couple = {id:"pair"};
+  await c.completeNativeWidgetLink();
+  assert.equal(calls, 0);
+  c.user = null;
+  receive(event);
+  assert.equal(calls, 0);
+  c.user = {id:"user"};
+  await c.completeNativeWidgetLink();
+  await c.completeNativeWidgetLink();
+  assert.deepEqual(replies, [{code, state}]);
+  assert.equal(calls, 1);
+});
+
+test("all five Android widgets may be placed before a session exists", () => {
+  const xml = "android/app/src/main/res/xml";
+  const providers = fs.readdirSync(xml).filter(name => name.endsWith("_widget.xml"));
+  assert.equal(providers.length, 5);
+  for (const name of providers)
+    assert.doesNotMatch(fs.readFileSync(xml + "/" + name, "utf8"), /android:configure=/);
+});
+
+test("Android checks on every return and only confirms an equal published version", async () => {
+  const release = JSON.parse(fs.readFileSync("android-release.json", "utf8"));
+  const messages = [];
+  let requests = 0;
+  const c = context("src/android-updates.js", {
+    navigator: {userAgent:"Android"}, location:{search:"?ncAndroidVersion="+release.versionCode},
+    AbortSignal, $: () => null, showAppToast: message => messages.push(message),
+    fetch: async () => ({ok: ++requests !== 3, text: async () => JSON.stringify(release)})
+  });
+  await c.checkAndroidAppUpdate(); await c.checkAndroidAppUpdate(); await c.checkAndroidAppUpdate();
+  assert.equal(requests, 3);
+  assert.match(messages[0], /Ya tienes la última versión/);
+  assert.equal(messages[1], messages[0]);
+  assert.match(messages[2], /No pudimos comprobar/);
 });

@@ -6,8 +6,8 @@ android {
         applicationId 'co.calendario21.app'
         minSdk 26
         targetSdk 35
-        versionCode 4
-        versionName '1.0.0-preview.4'
+        versionCode 5
+        versionName '1.0.0-preview.5'
     }
     signingConfigs {
         release {
@@ -19,7 +19,10 @@ android {
             }
         }
     }
-    buildTypes { release { signingConfig signingConfigs.release; minifyEnabled false } }
+    buildTypes { release {
+        if (System.getenv('ANDROID_KEYSTORE')) signingConfig signingConfigs.release
+        minifyEnabled false
+    } }
     compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
 }
 dependencies {

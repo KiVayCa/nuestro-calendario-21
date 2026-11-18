@@ -183,6 +183,7 @@ public class WidgetSettingsActivity extends Activity {
         v -> {
           if (busy) return;
           busy = true;
+          WidgetSessionActivity.disable(this);
           status.setText("Desconectando…");
           executor.execute(
               () -> {
