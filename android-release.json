@@ -1,14 +1,15 @@
 {
   "format": 1,
   "packageName": "co.calendario21.app",
-  "versionCode": 11,
-  "versionName": "1.0.0-preview.11",
-  "apkUrl": "https://vz4dp1vu2kie6kny.public.blob.vercel-storage.com/android/nuestro-calendario-21-v11.apk",
-  "sha256": "4555c284368e7a63b8a12d8b2a3dfa1a0d4507945cf55313cf752f3a34ba5cc3",
-  "bytes": 5397130,
+  "versionCode": 12,
+  "versionName": "1.0.0-preview.12",
+  "apkUrl": "https://vz4dp1vu2kie6kny.public.blob.vercel-storage.com/android/nuestro-calendario-21-v12.apk",
+  "sha256": "751bcdc93245de529d1c41dac347ac9703a9d551570a4d0401afbe40ec51ce43",
+  "bytes": 5397186,
   "minSdk": 26,
-  "publishedAt": "2026-11-18T20:59:22.664Z",
+  "publishedAt": "2026-11-18T21:25:33.049Z",
   "notes": [
-    "Refuerza los colores del fondo de los widgets claros y mantiene los temas oscuros."
+    "Las notificaciones de Android usan el icono de corazón del calendario.",
+    "Los avisos del navegador se reservan para computadores."
   ]
 }
