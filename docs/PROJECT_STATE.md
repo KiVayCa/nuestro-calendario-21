@@ -85,3 +85,10 @@ El flujo `publish-android.yml` prepara el APK y el descriptor desde ramas
 `release/android-v<N>`. Requiere configurar en GitHub Actions el respaldo de
 firma y el acceso de escritura al almacén Blob actual. La v7 sigue anunciada
 en producción mientras se valida la primera publicación automatizada.
+
+## Canal de publicación de APK
+
+El flujo `publish-android.yml` prepara el APK y el descriptor desde ramas
+`release/android-v<N>`. Requiere configurar en GitHub Actions el respaldo de
+firma y el acceso de escritura al almacén Blob actual. La v7 sigue anunciada
+en producción mientras se valida la primera publicación automatizada.
