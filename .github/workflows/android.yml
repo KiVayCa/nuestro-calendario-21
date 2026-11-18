@@ -20,6 +20,14 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.11.1'
+      - name: Configure Firebase for Android
+        env:
+          FIREBASE_ANDROID_CONFIG: ${{ secrets.FIREBASE_ANDROID_CONFIG }}
+        run: |
+          if [ -n "$FIREBASE_ANDROID_CONFIG" ]; then
+            umask 077
+            printf '%s' "$FIREBASE_ANDROID_CONFIG" > android/app/google-services.json
+          fi
       - name: Test, lint and build development APK
         working-directory: android
         run: gradle --no-daemon testDebugUnitTest lintDebug assembleDebug assembleRelease

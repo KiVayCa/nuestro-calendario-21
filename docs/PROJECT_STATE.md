@@ -75,9 +75,16 @@ Nicolás confirmó en su teléfono que la RC2 abre desde el icono y que Play Pro
 
 Al tocar un aviso, el service worker prioriza una instancia abierta desde el APK y conserva la información de versión al abrir el destino. Si la instancia ya se cerró, el navegador decide dónde abrir el enlace web. Pendiente comprobar la apertura en el teléfono con la app en segundo plano y estudiar el arranque en frío.
 
+## Android v8 · registro de teléfonos en preparación
+
+La configuración de Android ofrece vincular y revocar teléfonos para avisos. El vínculo requiere permiso Android, una cuenta autenticada en la web y un código de un uso de 90 segundos ligado a un verificador privado del teléfono. El permiso de envío dura 90 días. La migración y las funciones de envío con FCM están en revisión y requieren validación. No se han registrado teléfonos reales con este cambio. El descriptor público sigue ofreciendo v7. Pasaron las 21 pruebas web. La compilación local de Android se detuvo al descargar Gradle por un fallo de red. Quedan pendientes la prueba en TEST, la firma, el despliegue y la prueba de apertura desde una notificación con la app cerrada.
 ## Instalación en Configuración
 
 Se retiró la tarjeta «Instalar en este dispositivo». «Aplicación Android y widgets» sigue disponible para instalar y consultar actualizaciones del APK.
+
+La migración se aplicó en TEST. Una prueba SQL con reversión verificó el vínculo válido, el rechazo de un verificador ajeno, el rechazo de un código reutilizado y la protección del token FCM frente al rol autenticado.
+
+GitHub Actions completó la compilación Android de la primera revisión (44381359810). Para generar un APK con Firebase configurado, el flujo lee el secreto de GitHub Actions `FIREBASE_ANDROID_CONFIG` con el contenido de `google-services.json`. La cuenta de servicio de FCM permanece en Supabase.
 
 ## Canal de publicación de APK
 
@@ -87,3 +94,8 @@ firma y el acceso de escritura al almacén Blob actual. La v7 sigue anunciada
 en producción mientras se valida la primera publicación automatizada.
 
 GitHub Actions validó la primera publicación automatizada en la ejecución 44387420011. El APK v8 quedó alojado en el mismo Blob que la v7. Se verificaron la descarga de 5.413.570 bytes, el SHA-256 `4abc5f8e563aa820cbe3d51689b370a0e634dd0272cdd5c9b29a7322440a1719` y el certificado existente. El descriptor verificado está disponible como artefacto de la ejecución. El actualizador sigue anunciando v7 hasta activar el registro y el envío de notificaciones en producción.
+
+La entrega de v8 incorpora el descriptor verificado al sitio de producción.
+Registro y funciones push desplegados en Supabase producción.
+Pendiente validar en los teléfonos el vínculo y la apertura desde un aviso
+con el calendario fuera de Recientes.

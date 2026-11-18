@@ -1,14 +1,14 @@
 {
   "format": 1,
   "packageName": "co.calendario21.app",
-  "versionCode": 7,
-  "versionName": "1.0.0-preview.7",
-  "apkUrl": "https://vz4dp1vu2kie6kny.public.blob.vercel-storage.com/android/nuestro-calendario-21-v7.apk",
-  "sha256": "24cc328ed1b37c453ad3172cd3ddb0072dd72d75c7ad38e24c77a0e35e69f433",
-  "bytes": 4102038,
+  "versionCode": 8,
+  "versionName": "1.0.0-preview.8",
+  "apkUrl": "https://vz4dp1vu2kie6kny.public.blob.vercel-storage.com/android/nuestro-calendario-21-v8.apk",
+  "sha256": "4abc5f8e563aa820cbe3d51689b370a0e634dd0272cdd5c9b29a7322440a1719",
+  "bytes": 5413570,
   "minSdk": 26,
-  "publishedAt": "2026-11-18T16:29:24.903Z",
+  "publishedAt": "2026-11-18T20:08:05.973Z",
   "notes": [
-    "Versión de prueba del arranque desde el icono del calendario."
+    "Vincula el teléfono para abrir los avisos directamente en el calendario Android."
   ]
 }

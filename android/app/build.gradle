@@ -1,4 +1,7 @@
 plugins { id 'com.android.application' }
+if (file('google-services.json').exists()) {
+    apply plugin: 'com.google.gms.google-services'
+}
 android {
     namespace 'co.calendario21.app'
     compileSdk 36
@@ -6,8 +9,8 @@ android {
         applicationId 'co.calendario21.app'
         minSdk 26
         targetSdk 35
-        versionCode 6
-        versionName '1.0.0-preview.6'
+        versionCode 8
+        versionName '1.0.0-preview.8'
     }
     signingConfigs {
         release {
@@ -26,6 +29,7 @@ android {
     compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
 }
 dependencies {
+    implementation 'com.google.firebase:firebase-messaging:25.0.1'
     implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.6.2'
     implementation 'androidx.browser:browser:1.9.0'
     implementation 'androidx.work:work-runtime:2.10.1'

@@ -1,3 +1,4 @@
+import { sendCalendarPush, type PushDevice } from "../_shared/calendar-push.ts";
 import webpush from "npm:web-push@3.6.7";
 import { createClient } from "npm:@supabase/supabase-js@2.49.8";
 
@@ -43,6 +44,17 @@ Deno.serve(async (request) => {
       failed++;
       continue;
     }
+    const { data: androidDevices, error: androidError } = await admin
+      .from("android_push_devices")
+      .select("token")
+      .gt("expires_at", new Date().toISOString())
+      .eq("couple_id", reminder.couple_id)
+      .eq("user_id", reminder.recipient_user_id);
+    if (androidError) {
+      failed++;
+      continue;
+    }
+    const devices: PushDevice[] = [...subscriptions, ...androidDevices];
     const date = /^(?:plan|task):[^:]+:(\d{4}-\d{2}-\d{2}):/.exec(
       reminder.reminder_key,
     )?.[1];
@@ -66,10 +78,14 @@ Deno.serve(async (request) => {
       if (error) failed++;
     };
     await Promise.all(
-      subscriptions.map(async (subscription) => {
+      devices.map(async (subscription) => {
         const hash = await crypto.subtle.digest(
           "SHA-256",
-          new TextEncoder().encode(subscription.endpoint),
+          new TextEncoder().encode(
+            "endpoint" in subscription
+              ? subscription.endpoint
+              : "android:" + subscription.token,
+          ),
         );
         const device = Array.from(new Uint8Array(hash), (byte) =>
           byte.toString(16).padStart(2, "0"),
@@ -78,14 +94,7 @@ Deno.serve(async (request) => {
         const attempts = (results[device]?.attempts || 0) + 1;
         let done = false;
         try {
-          await webpush.sendNotification(
-            {
-              endpoint: subscription.endpoint,
-              keys: { p256dh: subscription.p256dh, auth: subscription.auth },
-            },
-            payload,
-            { TTL: 900, timeout: 5000 },
-          );
+          await sendCalendarPush(subscription, payload);
           sent++;
           done = true;
         } catch (error) {
@@ -99,11 +108,19 @@ Deno.serve(async (request) => {
               status !== 429 &&
               status !== 408);
           if (status === 404 || status === 410) {
-            await admin
-              .from("push_subscriptions")
-              .delete()
-              .eq("user_id", reminder.recipient_user_id)
-              .eq("endpoint", subscription.endpoint);
+            if ("endpoint" in subscription) {
+              await admin
+                .from("push_subscriptions")
+                .delete()
+                .eq("user_id", reminder.recipient_user_id)
+                .eq("endpoint", subscription.endpoint);
+            } else {
+              await admin
+                .from("android_push_devices")
+                .delete()
+                .eq("user_id", reminder.recipient_user_id)
+                .eq("token", subscription.token);
+            }
           }
         }
         results[device] = { attempts, done };
