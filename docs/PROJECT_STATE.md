@@ -83,3 +83,5 @@ La configuración de Android ofrece vincular y revocar teléfonos para avisos. E
 Se retiró la tarjeta «Instalar en este dispositivo». «Aplicación Android y widgets» sigue disponible para instalar y consultar actualizaciones del APK.
 
 La migración se aplicó en TEST. Una prueba SQL con reversión verificó el vínculo válido, el rechazo de un verificador ajeno, el rechazo de un código reutilizado y la protección del token FCM frente al rol autenticado.
+
+GitHub Actions completó la compilación Android de la primera revisión (44381359810). Para generar un APK con Firebase configurado, el flujo lee el secreto de GitHub Actions `FIREBASE_ANDROID_CONFIG` con el contenido de `google-services.json`. La cuenta de servicio de FCM permanece en Supabase.
