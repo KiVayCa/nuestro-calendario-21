@@ -149,3 +149,6 @@ Se desplegaron las dos funciones push en TEST y producción. Las 21 pruebas web 
 El aviso de actualización Android usa los colores de superficie y texto del
 tema activo. Pacifico reemplaza la opción Manuscrita del selector. Los textos
 guardados con la manuscrita anterior conservan su formato.
+
+La sección de recurrencia del editor de planes usa los colores del tema
+activo, incluidos el fondo del aviso y los días de la semana.

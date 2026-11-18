@@ -1695,3 +1695,24 @@ body:is([data-theme="night"], [data-theme="midnight"], [data-theme="charcoal"])
   color: var(--surface, #fff);
 }
 .letterPaper [style*="Pacifico"] { font-family: "Pacifico", cursive !important; }
+
+/* The recurrence settings live outside advancedContent in the plan editor. */
+body[data-theme] #modal .recurrenceBox {
+  background: var(--soft);
+  color: var(--ink);
+  border-color: var(--line);
+}
+body[data-theme] #modal .recurrenceBox .dayCheck span {
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+body[data-theme] #modal .recurrenceBox .dayCheck input:checked + span {
+  background: var(--ink);
+  color: var(--surface);
+  border-color: var(--ink);
+}
+body[data-theme] #modal .recurrenceBox .dayCheck input:focus-visible + span {
+  outline: 2px solid var(--rose);
+  outline-offset: 2px;
+}
