@@ -145,3 +145,7 @@ desde un teléfono se cancela su suscripción web local si existe. Las
 notificaciones nativas de Android usan un icono monocromo de corazón en v12.
 
 Se desplegaron las dos funciones push en TEST y producción. Las 21 pruebas web pasaron y se verificaron firma, descarga e icono del APK v12 generado por la ejecución 44401152204. Pendiente prueba de entrega en el Motorola.
+
+El aviso de actualización Android usa los colores de superficie y texto del
+tema activo. Pacifico reemplaza la opción Manuscrita del selector. Los textos
+guardados con la manuscrita anterior conservan su formato.

@@ -1671,3 +1671,27 @@ body:is([data-theme="night"], [data-theme="midnight"], [data-theme="charcoal"])
   --paper-bg: radial-gradient(ellipse at 0 100%, #e5eaa6ab, transparent 50%),
     linear-gradient(145deg, #fffbe6, #f9e7a8);
 }
+
+#androidUpdateNotice {
+  position: fixed;
+  inset: calc(env(safe-area-inset-top, 0px) + 12px) 12px auto;
+  z-index: 12000;
+  max-width: 420px;
+  margin-inline: auto;
+  padding: 18px;
+  border: 1px solid var(--line, #efdee4);
+  border-radius: 20px;
+  background: var(--surface, #fff);
+  color: var(--ink, #35262b);
+  box-shadow: 0 14px 45px #0004;
+}
+#androidUpdateNotice .btn {
+  background: var(--surface, #fff);
+  color: var(--ink, #35262b);
+  border-color: var(--line, #efdee4);
+}
+#androidUpdateNotice .btn.primary {
+  background: var(--ink, #35262b);
+  color: var(--surface, #fff);
+}
+.letterPaper [style*="Pacifico"] { font-family: "Pacifico", cursive !important; }

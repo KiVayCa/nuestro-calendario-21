@@ -236,13 +236,14 @@ const letterFonts = [
   "Verdana",
   "Times New Roman",
   "Courier New",
-  "cursive",
+  "Pacifico",
   "Dancing Script",
   "Caveat",
   "Great Vibes",
   "Kalam",
   "Sacramento",
 ];
+const supportedLetterFonts = [...letterFonts, "cursive"];
 const letterMarkupTags = new Set([
   "B",
   "STRONG",
@@ -287,7 +288,7 @@ function cleanLetterMarkup(html) {
       .replace(/['"]/g, "")
       .trim()
       .toLowerCase();
-    const font = letterFonts.find(
+    const font = supportedLetterFonts.find(
       (value) => value.toLowerCase() === suppliedFont,
     );
     const tag = node.tagName === "FONT" ? "SPAN" : node.tagName;
@@ -319,10 +320,7 @@ function letterEditorHtml() {
     select("paper", "Fondo de la carta", letterPapers) +
     '<div class="advActions letterEditorTools" role="group" aria-label="Formato de carta"><button class="btn" type="button" data-command="bold"><b>Negrita</b></button><button class="btn" type="button" data-command="italic"><i>Cursiva</i></button><label>Tipo de letra <select id="letterFont">' +
     letterFonts
-      .map(
-        (font) =>
-          `<option value="${esc(font)}">${font === "cursive" ? "Manuscrita (cursiva)" : esc(font)}</option>`,
-      )
+      .map((font) => `<option value="${esc(font)}">${esc(font)}</option>`)
       .join("") +
     '</select></label><label>Al pegar <select id="letterPaste"><option value="original">Conservar formato del origen</option><option value="destination">Usar formato de la carta</option></select></label></div>' +
     '<div id="letterEditor" class="letterPaper letterPaper-classic" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Texto de la carta"></div>' +
@@ -354,7 +352,7 @@ function bindLetterEditor(letter) {
       .replace(/['"]/g, "")
       .trim()
       .toLowerCase();
-    return letterFonts.find((font) => font.toLowerCase() === value);
+    return supportedLetterFonts.find((font) => font.toLowerCase() === value);
   };
   const remember = () => {
     const current = window.getSelection();
