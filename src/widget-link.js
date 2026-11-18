@@ -12,15 +12,23 @@ function validWidgetLinkRequest() {
 
 let nativeWidgetRequest = null;
 window.addEventListener("message", event => {
-  if (window !== window.top || event.origin !== location.origin || !event.ports[0] ||
-      typeof event.data !== "string") return;
+  const port = event.ports[0];
+  if (window !== window.top || event.origin !== location.origin || !port)
+    return;
+  port.onmessage = reply => acceptNativeWidgetLink(reply.data, port);
+  // Older clients and test harnesses may attach the request to the first message.
+  if (event.data) acceptNativeWidgetLink(event.data, port);
+});
+
+function acceptNativeWidgetLink(data, port) {
+  if (typeof data !== "string") return;
   let message;
-  try { message = JSON.parse(event.data); } catch { return; }
+  try { message = JSON.parse(data); } catch { return; }
   if (message?.type !== "nc21-widget-link" || !/^[a-f0-9]{64}$/.test(message.challenge) ||
       !/^[a-f0-9]{32}$/.test(message.state)) return;
-  nativeWidgetRequest = { ...message, port: event.ports[0] };
+  nativeWidgetRequest = { ...message, port };
   completeNativeWidgetLink();
-});
+}
 
 async function completeNativeWidgetLink() {
   const request = nativeWidgetRequest;

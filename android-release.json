@@ -1,16 +1,15 @@
 {
   "format": 1,
   "packageName": "co.calendario21.app",
-  "versionCode": 5,
-  "versionName": "1.0.0-preview.5",
-  "apkUrl": "https://vz4dp1vu2kie6kny.public.blob.vercel-storage.com/android/nuestro-calendario-21-v5.apk",
-  "sha256": "bc47a04e5caff89b336835c4e0045d749da64098b3c39eb3059902d8bc453acb",
+  "versionCode": 6,
+  "versionName": "1.0.0-preview.6",
+  "apkUrl": "https://vz4dp1vu2kie6kny.public.blob.vercel-storage.com/android/nuestro-calendario-21-v6.apk",
+  "sha256": "486bc6aa26ba557e231a0a41252e6ade3c60f7bc9a7790e29c0e7116346c1891",
   "bytes": 4106190,
   "minSdk": 26,
-  "publishedAt": "2026-11-18T03:13:37.406Z",
+  "publishedAt": "2026-11-18T13:45:12.897Z",
   "notes": [
-    "Los cinco widgets se agregan directamente desde la pantalla de inicio.",
-    "Al abrir el calendario en Android, los widgets se conectan a la sesión iniciada.",
-    "Al abrir o volver a la app, comprueba si hay actualizaciones y avisa cuando tienes la última versión."
+    "Corrige la apertura de la aplicación desde su icono.",
+    "Corrige el intercambio automático de sesión con los widgets."
   ]
 }

@@ -17,7 +17,7 @@ public class WidgetSessionActivity extends Activity {
   private static final Uri ORIGIN = Uri.parse(MainActivity.ORIGIN);
   private final Handler handler = new Handler(Looper.getMainLooper());
   private CustomTabsSession session;
-  private boolean bound, launched, validated, loaded, requested, claiming;
+  private boolean bound, launched, leftForBrowser, validated, loaded, requested, claiming;
   private String verifier, state;
 
   static boolean needed(Context context) {
@@ -88,6 +88,18 @@ public class WidgetSessionActivity extends Activity {
   private final CustomTabsServiceConnection connection = new CustomTabsServiceConnection() {
     @Override public void onCustomTabsServiceConnected(ComponentName name, CustomTabsClient client) {
       if (isFinishing() || isDestroyed() || launched) return;
+      try {
+        launchBrowser(client);
+      } catch (RuntimeException unavailable) {
+        launched = false;
+        fallback();
+      }
+    }
+
+    @Override public void onServiceDisconnected(ComponentName name) { session = null; }
+  };
+
+  private void launchBrowser(CustomTabsClient client) {
       client.warmup(0);
       session = client.newSession(callback);
       if (session == null) { fallback(); return; }
@@ -97,21 +109,22 @@ public class WidgetSessionActivity extends Activity {
       builder.setToolbarColor(getColor(R.color.rose));
       builder.setNavigationBarColor(getColor(R.color.night));
       Intent browser = builder.build(session).getIntent();
+      startActivity(browser);
       launched = true;
-      try { startActivityForResult(browser, 1); }
-      catch (RuntimeException unavailable) { launched = false; fallback(); }
-    }
-
-    @Override public void onServiceDisconnected(ComponentName name) { session = null; }
-  };
+  }
 
   @Override public void onCreate(Bundle saved) {
     super.onCreate(saved);
-    if (saved != null) { finish(); return; }
+    if (saved != null) { fallback(); return; }
     verifier = WidgetLinkProof.random(32);
     state = WidgetLinkProof.random(16);
-    String provider = CustomTabsClient.getPackageName(this, null);
-    if (provider != null) bound = CustomTabsClient.bindCustomTabsService(this, provider, connection);
+    try {
+      String provider = CustomTabsClient.getPackageName(this, null);
+      if (provider != null) bound = CustomTabsClient.bindCustomTabsService(this, provider, connection);
+    } catch (RuntimeException unavailable) {
+      fallback();
+      return;
+    }
     if (!bound) fallback();
     else handler.postDelayed(this::fallback, 3500);
   }
@@ -122,9 +135,14 @@ public class WidgetSessionActivity extends Activity {
     finish();
   }
 
-  @Override protected void onActivityResult(int request, int result, Intent data) {
-    super.onActivityResult(request, result, data);
-    if (request == 1) finish();
+  @Override protected void onStop() {
+    super.onStop();
+    leftForBrowser = launched;
+  }
+
+  @Override protected void onResume() {
+    super.onResume();
+    if (leftForBrowser) finish();
   }
 
   @Override protected void onDestroy() {

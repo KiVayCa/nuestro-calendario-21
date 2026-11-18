@@ -415,7 +415,8 @@ test("Android widget links wait for login and return a one-use code only to the 
   await c.completeNativeWidgetLink();
   assert.equal(calls, 0);
   c.user = null;
-  receive(event);
+  receive({...event, data:""});
+  event.ports[0].onmessage({data:event.data});
   assert.equal(calls, 0);
   c.user = {id:"user"};
   await c.completeNativeWidgetLink();
