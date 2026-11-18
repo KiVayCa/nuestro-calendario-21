@@ -14,7 +14,7 @@ const letterReactionOptions = [
 
 function renderLetterReactions(letterId) {
   const reactions = advCache.letterReactions.filter(
-    (item) => item.letter_id === letterId,
+    (item) => item.letter_id === letterId && item.emoji,
   );
   const mine = reactions.find((item) => item.user_id === user.id)?.emoji;
   return (
