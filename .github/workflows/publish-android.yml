@@ -55,7 +55,9 @@ jobs:
       - name: Build and validate Android
         working-directory: android
         run: |
-          sdkmanager 'platforms;android-36' 'build-tools;35.0.0'
+          if [ ! -x "$ANDROID_HOME/build-tools/35.0.0/apksigner" ]; then
+            "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'build-tools;35.0.0'
+          fi
           gradle --no-daemon testDebugUnitTest lintDebug assembleRelease
       - name: Sign with the existing Android certificate
         env:
