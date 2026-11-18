@@ -99,3 +99,7 @@ La entrega de v8 incorpora el descriptor verificado al sitio de producción.
 Registro y funciones push desplegados en Supabase producción.
 Pendiente validar en los teléfonos el vínculo y la apertura desde un aviso
 con el calendario fuera de Recientes.
+
+## Retirada de Android v8
+
+Se restauró v7 en producción tras el reporte de cierre al abrir v8 y el aviso de Play Protect. Se verificó el descriptor público. La rama `release/android-v9` prepara la corrección del lanzador y elimina el permiso de instalación de paquetes.
