@@ -15,7 +15,7 @@ final class WidgetPalette {
     name = themes.has(selected) ? selected : "romance";
     JSONObject theme = themes.getJSONObject(name);
     ink = color(theme.getString("ink"));
-    muted = color(theme.getString("muted"));
+    muted = color(theme.optString("widgetMuted", theme.getString("muted")));
     surface = color(theme.getString("surface"));
     String custom = settings.optString("accent_color", "");
     accent =

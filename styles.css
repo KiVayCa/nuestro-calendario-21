@@ -1568,3 +1568,58 @@ body:is([data-theme="night"], [data-theme="midnight"], [data-theme="charcoal"])
   gap: .35rem;
   margin-top: .45rem;
 }
+
+.letterPaper {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding-block: 2rem 1.25rem;
+}
+.letterPaper::before {
+  content: var(--paper-decoration, "");
+  position: absolute;
+  inset-block-start: .25rem;
+  inset-inline-end: .85rem;
+  color: var(--paper-decoration-color);
+  font: 1rem/1.3 Georgia, serif;
+  letter-spacing: .25em;
+  pointer-events: none;
+  user-select: none;
+}
+.letterPaper-classic {
+  --paper-decoration: "❧";
+  --paper-decoration-color: #a98561;
+  --paper-bg: repeating-linear-gradient(0deg, transparent 0 27px, #a9856114 27px 28px),
+    linear-gradient(145deg, #fffaf0, #f6eadb);
+}
+.letterPaper-rose {
+  --paper-decoration: "♡ ♥ ♡";
+  --paper-decoration-color: #bf547d;
+  --paper-bg: radial-gradient(circle at 8% 92%, #ee9eb849, transparent 46%),
+    linear-gradient(145deg, #fff4f8, #f7d5e3);
+}
+.letterPaper-lavender {
+  --paper-decoration: "❀ ✿ ❀";
+  --paper-decoration-color: #9270b4;
+  --paper-bg: radial-gradient(circle at 0 100%, #b28fd947, transparent 54%),
+    linear-gradient(145deg, #faf4ff, #e7d8f5);
+}
+.letterPaper-sea {
+  --paper-decoration: "≋  ≋";
+  --paper-decoration-color: #3e8aaa;
+  --paper-bg: repeating-linear-gradient(-12deg, transparent 0 27px, #55a3be1c 28px, transparent 32px),
+    linear-gradient(145deg, #f0fcff, #c8e8ef);
+}
+.letterPaper-gold {
+  --paper-decoration: "✦ ◇ ✦";
+  --paper-decoration-color: #ae751e;
+  --paper-bg: radial-gradient(circle at 1px 1px, #a46d263b 1px, transparent 1.5px) 0 0 / 23px 23px,
+    linear-gradient(145deg, #fff7de, #f8e2ad);
+}
+.letterPaper-night {
+  --paper-decoration: "☾ ✦ ✧";
+  --paper-decoration-color: #f8dc9d;
+  --paper-bg: radial-gradient(circle at 12% 20%, #faf2df98 1px, transparent 1.7px) 0 0 / 73px 47px,
+    radial-gradient(circle at 64% 59%, #e6dfff83 1px, transparent 1.8px) 0 0 / 83px 61px,
+    radial-gradient(ellipse at top right, #454368, #242339 70%);
+}

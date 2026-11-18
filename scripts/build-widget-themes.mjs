@@ -31,13 +31,38 @@ const luminance = (hex) =>
     return total + linear * [0.2126, 0.7152, 0.0722][index];
   }, 0);
 const contrast = (a, b) => (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+const blend = (base, tint, weight) => {
+  const tintChannels = channels(tint);
+  return (
+    "#" +
+    channels(base)
+      .map((channel, index) =>
+        Math.round(channel * (1 - weight) + tintChannels[index] * weight)
+          .toString(16)
+          .padStart(2, "0"),
+      )
+      .join("")
+  );
+};
 for (const colors of Object.values(themes)) {
-  const softer = luminance(colors.soft);
-  colors.widgetBackground =
-    luminance(colors.surface) > 0.45 &&
-    contrast(softer, luminance(colors.ink)) >= 4.5
-      ? colors.soft
-      : colors.surface;
+  colors.widgetBackground = colors.surface;
+  colors.widgetMuted = colors.muted;
+  if (luminance(colors.surface) <= 0.45) continue;
+  const ink = luminance(colors.ink);
+  for (const strength of [0.48, 0.36, 0.24, 0.12, 0]) {
+    const background = blend(colors.soft, colors.rose, strength);
+    if (
+      luminance(background) > ink &&
+      contrast(luminance(background), ink) >= 5
+    ) {
+      colors.widgetBackground = background;
+      break;
+    }
+  }
+  const background = luminance(colors.widgetBackground);
+  if (contrast(luminance(colors.muted), background) < 4.5) {
+    colors.widgetMuted = colors.ink;
+  }
 }
 
 await mkdir("android/app/src/main/assets", { recursive: true });

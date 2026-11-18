@@ -230,6 +230,7 @@ const letterFonts = [
   "Verdana",
   "Times New Roman",
   "Courier New",
+  "cursive",
 ];
 const letterMarkupTags = new Set([
   "B",
@@ -302,7 +303,12 @@ function letterEditorHtml() {
   return (
     select("paper", "Fondo de la carta", letterPapers) +
     '<div class="advActions letterEditorTools" role="group" aria-label="Formato de carta"><button class="btn" type="button" data-command="bold"><b>Negrita</b></button><button class="btn" type="button" data-command="italic"><i>Cursiva</i></button><label>Tipo de letra <select id="letterFont">' +
-    letterFonts.map((font) => "<option>" + esc(font) + "</option>").join("") +
+    letterFonts
+      .map(
+        (font) =>
+          `<option value="${esc(font)}">${font === "cursive" ? "Manuscrita (cursiva)" : esc(font)}</option>`,
+      )
+      .join("") +
     '</select></label><label>Al pegar <select id="letterPaste"><option value="original">Conservar formato del origen</option><option value="destination">Usar formato de la carta</option></select></label></div>' +
     '<div id="letterEditor" class="letterPaper letterPaper-classic" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Texto de la carta"></div>' +
     '<label>Audio opcional (hasta 30 segundos y 5 MB)<input type="file" id="letterAudio" accept="audio/mpeg,audio/mp4,audio/aac,audio/ogg,audio/wav,audio/webm,.m4a"></label><label id="letterRemoveAudio" hidden><input type="checkbox" id="removeLetterAudio"> Quitar el audio actual</label>'

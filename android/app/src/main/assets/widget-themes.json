@@ -6,7 +6,8 @@
     "muted": "#8c6571",
     "line": "#efd0da",
     "surface": "#fffafb",
-    "widgetBackground": "#ffe3eb"
+    "widgetBackground": "#ec88a7",
+    "widgetMuted": "#3a1723"
   },
   "emerald": {
     "rose": "#2f8f73",
@@ -15,7 +16,8 @@
     "muted": "#648078",
     "line": "#cde5dc",
     "surface": "#fbfffd",
-    "widgetBackground": "#e0f4ec"
+    "widgetBackground": "#8bc4b2",
+    "widgetMuted": "#17372f"
   },
   "coffee": {
     "rose": "#a56a43",
@@ -24,7 +26,8 @@
     "muted": "#806b60",
     "line": "#e5d2c2",
     "surface": "#fffaf5",
-    "widgetBackground": "#f3e3d5"
+    "widgetBackground": "#cea98f",
+    "widgetMuted": "#35231b"
   },
   "sakura": {
     "rose": "#e58cab",
@@ -33,7 +36,8 @@
     "muted": "#92727f",
     "line": "#f0d5df",
     "surface": "#fff",
-    "widgetBackground": "#ffe9f1"
+    "widgetBackground": "#f3bccf",
+    "widgetMuted": "#4a2936"
   },
   "royal": {
     "rose": "#7255b5",
@@ -42,7 +46,8 @@
     "muted": "#746b86",
     "line": "#d9cfee",
     "surface": "#fff",
-    "widgetBackground": "#ece5fb"
+    "widgetBackground": "#b1a0d9",
+    "widgetMuted": "#292039"
   },
   "forest": {
     "rose": "#557a55",
@@ -51,7 +56,8 @@
     "muted": "#6f7e70",
     "line": "#d0dfcf",
     "surface": "#fbfdf9",
-    "widgetBackground": "#e4efe2"
+    "widgetBackground": "#9fb79e",
+    "widgetMuted": "#243225"
   },
   "wine": {
     "rose": "#9d3d58",
@@ -60,7 +66,8 @@
     "muted": "#85616b",
     "line": "#e3c4cf",
     "surface": "#fff9fb",
-    "widgetBackground": "#f4dfe6"
+    "widgetBackground": "#ca91a2",
+    "widgetMuted": "#351821"
   },
   "sky": {
     "rose": "#4c8ec4",
@@ -69,7 +76,8 @@
     "muted": "#6b7f8d",
     "line": "#d1e4f0",
     "surface": "#fff",
-    "widgetBackground": "#e3f1fb"
+    "widgetBackground": "#9bc1e1",
+    "widgetMuted": "#20313f"
   },
   "mint": {
     "rose": "#4a9b88",
@@ -78,7 +86,8 @@
     "muted": "#668078",
     "line": "#c9e6de",
     "surface": "#fcfffe",
-    "widgetBackground": "#dff4ee"
+    "widgetBackground": "#97c9bd",
+    "widgetMuted": "#20352f"
   },
   "peach": {
     "rose": "#e58b62",
@@ -87,7 +96,8 @@
     "muted": "#8a7067",
     "line": "#efd5c9",
     "surface": "#fffdfb",
-    "widgetBackground": "#ffeadf"
+    "widgetBackground": "#f3bca3",
+    "widgetMuted": "#3d2b24"
   },
   "gold": {
     "rose": "#b48a2d",
@@ -96,7 +106,8 @@
     "muted": "#82775b",
     "line": "#e8dbb7",
     "surface": "#fffefa",
-    "widgetBackground": "#f8efd2"
+    "widgetBackground": "#d7bf83",
+    "widgetMuted": "#382f1e"
   },
   "plum": {
     "rose": "#8d4f91",
@@ -105,7 +116,8 @@
     "muted": "#7d6a82",
     "line": "#dfcfe1",
     "surface": "#fffaff",
-    "widgetBackground": "#f1e3f1"
+    "widgetBackground": "#c19cc3",
+    "widgetMuted": "#34233a"
   },
   "midnight": {
     "rose": "#8ca8ff",
@@ -114,7 +126,8 @@
     "muted": "#b6bdd8",
     "line": "#414b70",
     "surface": "#191d2d",
-    "widgetBackground": "#191d2d"
+    "widgetBackground": "#191d2d",
+    "widgetMuted": "#b6bdd8"
   },
   "charcoal": {
     "rose": "#d9a7b8",
@@ -123,7 +136,8 @@
     "muted": "#bbb4bb",
     "line": "#55515a",
     "surface": "#24242a",
-    "widgetBackground": "#24242a"
+    "widgetBackground": "#24242a",
+    "widgetMuted": "#bbb4bb"
   },
   "blush": {
     "rose": "#c95f87",
@@ -132,7 +146,8 @@
     "muted": "#846b77",
     "line": "#e8c8d5",
     "surface": "#fff",
-    "widgetBackground": "#f7dce7"
+    "widgetBackground": "#e1a0b9",
+    "widgetMuted": "#3a2530"
   },
   "ice": {
     "rose": "#639eb7",
@@ -141,7 +156,8 @@
     "muted": "#6c828a",
     "line": "#cce4eb",
     "surface": "#fbfeff",
-    "widgetBackground": "#e2f3f8"
+    "widgetBackground": "#a5cad9",
+    "widgetMuted": "#21323a"
   },
   "rosewood": {
     "rose": "#a74d62",
@@ -150,7 +166,8 @@
     "muted": "#805f68",
     "line": "#dec8cf",
     "surface": "#fffafb",
-    "widgetBackground": "#f1dfe4"
+    "widgetBackground": "#cd99a6",
+    "widgetMuted": "#351d24"
   },
   "aurora": {
     "rose": "#65a6a4",
@@ -159,7 +176,8 @@
     "muted": "#687f81",
     "line": "#c9dfdd",
     "surface": "#fbfffe",
-    "widgetBackground": "#dff1ee"
+    "widgetBackground": "#a4cdca",
+    "widgetMuted": "#213537"
   },
   "romance": {
     "rose": "#e64d78",
@@ -168,7 +186,8 @@
     "muted": "#8e747c",
     "line": "#ead8df",
     "surface": "#fff",
-    "widgetBackground": "#fde8ee"
+    "widgetBackground": "#f29eb5",
+    "widgetMuted": "#35262b"
   },
   "night": {
     "rose": "#d78aa7",
@@ -177,7 +196,8 @@
     "muted": "#c7aeb9",
     "line": "#573947",
     "surface": "#2b2027",
-    "widgetBackground": "#2b2027"
+    "widgetBackground": "#2b2027",
+    "widgetMuted": "#c7aeb9"
   },
   "lavender": {
     "rose": "#9a78c7",
@@ -186,7 +206,8 @@
     "muted": "#7d7188",
     "line": "#ded3ec",
     "surface": "#fff",
-    "widgetBackground": "#eee7fa"
+    "widgetBackground": "#c6b2e2",
+    "widgetMuted": "#342d3c"
   },
   "sunset": {
     "rose": "#d96b48",
@@ -195,7 +216,8 @@
     "muted": "#8c7069",
     "line": "#eed8ce",
     "surface": "#fff",
-    "widgetBackground": "#ffeadf"
+    "widgetBackground": "#edad97",
+    "widgetMuted": "#3b2b28"
   },
   "ocean": {
     "rose": "#4b8fb4",
@@ -204,7 +226,8 @@
     "muted": "#6f858d",
     "line": "#d3e6ed",
     "surface": "#fff",
-    "widgetBackground": "#e2f2f8"
+    "widgetBackground": "#9ac2d7",
+    "widgetMuted": "#26343a"
   },
   "sage": {
     "rose": "#64856a",
@@ -213,7 +236,8 @@
     "muted": "#657768",
     "line": "#d1dfd0",
     "surface": "#fcfefb",
-    "widgetBackground": "#e5efe4"
+    "widgetBackground": "#a7bca9",
+    "widgetMuted": "#243529"
   },
   "blueberry": {
     "rose": "#6476c8",
@@ -222,7 +246,8 @@
     "muted": "#68739b",
     "line": "#d3daf7",
     "surface": "#fcfcff",
-    "widgetBackground": "#e9edff"
+    "widgetBackground": "#a9b4e5",
+    "widgetMuted": "#252d4c"
   },
   "terracotta": {
     "rose": "#b85f48",
@@ -231,7 +256,8 @@
     "muted": "#89675b",
     "line": "#e8cfc3",
     "surface": "#fffaf7",
-    "widgetBackground": "#f7e4db"
+    "widgetBackground": "#d9a494",
+    "widgetMuted": "#43291f"
   },
   "butter": {
     "rose": "#a98527",
@@ -240,7 +266,8 @@
     "muted": "#81724a",
     "line": "#ebdfb6",
     "surface": "#fffef9",
-    "widgetBackground": "#fff4cf"
+    "widgetBackground": "#d6bf7e",
+    "widgetMuted": "#3c3218"
   },
   "lagoon": {
     "rose": "#258e95",
@@ -249,7 +276,8 @@
     "muted": "#5f7f82",
     "line": "#c4e4e2",
     "surface": "#fbfffe",
-    "widgetBackground": "#dff4f2"
+    "widgetBackground": "#86c3c5",
+    "widgetMuted": "#17363a"
   },
   "rosegold": {
     "rose": "#b76e79",
@@ -258,7 +286,8 @@
     "muted": "#896c71",
     "line": "#e6cbd0",
     "surface": "#fffafb",
-    "widgetBackground": "#f5e1e4"
+    "widgetBackground": "#d7aab1",
+    "widgetMuted": "#3e252b"
   },
   "porcelain": {
     "rose": "#667085",
@@ -267,7 +296,8 @@
     "muted": "#737d8b",
     "line": "#dce1e8",
     "surface": "#fff",
-    "widgetBackground": "#edf0f4"
+    "widgetBackground": "#acb3bf",
+    "widgetMuted": "#29313d"
   },
   "citrus": {
     "rose": "#718b2e",
@@ -276,7 +306,8 @@
     "muted": "#78815f",
     "line": "#dce7bf",
     "surface": "#fdfff8",
-    "widgetBackground": "#edf4d8"
+    "widgetBackground": "#b1c286",
+    "widgetMuted": "#30391e"
   },
   "denim": {
     "rose": "#477da8",
@@ -285,7 +316,8 @@
     "muted": "#6b8295",
     "line": "#cedfeb",
     "surface": "#fbfdff",
-    "widgetBackground": "#e3eef7"
+    "widgetBackground": "#98b8d1",
+    "widgetMuted": "#243849"
   },
   "cinnamon": {
     "rose": "#a45f36",
@@ -294,7 +326,8 @@
     "muted": "#896e5d",
     "line": "#e7d2c2",
     "surface": "#fffaf5",
-    "widgetBackground": "#f4e5d8"
+    "widgetBackground": "#cea58a",
+    "widgetMuted": "#3d2b21"
   },
   "orchid": {
     "rose": "#9b6aa8",
@@ -303,6 +336,7 @@
     "muted": "#806d86",
     "line": "#e2d2e8",
     "surface": "#fffbff",
-    "widgetBackground": "#f1e6f4"
+    "widgetBackground": "#c8aad0",
+    "widgetMuted": "#392b40"
   }
 }

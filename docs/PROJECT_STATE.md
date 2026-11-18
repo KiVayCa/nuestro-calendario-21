@@ -127,3 +127,8 @@ Las reacciones de Cartas se muestran en un selector plegado por defecto, con la 
 La edición del nombre de un teléfono se hace dentro de la lista, con confirmación al guardar. El guardado usa una función que solo actualiza el nombre de un dispositivo de la cuenta autenticada. Verificados el guardado y el aislamiento en TEST y las 21 pruebas web.
 
 El total del selector de reacciones cuenta únicamente emojis activos, incluidas las cartas con registros de reacciones retiradas.
+
+Cartas incorpora la tipografía manuscrita del dispositivo y seis fondos con
+motivos diferenciados. Android v11 refuerza el color de fondo de los temas
+claros de widgets y conserva los fondos oscuros. Pendiente prueba visual en
+el Motorola.
