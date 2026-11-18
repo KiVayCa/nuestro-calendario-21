@@ -5,6 +5,11 @@ const letterReactionOptions = [
   ["🥰", "Me dio ternura"],
   ["🤗", "Un abrazo"],
   ["🙏", "Gracias"],
+  ["😘", "Un beso"],
+  ["💘", "Me conquistó"],
+  ["😭", "Me hizo llorar"],
+  ["❤️‍🔥", "Me apasiona"],
+  ["💓", "Me aceleró el corazón"],
 ];
 
 function renderLetterReactions(letterId) {
@@ -91,7 +96,7 @@ function renderAdvLetters() {
                 x.unlock_at && new Date(x.unlock_at) > new Date();
               const locked = !!x.is_locked;
               const pendingForRecipient = scheduled && x.created_by !== user.id;
-              return `<div class="advItem letterItem" data-advanced-id="${x.id}"><div class="letterContent"><div class="advItemTitle">${locked ? "🔒 " : scheduled ? "🕒 " : "💌 "}${esc(x.title)}</div><div class="advMeta">${esc(x.category)}${x.place_id && advCache.places.find((p) => p.id === x.place_id) ? " · 📍 " + placeLinkHtml(x.place_id, advCache.places.find((p) => p.id === x.place_id).name) : ""} · ${scheduled ? "Se desbloquea " + new Date(x.unlock_at).toLocaleString("es-CO") + " · " + letterCountdown(x.unlock_at) : "Disponible"} · ${locked ? "Carta protegida" : "Sin bloqueo"}</div><p>${scheduled ? "Esta carta está guardada para el futuro. ❤️" : esc(x.content)}</p>${scheduled ? "" : renderLetterReactions(x.id)}</div><div class="advActions letterActions">${pendingForRecipient ? "<span>Disponible en la fecha indicada ❤️</span>" : `${!scheduled && x.opened_at ? "✓ Leída" : ""}<button type="button" class="btn" onclick="openAdvancedEdit('letters','${x.id}')">✏️ Editar</button><button type="button" class="btn" onclick="toggleLetterLock('${x.id}')">${locked ? "🔓 Desbloquear" : "🔒 Bloquear"}</button><button type="button" class="btn danger" ${locked ? 'disabled title="Desbloquea la carta para poder eliminarla" aria-label="Eliminar carta bloqueada"' : ""} onclick="deleteAdvanced('letters','${x.id}')">🗑️ Eliminar</button>`}</div></div>`;
+              return `<div class="advItem letterItem" data-advanced-id="${x.id}"><div class="letterContent"><div class="advItemTitle">${locked ? "🔒 " : scheduled ? "🕒 " : "💌 "}${esc(x.title)}</div><div class="advMeta">${esc(x.category)}${x.place_id && advCache.places.find((p) => p.id === x.place_id) ? " · 📍 " + placeLinkHtml(x.place_id, advCache.places.find((p) => p.id === x.place_id).name) : ""} · ${scheduled ? "Se desbloquea " + new Date(x.unlock_at).toLocaleString("es-CO") + " · " + letterCountdown(x.unlock_at) : "Disponible"} · ${locked ? "Carta protegida" : "Sin bloqueo"}</div>${scheduled ? "<p>Esta carta está guardada para el futuro. ❤️</p>" : `<div class="letterPaper letterPaper-${letterPaperName(x.paper)}">${x.content_html ? cleanLetterMarkup(x.content_html) : esc(x.content).replace(/\r?\n/g, "<br>")}</div>${x.audio_path ? `<button type="button" class="btn letterAudioButton" onclick="playLetterAudio('${x.id}',this)">♫ Escuchar audio</button>` : ""}`}${scheduled ? "" : renderLetterReactions(x.id)}</div><div class="advActions letterActions">${pendingForRecipient ? "<span>Disponible en la fecha indicada ❤️</span>" : `${!scheduled && x.opened_at ? "✓ Leída" : ""}<button type="button" class="btn" onclick="openAdvancedEdit('letters','${x.id}')">✏️ Editar</button><button type="button" class="btn" onclick="toggleLetterLock('${x.id}')">${locked ? "🔓 Desbloquear" : "🔒 Bloquear"}</button><button type="button" class="btn danger" ${locked ? 'disabled title="Desbloquea la carta para poder eliminarla" aria-label="Eliminar carta bloqueada"' : ""} onclick="deleteAdvanced('letters','${x.id}')">🗑️ Eliminar</button>`}</div></div>`;
             })
             .join("")
         : `<div class="advEmpty">💌 Escriban su primera carta. Puede ser para hoy, para un aniversario o para un día difícil.</div>`
@@ -113,11 +118,16 @@ function openLetterForm(isEdit = false) {
           ["aniversario", "Para nuestro aniversario"],
           ["futuro", "Para el futuro"],
         ]) +
-        textarea("content", "Carta", "Escribe todo lo que quieras decir...") +
+        letterEditorHtml() +
         input("unlock_at", "Desbloquear el", "datetime-local") +
         '<label><input id="adv_notify_on_unlock" type="checkbox"> Avisar a mi pareja al abrirse la carta</label>',
       `saveLetter()`,
     ),
+  );
+  bindLetterEditor(
+    isEdit
+      ? advCache.letters.find((letter) => letter.id === advancedEditState.id)
+      : null,
   );
 }
 
@@ -125,8 +135,15 @@ async function saveLetter() {
   if (advancedEditState.key === "letters" && advancedEditState.id)
     return saveAdvancedEdit();
   const title = $("adv_title").value.trim(),
-    content = $("adv_content").value.trim();
-  if (!title || !content) return appAlert("Completa el título y la carta ❤️");
+    draft = letterDraft();
+  if (!title || !draft.content)
+    return appAlert("Completa el título y la carta ❤️");
+  let audio;
+  try {
+    audio = await uploadLetterAudio();
+  } catch (error) {
+    return appAlert(error.message);
+  }
   const unlock = $("adv_unlock_at").value;
   const { data: created, error } = await sb
     .from("love_letters")
@@ -134,7 +151,8 @@ async function saveLetter() {
       couple_id: couple.id,
       created_by: user.id,
       title,
-      content,
+      ...draft,
+      audio_path: audio.audio_path,
       category: $("adv_category").value,
       place_id: $("adv_place_id")?.value || null,
       notify_on_unlock: !!unlock && $("adv_notify_on_unlock").checked,
@@ -142,7 +160,10 @@ async function saveLetter() {
     })
     .select("id")
     .single();
-  if (error) return appAlert(error.message);
+  if (error) {
+    await removeLetterAudio(audio.uploaded);
+    return appAlert(error.message);
+  }
   await createPartnerNotification({
     event_type: "letter_created",
     title: "Nueva carta 💌",
@@ -192,4 +213,236 @@ async function toggleLetterLock(id) {
     });
     await advLoadAll();
   })();
+}
+
+const letterPapers = [
+  ["classic", "Papel clásico"],
+  ["rose", "Rosa romántica"],
+  ["lavender", "Lavanda"],
+  ["sea", "Azul océano"],
+  ["gold", "Dorado cálido"],
+  ["night", "Noche estrellada"],
+];
+const letterFonts = [
+  "Georgia",
+  "Arial",
+  "Verdana",
+  "Times New Roman",
+  "Courier New",
+];
+const letterMarkupTags = new Set([
+  "B",
+  "STRONG",
+  "I",
+  "EM",
+  "BR",
+  "P",
+  "DIV",
+  "SPAN",
+  "FONT",
+]);
+
+// Rebuild supported formatting in an inert template. Never copy executable attributes or URLs.
+function cleanLetterMarkup(html) {
+  const source = document.createElement("template");
+  source.innerHTML = html;
+  const output = document.createElement("div");
+  const copy = (node, parent) => {
+    if (node.nodeType === 3)
+      return parent.append(document.createTextNode(node.textContent));
+    if (
+      node.nodeType !== 1 ||
+      [
+        "SCRIPT",
+        "STYLE",
+        "IFRAME",
+        "OBJECT",
+        "SVG",
+        "MATH",
+        "TEMPLATE",
+      ].includes(node.tagName)
+    )
+      return;
+    const bold = ["bold", "700", "800", "900"].includes(node.style?.fontWeight);
+    const italic = ["italic", "oblique"].includes(node.style?.fontStyle);
+    const suppliedFont = (
+      node.style?.fontFamily ||
+      node.getAttribute("face") ||
+      ""
+    )
+      .split(",")[0]
+      .replace(/['"]/g, "")
+      .trim()
+      .toLowerCase();
+    const font = letterFonts.find(
+      (value) => value.toLowerCase() === suppliedFont,
+    );
+    const tag = node.tagName === "FONT" ? "SPAN" : node.tagName;
+    const element = letterMarkupTags.has(node.tagName)
+      ? document.createElement(tag)
+      : parent;
+    if (element !== parent) {
+      if (bold) element.style.fontWeight = "bold";
+      if (italic) element.style.fontStyle = "italic";
+      if (font) element.style.fontFamily = font;
+      parent.append(element);
+    }
+    for (const child of node.childNodes) copy(child, element);
+  };
+  for (const node of source.content.childNodes) copy(node, output);
+  return output.innerHTML;
+}
+
+function letterPaperName(paper) {
+  return letterPapers.some(([value]) => value === paper) ? paper : "classic";
+}
+
+function letterEditorHtml() {
+  return (
+    select("paper", "Fondo de la carta", letterPapers) +
+    '<div class="advActions letterEditorTools" role="group" aria-label="Formato de carta"><button class="btn" type="button" data-command="bold"><b>Negrita</b></button><button class="btn" type="button" data-command="italic"><i>Cursiva</i></button><label>Tipo de letra <select id="letterFont">' +
+    letterFonts.map((font) => "<option>" + esc(font) + "</option>").join("") +
+    '</select></label><label>Al pegar <select id="letterPaste"><option value="original">Conservar formato del origen</option><option value="destination">Usar formato de la carta</option></select></label></div>' +
+    '<div id="letterEditor" class="letterPaper letterPaper-classic" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Texto de la carta"></div>' +
+    '<label>Audio opcional (hasta 30 segundos y 5 MB)<input type="file" id="letterAudio" accept="audio/mpeg,audio/mp4,audio/aac,audio/ogg,audio/wav,audio/webm,.m4a"></label><label id="letterRemoveAudio" hidden><input type="checkbox" id="removeLetterAudio"> Quitar el audio actual</label>'
+  );
+}
+
+function bindLetterEditor(letter) {
+  const editor = $("letterEditor");
+  const paper = $("adv_paper");
+  editor.innerHTML = letter?.content_html
+    ? cleanLetterMarkup(letter.content_html)
+    : esc(letter?.content || "").replace(/\r?\n/g, "<br>");
+  $("letterRemoveAudio").hidden = !letter?.audio_path;
+  paper.value = letterPaperName(letter?.paper);
+  const updatePaper = () => {
+    editor.className = "letterPaper letterPaper-" + paper.value;
+  };
+  paper.onchange = updatePaper;
+  updatePaper();
+  let selection;
+  const remember = () => {
+    const current = window.getSelection();
+    if (
+      current?.rangeCount &&
+      editor.contains(current.anchorNode) &&
+      editor.contains(current.focusNode)
+    )
+      selection = current.getRangeAt(0).cloneRange();
+  };
+  editor.addEventListener("blur", remember);
+  const format = (command, value) => {
+    editor.focus();
+    if (selection) {
+      const current = window.getSelection();
+      current.removeAllRanges();
+      current.addRange(selection);
+    }
+    document.execCommand(command, false, value);
+    remember();
+  };
+  for (const button of editor.previousElementSibling.querySelectorAll(
+    "[data-command]",
+  )) {
+    button.onmousedown = (event) => {
+      remember();
+      event.preventDefault();
+    };
+    button.onclick = () => format(button.dataset.command);
+  }
+  $("letterFont").onchange = (event) => format("fontName", event.target.value);
+  editor.addEventListener("paste", (event) => {
+    event.preventDefault();
+    const html = event.clipboardData?.getData("text/html");
+    if ($("letterPaste").value === "original" && html)
+      document.execCommand("insertHTML", false, cleanLetterMarkup(html));
+    else
+      document.execCommand(
+        "insertText",
+        false,
+        event.clipboardData?.getData("text/plain") || "",
+      );
+    remember();
+  });
+}
+
+function letterDraft() {
+  const editor = $("letterEditor");
+  return {
+    content: (editor.innerText ?? editor.textContent).trim(),
+    content_html: cleanLetterMarkup(editor.innerHTML),
+    paper: letterPaperName($("adv_paper").value),
+  };
+}
+
+async function uploadLetterAudio(letter) {
+  const file = $("letterAudio").files?.[0];
+  if (!file)
+    return {
+      audio_path: $("removeLetterAudio").checked
+        ? null
+        : letter?.audio_path || null,
+    };
+  if (file.size > 5 * 1024 * 1024)
+    throw new Error("El audio debe pesar hasta 5 MB.");
+  const mime = file.type || (/\.m4a$/i.test(file.name) ? "audio/mp4" : "");
+  const audio = document.createElement("audio");
+  const source = URL.createObjectURL(file);
+  try {
+    const duration = await new Promise((resolve, reject) => {
+      const timeout = setTimeout(
+        () => reject(new Error("No pudimos leer el audio.")),
+        5000,
+      );
+      audio.onloadedmetadata = () => {
+        clearTimeout(timeout);
+        resolve(audio.duration);
+      };
+      audio.onerror = () => {
+        clearTimeout(timeout);
+        reject(new Error("El formato de audio no es compatible."));
+      };
+      audio.preload = "metadata";
+      audio.src = source;
+    });
+    if (!Number.isFinite(duration) || duration <= 0 || duration > 30.15)
+      throw new Error("Selecciona un fragmento de hasta 30 segundos.");
+  } finally {
+    audio.removeAttribute("src");
+    URL.revokeObjectURL(source);
+  }
+  const path = user.id + "/" + crypto.randomUUID();
+  const { error } = await sb.storage
+    .from("letter-audio")
+    .upload(path, file, { contentType: mime });
+  if (error) throw new Error("No pudimos subir el audio.");
+  return { audio_path: path, uploaded: path };
+}
+
+async function removeLetterAudio(path) {
+  if (path?.startsWith(user.id + "/"))
+    await sb.storage.from("letter-audio").remove([path]);
+}
+
+async function playLetterAudio(letterId, button) {
+  const letter = advCache.letters.find((item) => item.id === letterId);
+  if (
+    !letter?.audio_path ||
+    (letter.unlock_at && new Date(letter.unlock_at) > new Date())
+  )
+    return;
+  button.disabled = true;
+  const { data, error } = await sb.storage
+    .from("letter-audio")
+    .createSignedUrl(letter.audio_path, 300);
+  if (error || !data?.signedUrl) {
+    button.disabled = false;
+    return appAlert("No pudimos abrir el audio de la carta.");
+  }
+  if (!button.isConnected) return;
+  const audio = document.createElement("audio");
+  audio.controls = true;
+  audio.src = data.signedUrl;
+  button.replaceWith(audio);
 }

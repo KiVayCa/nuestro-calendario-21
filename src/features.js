@@ -634,7 +634,6 @@ function openAdvancedEdit(key, id) {
     setAdvField("adv_location", x.location || "");
   } else if (key === "letters") {
     setAdvField("adv_category", x.category || "libre");
-    setAdvField("adv_content", x.content || "");
     setAdvField("adv_unlock_at", localDateTimeValue(x.unlock_at));
     $("adv_notify_on_unlock").checked = !!x.notify_on_unlock;
   } else if (key === "dreams") {
@@ -675,6 +674,8 @@ async function saveAdvancedEdit() {
   const { key, id } = advancedEditState;
   if (!key || !id) return;
   let patch = {};
+  let letterAudio;
+  let priorLetterAudio;
   if (key === "memories") {
     patch = {
       title: $("adv_title").value.trim(),
@@ -696,9 +697,21 @@ async function saveAdvancedEdit() {
       patch.photo_url = path;
     }
   } else if (key === "letters") {
+    const title = $("adv_title").value.trim();
+    const draft = letterDraft();
+    if (!title || !draft.content)
+      return appAlert("Completa el título y la carta ❤️");
+    const letter = advCache.letters.find((item) => item.id === id);
+    priorLetterAudio = letter?.audio_path;
+    try {
+      letterAudio = await uploadLetterAudio(letter);
+    } catch (error) {
+      return appAlert(error.message);
+    }
     patch = {
-      title: $("adv_title").value.trim(),
-      content: $("adv_content").value.trim(),
+      title,
+      ...draft,
+      audio_path: letterAudio.audio_path,
       category: $("adv_category").value,
       place_id: $("adv_place_id")?.value || null,
       notify_on_unlock:
@@ -783,10 +796,13 @@ async function saveAdvancedEdit() {
     return appAlert("El contenido no puede quedar vacío.");
   const { error } = await sb.from(advTables[key]).update(patch).eq("id", id);
   if (error) {
+    if (letterAudio?.uploaded) await removeLetterAudio(letterAudio.uploaded);
     if (key === "memories" && patch.photo_url)
       await sb.storage.from("couple-media").remove([patch.photo_url]);
     return appAlert("No se pudo guardar: " + error.message);
   }
+  if (letterAudio && letterAudio.audio_path !== priorLetterAudio)
+    await removeLetterAudio(priorLetterAudio);
   if (key !== "privateNotes") {
     const tab =
       {
@@ -840,6 +856,7 @@ async function deleteAdvanced(key, id) {
     const item = (advCache[key] || []).find((x) => x.id === id);
     const { error } = await sb.from(advTables[key]).delete().eq("id", id);
     if (error) return appAlert(error.message);
+    if (key === "letters") await removeLetterAudio(item?.audio_path);
     if (key !== "privateNotes" && item) {
       const tab =
         {

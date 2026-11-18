@@ -109,3 +109,13 @@ La lista de teléfonos vinculados retira el indicador de carga al mostrar
 resultados y permite asignar un nombre a cada teléfono. Los vínculos existentes
 conservan su vencimiento de 90 días. Se probó el cambio web (21 pruebas) y se
 aplicó la migración de nombres en TEST y producción.
+
+## Cartas, vínculo anual y temas de widget
+
+Los vínculos activos de avisos se amplían a un año desde el último registro.
+El proceso de recordatorios intenta enviar un aviso nativo durante los siete
+días anteriores al vencimiento y registra la entrega aceptada por FCM.
+Las cartas admiten fondos, formato básico sanitizado y audio privado. Una
+carta programada conserva bloqueados el texto y el audio para su destinatario
+hasta la fecha de apertura. Los widgets de Android v10 usan un color de fondo
+visible en las paletas claras. La prueba de Android físico queda pendiente.

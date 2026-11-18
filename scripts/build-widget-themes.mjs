@@ -15,11 +15,36 @@ for (const match of css.matchAll(
   ))
     values[property[1]] = property[2];
 }
+// The calendar cards often use white surfaces; the widget uses the softer
+// theme color when that surface is light, preserving the dark palettes.
+const channels = (hex) => {
+  const value = hex.slice(1);
+  const rgb =
+    value.length === 3 ? [...value].map((c) => c + c).join("") : value;
+  return [0, 2, 4].map((offset) => parseInt(rgb.slice(offset, offset + 2), 16));
+};
+const luminance = (hex) =>
+  channels(hex).reduce((total, channel, index) => {
+    const value = channel / 255;
+    const linear =
+      value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+    return total + linear * [0.2126, 0.7152, 0.0722][index];
+  }, 0);
+const contrast = (a, b) => (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+for (const colors of Object.values(themes)) {
+  const softer = luminance(colors.soft);
+  colors.widgetBackground =
+    luminance(colors.surface) > 0.45 &&
+    contrast(softer, luminance(colors.ink)) >= 4.5
+      ? colors.soft
+      : colors.surface;
+}
+
 await mkdir("android/app/src/main/assets", { recursive: true });
 let java =
   "package co.calendario21.app;\n\n// Generated from styles.css by scripts/build-widget-themes.mjs.\nfinal class WidgetThemeResources {\n";
 for (const [method, prefix, field] of [
-  ["background", "widget_theme", "surface"],
+  ["background", "widget_theme", "widgetBackground"],
   ["today", "widget_today", "soft"],
   ["event", "widget_event", "soft"],
 ]) {

@@ -134,5 +134,38 @@ Deno.serve(async (request) => {
     )
       await persist(results, true);
   }
+  const { data: expiringDevices, error: expiryError } = await admin.rpc(
+    "android_push_expiring_devices",
+  );
+  if (expiryError) failed++;
+  for (const device of expiringDevices || []) {
+    try {
+      await sendCalendarPush(
+        { token: device.token },
+        JSON.stringify({
+          title: "Renueva el vínculo de tu teléfono",
+          body: "Abre Configuración y toca Vincular este teléfono para seguir recibiendo avisos.",
+          url: "/?tab=settings",
+          tag: "nc21-phone-renewal",
+        }),
+      );
+      const { error: saved } = await admin
+        .from("android_push_devices")
+        .update({ expiry_notice_for: device.expires_at })
+        .eq("token", device.token)
+        .eq("expires_at", device.expires_at);
+      if (saved) failed++;
+      else sent++;
+    } catch (error) {
+      if ((error as { statusCode?: number }).statusCode === 410) {
+        await admin
+          .from("android_push_devices")
+          .delete()
+          .eq("token", device.token)
+          .eq("expires_at", device.expires_at);
+      }
+      failed++;
+    }
+  }
   return Response.json({ reminders: reminders.length, sent, failed });
 });

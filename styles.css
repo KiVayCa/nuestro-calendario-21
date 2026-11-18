@@ -1531,3 +1531,26 @@ body:is([data-theme="night"], [data-theme="midnight"], [data-theme="charcoal"])
   opacity: .76;
   border-style: dashed;
 }
+
+.letterPaper {
+  padding: 1rem 1.15rem;
+  border-radius: 16px;
+  border: 1px solid var(--paper-border);
+  color: var(--paper-ink);
+  background: var(--paper-bg);
+  font-family: Georgia, serif;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+.letterPaper-classic { --paper-ink: #3a2a23; --paper-border: #dfcbb2; --paper-bg: linear-gradient(145deg,#fffaf0,#f6eadb); }
+.letterPaper-rose { --paper-ink: #56263b; --paper-border: #eab7ca; --paper-bg: linear-gradient(145deg,#fff4f8,#f7d5e3); }
+.letterPaper-lavender { --paper-ink: #3c275c; --paper-border: #d6bfe9; --paper-bg: linear-gradient(145deg,#faf4ff,#e7d8f5); }
+.letterPaper-sea { --paper-ink: #173e52; --paper-border: #afd2df; --paper-bg: linear-gradient(145deg,#f0fcff,#c8e8ef); }
+.letterPaper-gold { --paper-ink: #51351b; --paper-border: #e8c789; --paper-bg: linear-gradient(145deg,#fff7de,#f8e2ad); }
+.letterPaper-night { --paper-ink: #fff5de; --paper-border: #61628a; --paper-bg: radial-gradient(ellipse at top right,#454368,#242339 70%); }
+#letterEditor { min-height: 11rem; }
+#letterEditor:focus-visible { outline: 2px solid var(--rose); outline-offset: 2px; }
+.letterEditorTools { flex-wrap: wrap; margin-bottom: .7rem; }
+.letterAudioButton { margin-top: .65rem; }
+.letterContent audio { display: block; width: min(100%, 380px); margin-top: .65rem; }
