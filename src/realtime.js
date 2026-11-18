@@ -219,6 +219,7 @@ async function initAdvanced() {
     pendingDeepLink = new URLSearchParams();
     history.replaceState(null, "", location.pathname);
   }
+  maybeOfferWidgetLink();
   $("advModal")?.addEventListener("click", (e) => {
     if (e.target === $("advModal")) closeAdvModal();
   });

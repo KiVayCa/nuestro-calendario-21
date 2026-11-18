@@ -357,3 +357,35 @@ test("a newer Android release shows one dismissible notice with escaped text", a
   assert.equal(dom.window.document.getElementById("androidUpdateNotice"), null);
   dom.window.close();
 });
+
+test("widget pairing needs Android v4, a logged-in account and explicit approval", async () => {
+  let prompts = 0, calls = 0;
+  const node = { isConnected: true, innerHTML: "" };
+  const c = context("src/widget-link.js", {
+    location: { search: `?widget_challenge=${"a".repeat(64)}&widget_state=${"b".repeat(32)}` },
+    androidDevice: () => true, nativeAndroidCode: 4,
+    user: null, couple: { id: "pair" },
+    openAdvModal: () => prompts++, $: () => node,
+    esc: (s) => s, setTimeout: () => {},
+    sb: { rpc: async (name,args) => { calls++; assert.equal(name,"create_widget_pair_code");
+      assert.equal(args.p_couple_id,"pair"); return {data:"c".repeat(64)}; } },
+  });
+  c.maybeOfferWidgetLink(); assert.equal(prompts,0);
+  c.user={id:"user"}; c.maybeOfferWidgetLink(); c.maybeOfferWidgetLink();
+  assert.equal(prompts,1); assert.equal(calls,0);
+  await c.createWidgetLink({disabled:false}); assert.equal(calls,1);
+  assert.ok(node.innerHTML.includes("calendario21://widget-link?code="));
+  assert.ok(!node.innerHTML.includes("access_token"));
+});
+
+test("widget pairing does not render a code after the active account changes", async () => {
+  let resolve;
+  const node={isConnected:true,innerHTML:""};
+  const c=context("src/widget-link.js", {
+    location:{search:`?widget_challenge=${"a".repeat(64)}&widget_state=${"b".repeat(32)}`},
+    androidDevice:()=>true,nativeAndroidCode:4,user:{id:"one"},couple:{id:"pair"},
+    $:()=>node,sb:{rpc:()=>new Promise(r=>resolve=r)},esc:s=>s,setTimeout:()=>{},
+  });
+  const pending=c.createWidgetLink({disabled:false}); c.user={id:"two"};
+  resolve({data:"c".repeat(64)}); await pending; assert.equal(node.innerHTML,"");
+});

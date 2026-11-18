@@ -90,13 +90,28 @@ final class WidgetRenderer {
                 : week ? R.layout.widget_week : R.layout.widget;
     RemoteViews views = new RemoteViews(c.getPackageName(), layout);
     SharedPreferences appearance = c.getSharedPreferences("appearance", 0);
-    String style = appearance.getString("frame", "rose");
+    WidgetPalette palette = palette(c, snapshot, appearance.getString("frame", "app"));
     views.setInt(
-        R.id.widget_root,
-        "setBackgroundResource",
-        style.equals("sage")
-            ? R.drawable.widget_sage
-            : style.equals("night") ? R.drawable.widget_night : R.drawable.widget_background);
+        R.id.widget_root, "setBackgroundResource", WidgetThemeResources.background(palette.name));
+    for (int text :
+        new int[] {
+          R.id.widget_heading,
+          R.id.widget_title,
+          R.id.widget_detail,
+          R.id.widget_refresh,
+          R.id.widget_settings
+        }) views.setTextColor(text, palette.ink);
+    views.setTextColor(R.id.widget_updated, palette.muted);
+    if (relationship)
+      for (int text :
+          new int[] {
+            R.id.together_number, R.id.dating_number, R.id.together_label, R.id.dating_label
+          }) views.setTextColor(text, palette.ink);
+    if (month) {
+      views.setTextColor(R.id.month_previous, palette.ink);
+      views.setTextColor(R.id.month_next, palette.ink);
+      views.setTextColor(R.id.calendar_agenda, palette.ink);
+    }
     String heading =
         month
             ? "NUESTRO MES ♡"
@@ -109,7 +124,11 @@ final class WidgetRenderer {
                         : "NUESTRO PRÓXIMO CAPÍTULO ♡";
     views.setTextViewText(R.id.widget_heading, heading);
     boolean compact = height < 160 || width < 220;
-    views.setViewVisibility(R.id.widget_heading, compact && !month ? View.GONE : View.VISIBLE);
+    views.setViewVisibility(
+        R.id.widget_heading,
+        (compact && !month) || (month && height < 380) ? View.GONE : View.VISIBLE);
+    if (month)
+      views.setViewVisibility(R.id.widget_detail, height >= 420 ? View.VISIBLE : View.GONE);
     views.setViewPadding(
         R.id.widget_root, dp(c, compact ? 10 : 18), dp(c, 10), dp(c, compact ? 10 : 18), dp(c, 6));
     int chosen = appearance.getInt("text_" + id, 34);
@@ -171,7 +190,16 @@ final class WidgetRenderer {
           JSONArray dates = snapshot.optJSONArray("dates");
           int marked =
               renderMonth(
-                  c, views, plans, dates == null ? new JSONArray() : dates, selected, today, width);
+                  c,
+                  views,
+                  plans,
+                  dates == null ? new JSONArray() : dates,
+                  selected,
+                  today,
+                  width,
+                  height,
+                  id,
+                  palette);
           detail = marked + " días con eventos · Toca el mes para volver a hoy";
           url += "?tab=calendar&date=" + selected.atDay(1);
           monthAction(c, views, id, R.id.month_previous, -1);
@@ -277,6 +305,26 @@ final class WidgetRenderer {
     return views;
   }
 
+  private static JSONObject themeDefinitions;
+
+  private static WidgetPalette palette(Context c, JSONObject snapshot, String frame) {
+    try {
+      if (themeDefinitions == null)
+        try (java.io.InputStream in = c.getAssets().open("widget-themes.json")) {
+          java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
+          byte[] buffer = new byte[4096];
+          int n;
+          while ((n = in.read(buffer)) != -1) out.write(buffer, 0, n);
+          themeDefinitions = new JSONObject(out.toString("UTF-8"));
+        }
+      JSONObject settings = snapshot == null ? null : snapshot.optJSONObject("appearance");
+      return new WidgetPalette(
+          themeDefinitions, settings == null ? new JSONObject() : settings, frame);
+    } catch (Exception error) {
+      throw new IllegalStateException("Widget theme resources are unavailable", error);
+    }
+  }
+
   private static int renderMonth(
       Context c,
       RemoteViews views,
@@ -284,46 +332,107 @@ final class WidgetRenderer {
       JSONArray dates,
       YearMonth month,
       LocalDate today,
-      int width)
+      int width,
+      int height,
+      int widgetId,
+      WidgetPalette palette)
       throws Exception {
     views.removeAllViews(R.id.calendar_grid);
-    RemoteViews header = new RemoteViews(c.getPackageName(), R.layout.calendar_row);
-    for (String name : new String[] {"L", "M", "X", "J", "V", "S", "D"}) {
-      RemoteViews cell = new RemoteViews(c.getPackageName(), R.layout.calendar_day);
-      cell.setTextViewText(R.id.calendar_day, name);
-      cell.setTextColor(R.id.calendar_day, 0xffe8b8ce);
+    RemoteViews header = new RemoteViews(c.getPackageName(), R.layout.calendar_header_row);
+    for (String day : new String[] {"L", "M", "X", "J", "V", "S", "D"}) {
+      RemoteViews cell = new RemoteViews(c.getPackageName(), R.layout.calendar_header_day);
+      cell.setTextViewText(R.id.calendar_day, day);
+      cell.setTextColor(R.id.calendar_day, palette.ink);
       header.addView(R.id.calendar_row, cell);
     }
     views.addView(R.id.calendar_grid, header);
-    LocalDate start = WidgetDates.gridStart(month);
+    String selectedKey =
+        c.getSharedPreferences("appearance", 0).getString("selected_" + widgetId, "");
+    LocalDate selected = month.equals(YearMonth.from(today)) ? today : month.atDay(1);
+    try {
+      LocalDate candidate = LocalDate.parse(selectedKey);
+      if (YearMonth.from(candidate).equals(month)) selected = candidate;
+    } catch (Exception ignored) {
+    }
+    int maxEvents = height >= 490 ? 3 : height >= 420 ? 2 : 1;
+    LocalDate first = WidgetDates.gridStart(month);
     int marked = 0;
     for (int row = 0; row < 6; row++) {
       RemoteViews line = new RemoteViews(c.getPackageName(), R.layout.calendar_row);
       for (int col = 0; col < 7; col++) {
-        LocalDate day = start.plusDays(row * 7L + col);
+        LocalDate day = first.plusDays(row * 7L + col);
         boolean inMonth = YearMonth.from(day).equals(month);
-        boolean mark = WidgetDates.marks(plans, dates, day) > 0;
-        if (mark && inMonth) marked++;
+        List<WidgetDates.CalendarEntry> entries = WidgetDates.eventsOn(plans, dates, day);
+        if (inMonth && !entries.isEmpty()) marked++;
         RemoteViews cell = new RemoteViews(c.getPackageName(), R.layout.calendar_day);
-        cell.setTextViewText(R.id.calendar_day, "" + day.getDayOfMonth() + (mark ? " •" : ""));
-        cell.setTextColor(
-            R.id.calendar_day,
-            day.equals(today) ? 0xffffffff : inMonth ? mark ? 0xffffc8dd : 0xfff5eef7 : 0xff938a9c);
-        cell.setTextViewTextSize(
-            R.id.calendar_day, TypedValue.COMPLEX_UNIT_SP, width < 280 ? 12 : 15);
+        cell.setTextViewText(R.id.calendar_day, "" + day.getDayOfMonth());
+        cell.setTextColor(R.id.calendar_day, inMonth ? palette.ink : palette.muted);
         cell.setContentDescription(
-            R.id.calendar_day,
+            R.id.calendar_cell,
             day.format(DateTimeFormatter.ofPattern("d 'de' MMMM yyyy", ES))
-                + (mark ? ", con eventos" : ""));
-        if (day.equals(today))
-          cell.setInt(R.id.calendar_day, "setBackgroundResource", R.drawable.calendar_today);
+                + ", "
+                + entries.size()
+                + " eventos");
+        if (day.equals(today) || day.equals(selected))
+          cell.setInt(
+              R.id.calendar_cell,
+              "setBackgroundResource",
+              WidgetThemeResources.today(palette.name));
+        Intent select =
+            new Intent(c, MonthWidget.class)
+                .setAction(NextPlanWidget.DAY)
+                .setData(Uri.parse("calendario21://calendar/" + widgetId + "/" + day))
+                .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
+                .putExtra("day", day.toString());
         cell.setOnClickPendingIntent(
-            R.id.calendar_day,
-            open(c, day.hashCode(), MainActivity.ORIGIN + "/?tab=calendar&date=" + day));
+            R.id.calendar_cell, PendingIntent.getBroadcast(c, widgetId, select, FLAGS));
+        for (int i = 0; i < Math.min(entries.size(), maxEvents); i++) {
+          WidgetDates.CalendarEntry entry = entries.get(i);
+          RemoteViews chip = new RemoteViews(c.getPackageName(), R.layout.calendar_event);
+          String label = (entry.completed ? "✓ " : "") + entry.title;
+          if (i == maxEvents - 1 && entries.size() > maxEvents)
+            label += " +" + (entries.size() - maxEvents);
+          chip.setTextViewText(R.id.calendar_event, label);
+          chip.setTextColor(R.id.calendar_event, palette.ink);
+          chip.setInt(
+              R.id.calendar_event,
+              "setBackgroundResource",
+              WidgetThemeResources.event(palette.name));
+          chip.setContentDescription(
+              R.id.calendar_event, entry.title + (entry.time.isEmpty() ? "" : " · " + entry.time));
+          String url =
+              MainActivity.ORIGIN
+                  + "/?tab="
+                  + (entry.source.equals("plan") ? "calendar" : "dates")
+                  + "&item="
+                  + Uri.encode(entry.id)
+                  + "&date="
+                  + day;
+          chip.setOnClickPendingIntent(R.id.calendar_event, open(c, widgetId, url));
+          cell.addView(R.id.calendar_events, chip);
+        }
         line.addView(R.id.calendar_row, cell);
       }
       views.addView(R.id.calendar_grid, line);
     }
+    List<WidgetDates.CalendarEntry> agenda = WidgetDates.eventsOn(plans, dates, selected);
+    StringBuilder summary =
+        new StringBuilder(selected.format(DateTimeFormatter.ofPattern("EEE d", ES))).append(" · ");
+    if (agenda.isEmpty()) summary.append("Sin planes para este día");
+    for (int i = 0; i < agenda.size(); i++) {
+      if (i > 0) summary.append(" · ");
+      WidgetDates.CalendarEntry entry = agenda.get(i);
+      if (!entry.time.isEmpty())
+        summary
+            .append(LocalTime.parse(entry.time).format(DateTimeFormatter.ofPattern("HH:mm")))
+            .append(' ');
+      summary.append(entry.completed ? "✓ " : "").append(entry.title);
+    }
+    views.setTextViewText(R.id.calendar_agenda, summary.toString());
+    views.setInt(R.id.calendar_agenda, "setMaxLines", height >= 450 ? 3 : height >= 380 ? 2 : 1);
+    views.setOnClickPendingIntent(
+        R.id.calendar_agenda,
+        open(c, widgetId, MainActivity.ORIGIN + "/?tab=calendar&date=" + selected));
     return marked;
   }
 

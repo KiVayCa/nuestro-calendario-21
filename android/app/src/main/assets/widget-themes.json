@@ -1,0 +1,274 @@
+{
+  "cherry": {
+    "rose": "#d7265e",
+    "soft": "#ffe3eb",
+    "ink": "#3a1723",
+    "muted": "#8c6571",
+    "line": "#efd0da",
+    "surface": "#fffafb"
+  },
+  "emerald": {
+    "rose": "#2f8f73",
+    "soft": "#e0f4ec",
+    "ink": "#17372f",
+    "muted": "#648078",
+    "line": "#cde5dc",
+    "surface": "#fbfffd"
+  },
+  "coffee": {
+    "rose": "#a56a43",
+    "soft": "#f3e3d5",
+    "ink": "#35231b",
+    "muted": "#806b60",
+    "line": "#e5d2c2",
+    "surface": "#fffaf5"
+  },
+  "sakura": {
+    "rose": "#e58cab",
+    "soft": "#ffe9f1",
+    "ink": "#4a2936",
+    "muted": "#92727f",
+    "line": "#f0d5df",
+    "surface": "#fff"
+  },
+  "royal": {
+    "rose": "#7255b5",
+    "soft": "#ece5fb",
+    "ink": "#292039",
+    "muted": "#746b86",
+    "line": "#d9cfee",
+    "surface": "#fff"
+  },
+  "forest": {
+    "rose": "#557a55",
+    "soft": "#e4efe2",
+    "ink": "#243225",
+    "muted": "#6f7e70",
+    "line": "#d0dfcf",
+    "surface": "#fbfdf9"
+  },
+  "wine": {
+    "rose": "#9d3d58",
+    "soft": "#f4dfe6",
+    "ink": "#351821",
+    "muted": "#85616b",
+    "line": "#e3c4cf",
+    "surface": "#fff9fb"
+  },
+  "sky": {
+    "rose": "#4c8ec4",
+    "soft": "#e3f1fb",
+    "ink": "#20313f",
+    "muted": "#6b7f8d",
+    "line": "#d1e4f0",
+    "surface": "#fff"
+  },
+  "mint": {
+    "rose": "#4a9b88",
+    "soft": "#dff4ee",
+    "ink": "#20352f",
+    "muted": "#668078",
+    "line": "#c9e6de",
+    "surface": "#fcfffe"
+  },
+  "peach": {
+    "rose": "#e58b62",
+    "soft": "#ffeadf",
+    "ink": "#3d2b24",
+    "muted": "#8a7067",
+    "line": "#efd5c9",
+    "surface": "#fffdfb"
+  },
+  "gold": {
+    "rose": "#b48a2d",
+    "soft": "#f8efd2",
+    "ink": "#382f1e",
+    "muted": "#82775b",
+    "line": "#e8dbb7",
+    "surface": "#fffefa"
+  },
+  "plum": {
+    "rose": "#8d4f91",
+    "soft": "#f1e3f1",
+    "ink": "#34233a",
+    "muted": "#7d6a82",
+    "line": "#dfcfe1",
+    "surface": "#fffaff"
+  },
+  "midnight": {
+    "rose": "#8ca8ff",
+    "soft": "#252c47",
+    "ink": "#f4f5ff",
+    "muted": "#b6bdd8",
+    "line": "#414b70",
+    "surface": "#191d2d"
+  },
+  "charcoal": {
+    "rose": "#d9a7b8",
+    "soft": "#34343a",
+    "ink": "#f4f2f4",
+    "muted": "#bbb4bb",
+    "line": "#55515a",
+    "surface": "#24242a"
+  },
+  "blush": {
+    "rose": "#c95f87",
+    "soft": "#f7dce7",
+    "ink": "#3a2530",
+    "muted": "#846b77",
+    "line": "#e8c8d5",
+    "surface": "#fff"
+  },
+  "ice": {
+    "rose": "#639eb7",
+    "soft": "#e2f3f8",
+    "ink": "#21323a",
+    "muted": "#6c828a",
+    "line": "#cce4eb",
+    "surface": "#fbfeff"
+  },
+  "rosewood": {
+    "rose": "#a74d62",
+    "soft": "#f1dfe4",
+    "ink": "#351d24",
+    "muted": "#805f68",
+    "line": "#dec8cf",
+    "surface": "#fffafb"
+  },
+  "aurora": {
+    "rose": "#65a6a4",
+    "soft": "#dff1ee",
+    "ink": "#213537",
+    "muted": "#687f81",
+    "line": "#c9dfdd",
+    "surface": "#fbfffe"
+  },
+  "romance": {
+    "rose": "#e64d78",
+    "soft": "#fde8ee",
+    "ink": "#35262b",
+    "muted": "#8e747c",
+    "line": "#ead8df",
+    "surface": "#fff"
+  },
+  "night": {
+    "rose": "#d78aa7",
+    "soft": "#35212d",
+    "ink": "#f8edf2",
+    "muted": "#c7aeb9",
+    "line": "#573947",
+    "surface": "#2b2027"
+  },
+  "lavender": {
+    "rose": "#9a78c7",
+    "soft": "#eee7fa",
+    "ink": "#342d3c",
+    "muted": "#7d7188",
+    "line": "#ded3ec",
+    "surface": "#fff"
+  },
+  "sunset": {
+    "rose": "#d96b48",
+    "soft": "#ffeadf",
+    "ink": "#3b2b28",
+    "muted": "#8c7069",
+    "line": "#eed8ce",
+    "surface": "#fff"
+  },
+  "ocean": {
+    "rose": "#4b8fb4",
+    "soft": "#e2f2f8",
+    "ink": "#26343a",
+    "muted": "#6f858d",
+    "line": "#d3e6ed",
+    "surface": "#fff"
+  },
+  "sage": {
+    "rose": "#64856a",
+    "soft": "#e5efe4",
+    "ink": "#243529",
+    "muted": "#657768",
+    "line": "#d1dfd0",
+    "surface": "#fcfefb"
+  },
+  "blueberry": {
+    "rose": "#6476c8",
+    "soft": "#e9edff",
+    "ink": "#252d4c",
+    "muted": "#68739b",
+    "line": "#d3daf7",
+    "surface": "#fcfcff"
+  },
+  "terracotta": {
+    "rose": "#b85f48",
+    "soft": "#f7e4db",
+    "ink": "#43291f",
+    "muted": "#89675b",
+    "line": "#e8cfc3",
+    "surface": "#fffaf7"
+  },
+  "butter": {
+    "rose": "#a98527",
+    "soft": "#fff4cf",
+    "ink": "#3c3218",
+    "muted": "#81724a",
+    "line": "#ebdfb6",
+    "surface": "#fffef9"
+  },
+  "lagoon": {
+    "rose": "#258e95",
+    "soft": "#dff4f2",
+    "ink": "#17363a",
+    "muted": "#5f7f82",
+    "line": "#c4e4e2",
+    "surface": "#fbfffe"
+  },
+  "rosegold": {
+    "rose": "#b76e79",
+    "soft": "#f5e1e4",
+    "ink": "#3e252b",
+    "muted": "#896c71",
+    "line": "#e6cbd0",
+    "surface": "#fffafb"
+  },
+  "porcelain": {
+    "rose": "#667085",
+    "soft": "#edf0f4",
+    "ink": "#29313d",
+    "muted": "#737d8b",
+    "line": "#dce1e8",
+    "surface": "#fff"
+  },
+  "citrus": {
+    "rose": "#718b2e",
+    "soft": "#edf4d8",
+    "ink": "#30391e",
+    "muted": "#78815f",
+    "line": "#dce7bf",
+    "surface": "#fdfff8"
+  },
+  "denim": {
+    "rose": "#477da8",
+    "soft": "#e3eef7",
+    "ink": "#243849",
+    "muted": "#6b8295",
+    "line": "#cedfeb",
+    "surface": "#fbfdff"
+  },
+  "cinnamon": {
+    "rose": "#a45f36",
+    "soft": "#f4e5d8",
+    "ink": "#3d2b21",
+    "muted": "#896e5d",
+    "line": "#e7d2c2",
+    "surface": "#fffaf5"
+  },
+  "orchid": {
+    "rose": "#9b6aa8",
+    "soft": "#f1e6f4",
+    "ink": "#392b40",
+    "muted": "#806d86",
+    "line": "#e2d2e8",
+    "surface": "#fffbff"
+  }
+}

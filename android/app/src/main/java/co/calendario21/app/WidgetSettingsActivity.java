@@ -37,29 +37,46 @@ public class WidgetSettingsActivity extends Activity {
     text(box, "Nuestros días, más cerca ♡", 25);
     text(
         box,
-        "Conecta los widgets con tu cuenta de Nuestro Calendario #21. Esta sesión es independiente"
-            + " de la del calendario web. Tu contraseña no se guarda.",
+        "Conecta los widgets con tu cuenta de Nuestro Calendario #21. Puedes vincularlos usando la"
+            + " sesión abierta en la app. El permiso de lectura de los widgets es independiente de"
+            + " la del calendario web. Tu contraseña no se guarda.",
         16);
+    button(
+        box,
+        "Vincular desde la app · sin contraseña",
+        v -> {
+          if (!busy) WidgetLinkActivity.begin(this, widgetId);
+        });
+    LinearLayout credentials = new LinearLayout(this);
+    credentials.setOrientation(LinearLayout.VERTICAL);
+    credentials.setVisibility(View.GONE);
+    button(
+        box,
+        "Usar correo y contraseña (opcional)",
+        v ->
+            credentials.setVisibility(
+                credentials.getVisibility() == View.GONE ? View.VISIBLE : View.GONE));
+    box.addView(credentials);
     email = new EditText(this);
     email.setHint("Correo electrónico");
     email.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
     email.setSingleLine(true);
-    box.addView(email);
+    credentials.addView(email);
     password = new EditText(this);
     password.setHint("Contraseña");
     password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
     password.setSingleLine(true);
     password.setSaveEnabled(false);
-    box.addView(password);
+    credentials.addView(password);
     text(box, "Marco para tus widgets", 16);
     Spinner frame = new Spinner(this);
     frame.setAdapter(
         new ArrayAdapter<>(
             this,
             android.R.layout.simple_spinner_dropdown_item,
-            new String[] {"Rosa romántico", "Noche azul", "Verde salvia"}));
-    String[] frames = {"rose", "night", "sage"};
-    String current = getSharedPreferences("appearance", 0).getString("frame", "rose");
+            new String[] {"Igual que la app", "Rosa romántico", "Noche azul", "Verde salvia"}));
+    String[] frames = {"app", "rose", "night", "sage"};
+    String current = getSharedPreferences("appearance", 0).getString("frame", "app");
     for (int i = 0; i < frames.length; i++) if (frames[i].equals(current)) frame.setSelection(i);
     box.addView(frame);
     text(box, "Texto principal de este widget", 16);
@@ -84,8 +101,8 @@ public class WidgetSettingsActivity extends Activity {
     box.addView(status);
     connect =
         button(
-            box,
-            "Conectar y sincronizar",
+            credentials,
+            "Conectar con correo",
             v -> {
               if (busy) return;
               final String address = email.getText().toString().trim(),
@@ -110,7 +127,7 @@ public class WidgetSettingsActivity extends Activity {
                       failure = e;
                       if (e instanceof WidgetApi.AuthException)
                         synchronized (SecureStore.LOCK) {
-                          SecureStore.clear(this);
+                          new WidgetApi(this).disconnect();
                         }
                     }
                     final Exception result = failure;
@@ -170,7 +187,7 @@ public class WidgetSettingsActivity extends Activity {
           executor.execute(
               () -> {
                 synchronized (SecureStore.LOCK) {
-                  SecureStore.clear(this);
+                  new WidgetApi(this).disconnect();
                 }
                 runOnUiThread(
                     () -> {

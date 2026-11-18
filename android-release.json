@@ -1,16 +1,17 @@
 {
   "format": 1,
   "packageName": "co.calendario21.app",
-  "versionCode": 3,
-  "versionName": "1.0.0-preview.3",
-  "apkUrl": "https://vz4dp1vu2kie6kny.public.blob.vercel-storage.com/android/nuestro-calendario-21-v3.apk",
-  "sha256": "7ec7a8865c5a8176da6c01f9d41e999a717dc6479ad35f99415845c6ca777850",
-  "bytes": 3996587,
+  "versionCode": 4,
+  "versionName": "1.0.0-preview.4",
+  "apkUrl": "https://vz4dp1vu2kie6kny.public.blob.vercel-storage.com/android/nuestro-calendario-21-v4.apk",
+  "sha256": "228eb43e64fd31ced0c7af5bb252280deb823aae6a4d07f5050249667251af50",
+  "bytes": 4055743,
   "minSdk": 26,
-  "publishedAt": "2026-11-17T22:04:26.142Z",
+  "publishedAt": "2026-11-18T01:54:12.988Z",
   "notes": [
-    "Actualizaciones Android desde la aplicación: aviso de nueva versión al abrirla.",
-    "Descarga verificada del APK e instalación con la confirmación de Android.",
-    "Acceso al instalador y a las novedades desde Configuración."
+    "Calendario mensual con nombres de planes y resumen del día seleccionado.",
+    "Los widgets siguen los 34 temas de la app, incluidos los temas oscuros.",
+    "Vínculo desde la sesión abierta, sin repetir correo y contraseña.",
+    "Sincronización automática al abrir y en segundo plano, sujeta a las restricciones de Android."
   ]
 }

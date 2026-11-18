@@ -62,6 +62,11 @@ final class SecureStore {
   }
 
   static void clear(Context c) {
-    c.getSharedPreferences("widgets", 0).edit().remove("session").remove("snapshot").commit();
+    c.getSharedPreferences("widgets", 0)
+        .edit()
+        .remove("session")
+        .remove("snapshot")
+        .remove("widget_pair")
+        .commit();
   }
 }

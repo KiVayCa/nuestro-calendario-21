@@ -1,3 +1,4 @@
+import "./build-widget-themes.mjs";
 import { readFile, writeFile, mkdir, rm, copyFile, cp } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { Script } from "node:vm";
@@ -27,6 +28,7 @@ const sources = [
   "analysis",
   "calendar-tools",
   "android-updates",
+  "widget-link",
   "runtime",
 ];
 const chunks = await Promise.all(

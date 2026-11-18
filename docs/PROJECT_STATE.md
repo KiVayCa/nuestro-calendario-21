@@ -1,0 +1,48 @@
+# Estado de Nuestro Calendario #21
+
+Actualizado: 17 de noviembre de 2026, Colombia.
+
+## Fuentes que deben verificarse al retomar
+
+- Repositorio: https://github.com/KiVayCa/nuestro-calendario-21 (rama principal `main`).
+- Web: https://nuestrocalendario21.vercel.app.
+- Versión Android realmente publicada: descriptor `/android-release.json`; no deducirla únicamente de Gradle.
+- Vercel: proyecto `nuestro_calendario_21`, enlazado a este repositorio.
+- Supabase producción `vmvfcdtohzdhqatxhxdb`; TEST `jjxtugzzvtigmjcqnofq`.
+
+## Funciones existentes
+
+Calendario con recurrencias y estado por fecha, cancelación visible y reprogramación individual; recordatorios personales y pendientes por plan; álbum por salida; recuerdos, cartas, sueños, retos, metas con movimientos y proyecciones, presupuesto, lugares, ideas, pregunta diaria, análisis con gráficas y detalle, resumen semanal/mensual y cuenta regresiva compartida.
+
+Android reutiliza la web mediante TWA. Cinco widgets: próximo plan, cuenta regresiva, calendario mensual, historia y semana. Fechas: juntos desde 2026-01-21; novios desde 2026-04-21. Actualizador de APK con tamaño/hash/paquete/versión/firma verificados, permiso y confirmación del instalador Android.
+
+## Entrega de widgets v4
+
+- Calendario mensual con títulos por día, más eventos al ampliar, indicador de eventos adicionales y resumen del día seleccionado. Tocar un título abre el registro y fecha correspondientes.
+- Paletas generadas desde `styles.css`: 34 temas. Opción predeterminada «Igual que la app»; texto contrastado tanto en temas claros como oscuros. Regeneración: `node scripts/build-widget-themes.mjs` (también la ejecuta el build web).
+- Vínculo desde ⚙ → «Vincular desde la app · sin contraseña»: aprobación con la cuenta abierta, código de un uso de 90 segundos, prueba criptográfica del dispositivo y permiso de lectura de 90 días. No se exportan tokens de sesión web. Se puede revocar desde Configuración → Widgets vinculados; retirada de membresía también corta futuras lecturas.
+- Sigue funcionando el acceso antiguo por correo como alternativa. Al revincular se revoca el permiso anterior cuando hay conexión.
+- Sincronización automática al abrir la app, periódica solicitada cada 15 minutos por WorkManager y botón ↻. Android puede retrasarla; no hay push nativo de cambios ni tiempo real continuo. La revocación se detecta al sincronizar; caché privada cifrada se oculta tras 24 horas sin validación al redibujar.
+
+## Verificación y publicación
+
+Web compilada y 17 pruebas aprobadas; Android: 20 pruebas JVM, lintDebug y assembleRelease aprobados. Contraste principal/eventos verificado en las 34 paletas. Prueba SQL en TEST aprobada para proof/state, código de un uso, aislamiento de pareja, caducidad, RLS, retirada de membresía y revocación.
+Migración aplicada también a producción y verificadas las restricciones de acceso y el rechazo de códigos/tokens inválidos.
+APK v4 firmado y alojado con descarga/hash verificados: https://vz4dp1vu2kie6kny.public.blob.vercel-storage.com/android/nuestro-calendario-21-v4.apk.
+SHA-256: `228eb43e64fd31ced0c7af5bb252280deb823aae6a4d07f5050249667251af50` (4.055.743 bytes).
+El descriptor de esta entrega anuncia v4. Comprobar que producción sirve ese descriptor y el commit de esta entrega antes de asumir que el despliegue terminó.
+Migración: `supabase/migrations/20261117230000_widget_link.sql`.
+
+## Pendientes de aceptación
+
+Comprobar en los teléfonos de Nicolás y Ana: instalación encima de v3, vínculo con sesión existente, apertura de planes desde widgets, tamaño/legibilidad del calendario, cambio de tema y sincronización con ahorro de batería. Las pruebas automatizadas no sustituyen esta aceptación.
+Siguen pendientes de anteriores entregas: recepción push real en ambos celulares y restauración de base de datos/fotos desde respaldo en un entorno de prueba.
+
+## Decisiones del usuario
+
+Aplicación privada de pareja; evitar convertir los gastos en deudas entre los dos. Mantener instalación por APK y actualizaciones ofrecidas dentro de la app. Ideas para citas y rutinas compartidas fueron elegidas; verificar implementación real antes de prometer desarrollos pendientes. No se debe asumir que una función mencionada como propuesta ya existe.
+
+## Retomar desde otro chat
+
+Indicación breve recomendada: «Continúa Nuestro Calendario #21. Lee AGENTS.md y docs/PROJECT_STATE.md del repositorio; verifica main y la versión publicada antes de editar. La nueva tarea es: …».
+El historial del chat ayuda con decisiones; Git y este archivo conservan el estado técnico verificable. Actualizar este documento con cada entrega.

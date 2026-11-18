@@ -2,6 +2,10 @@
 
 Aplicación compartida para planes, recuerdos, cartas, metas y presupuesto.
 
+## Continuidad entre conversaciones
+
+Leer primero [AGENTS.md](AGENTS.md) y [docs/PROJECT_STATE.md](docs/PROJECT_STATE.md). El estado publicado se comprueba en Git y en el descriptor Android; no depende de recordar una conversación.
+
 ## Desarrollo
 
 Requiere Node.js 22 o posterior.

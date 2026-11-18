@@ -10,8 +10,10 @@ public class CalendarActivity extends LauncherActivity {
   protected void onCreate(Bundle state) {
     if (getIntent().getData() != null)
       getIntent().setData(UpdateSupport.safeUrl(getIntent().getData()));
-    WidgetWorker.schedule(this);
     super.onCreate(state);
+    // Widget work must not prevent opening the browser-backed calendar.
+    try { WidgetWorker.schedule(this); }
+    catch (RuntimeException error) { android.util.Log.w("Calendar21", "Widget sync unavailable", error); }
   }
 
   @Override

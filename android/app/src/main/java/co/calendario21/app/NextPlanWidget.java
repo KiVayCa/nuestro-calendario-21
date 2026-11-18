@@ -7,6 +7,7 @@ import android.os.Bundle;
 public class NextPlanWidget extends AppWidgetProvider {
   static final String REFRESH = "co.calendario21.app.REFRESH";
   static final String MONTH = "co.calendario21.app.MONTH";
+  static final String DAY = "co.calendario21.app.DAY";
 
   @Override
   public void onAppWidgetOptionsChanged(
@@ -36,6 +37,23 @@ public class NextPlanWidget extends AppWidgetProvider {
       c.getSharedPreferences("appearance", 0).edit().putInt("month_" + id, offset).apply();
       WidgetRenderer.updateAll(c);
     }
+    if (DAY.equals(i.getAction())) {
+      int id = i.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
+      try {
+        java.time.LocalDate date = java.time.LocalDate.parse(i.getStringExtra("day"));
+        long offset =
+            java.time.temporal.ChronoUnit.MONTHS.between(
+                java.time.YearMonth.now(PlanEngine.ZONE), java.time.YearMonth.from(date));
+        if (id < 0 || Math.abs(offset) > 24) return;
+        c.getSharedPreferences("appearance", 0)
+            .edit()
+            .putString("selected_" + id, date.toString())
+            .putInt("month_" + id, (int) offset)
+            .apply();
+        WidgetRenderer.updateAll(c);
+      } catch (Exception ignored) {
+      }
+    }
   }
 
   @Override
@@ -44,6 +62,7 @@ public class NextPlanWidget extends AppWidgetProvider {
     for (int id : ids) {
       edit.remove("month_" + id);
       edit.remove("text_" + id);
+      edit.remove("selected_" + id);
     }
     edit.apply();
   }

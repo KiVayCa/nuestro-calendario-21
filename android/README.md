@@ -1,5 +1,17 @@
 # Nuestro Calendario #21 · Android preview
 
+## Widgets · preview 4
+
+Nuestro mes muestra nombres de planes y fechas especiales en cada día. Al ampliar aparecen hasta tres títulos por día; los adicionales se indican con +N. Tocar el día muestra su resumen; tocar un título abre ese registro en la web.
+
+Los cinco widgets usan las 34 paletas generadas de `styles.css`. Elegir **Igual que la app** para seguir su tema compartido. Al actualizar desde v3 esta opción se activa automáticamente. El cambio llega en la siguiente sincronización.
+
+**⚙ → Vincular desde la app · sin contraseña** abre la web con un desafío criptográfico. Con la sesión abierta solo se aprueba el vínculo y se toca Continuar en Android. Si la sesión web venció hay que iniciar sesión allí. El código dura 90 segundos y es de un uso, ligado a un verificador que no abandona el almacén cifrado nativo. El permiso de dispositivo dura 90 días y permite leer únicamente títulos/fechas/estado de planes, fechas importantes y ajustes de tema/cuenta regresiva. No comparte contraseñas ni sesiones web y no permite escribir datos. Configuración → Widgets vinculados permite revocar permisos; ⚙ → Desconectar también lo intenta en el servidor y siempre limpia los datos locales.
+
+Sincronización automática al abrir la app y mediante WorkManager cada 15 minutos solicitados, además de ↻ manual. No hay sincronización push nativa de cambios; Android puede aplazar los trabajos por batería/Doze. No prometer tiempo real permanente.
+
+La migración `supabase/migrations/20261117230000_widget_link.sql` es necesaria en cada backend que use esta versión. Los RPC de claim/read/revoke son puntos de entrada de capacidades: su ejecución por anon es deliberada y requieren códigos/verificadores o tokens aleatorios de 256 bits. Nunca conceder acceso directo a los hashes. Las alertas de SECURITY DEFINER del asesor deben evaluarse con esta autorización explícita; las pruebas SQL cubren sus límites.
+
 ## Actualizaciones desde la app · preview 3
 
 El APK estable está alojado en el almacén público de versiones Android de Vercel Blob. Únicamente se publican instaladores; la sesión, las fotos y los datos de la pareja mantienen su acceso privado en Supabase.

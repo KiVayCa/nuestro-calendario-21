@@ -66,5 +66,13 @@
             <meta-data android:name="android.support.customtabs.trusted.STATUS_BAR_COLOR" android:resource="@color/rose" />
             <meta-data android:name="android.support.customtabs.trusted.NAVIGATION_BAR_COLOR" android:resource="@color/night" />
         </activity>
+        <activity android:name=".WidgetLinkActivity" android:exported="true" android:label="Vincular widgets">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="calendario21" android:host="widget-link" />
+            </intent-filter>
+        </activity>
     </application>
 </manifest>

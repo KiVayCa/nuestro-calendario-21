@@ -106,6 +106,19 @@ final class WidgetApi {
     config();
     session = SecureStore.read(context, "session");
     if (session == null) throw new AuthException();
+    if ("device".equals(session.optString("kind"))) {
+      String raw =
+          request(
+              BACKEND + "/rest/v1/rpc/read_widget_snapshot",
+              "POST",
+              new JSONObject().put("p_token", session.getString("device_token")),
+              apiKey,
+              null);
+      if (raw.trim().equals("null")) throw new AuthException();
+      JSONObject data = new JSONObject(raw);
+      return buildSnapshot(
+          data.getJSONArray("plans"), data.getJSONArray("settings"), data.getJSONArray("dates"));
+    }
     long expires =
         session.optLong(
             "expires_at", session.optLong("saved_at") / 1000 + session.optLong("expires_in", 3600));
@@ -145,16 +158,58 @@ final class WidgetApi {
     JSONArray settings =
         rows(
             "couple_settings",
-            "select=countdown_date,countdown_title,countdown_source,countdown_source_id"
+            "select=theme,accent_color,background_color,countdown_date,countdown_title,countdown_source,countdown_source_id"
                 + filter
                 + "&order=couple_id");
-    JSONObject countdown = settings.length() > 0 ? settings.getJSONObject(0) : new JSONObject();
     JSONArray importantDates =
         rows(
             "important_dates",
             "select=id,title,event_date,recurring,recurrence_type,recurrence_interval"
                 + filter
                 + "&order=event_date,id");
+    return buildSnapshot(plans, settings, importantDates);
+  }
+
+  JSONObject claimLink(String code, String verifier, String state) throws Exception {
+    config();
+    String raw =
+        request(
+            BACKEND + "/rest/v1/rpc/claim_widget_device",
+            "POST",
+            new JSONObject().put("p_code", code).put("p_verifier", verifier).put("p_state", state),
+            apiKey,
+            null);
+    if (raw.trim().equals("null")) throw new AuthException();
+    JSONObject device = new JSONObject(raw);
+    if (!device.optString("device_token").matches("[a-f0-9]{64}")) throw new AuthException();
+    return device;
+  }
+
+  void disconnect() {
+    try {
+      JSONObject saved = SecureStore.read(context, "session");
+      if (saved != null && saved.optString("kind").equals("device")) {
+        config();
+        request(
+            BACKEND + "/rest/v1/rpc/revoke_widget_device",
+            "POST",
+            new JSONObject().put("p_token", saved.getString("device_token")),
+            apiKey,
+            null);
+      }
+    } catch (Exception ignored) {
+    } finally {
+      SecureStore.clear(context);
+    }
+  }
+
+  private JSONObject buildSnapshot(JSONArray plans, JSONArray settings, JSONArray importantDates)
+      throws Exception {
+    JSONObject appearance =
+        settings.length() > 0
+            ? new JSONObject(settings.getJSONObject(0).toString())
+            : new JSONObject();
+    JSONObject countdown = settings.length() > 0 ? settings.getJSONObject(0) : new JSONObject();
     String source = countdown.optString("countdown_source");
     String id = countdown.optString("countdown_source_id");
     if (source.equals("plan")) {
@@ -184,6 +239,7 @@ final class WidgetApi {
         .put("plans", plans)
         .put("dates", importantDates)
         .put("countdown", countdown)
+        .put("appearance", appearance)
         .put("updated_at", System.currentTimeMillis());
   }
 }
