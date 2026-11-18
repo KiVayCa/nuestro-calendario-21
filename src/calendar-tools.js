@@ -97,7 +97,7 @@ function openPlanTasks(button) {
       <div class="field"><label for="taskTitle">Nueva tarea · ${esc(dateES(date))}</label><input id="taskTitle" required maxlength="140"></div>
       <div class="field"><label for="taskAssignee">Asignar a</label><select id="taskAssignee"><option value="">Sin asignar</option>
         ${coupleProfiles.map((profile) => `<option value="${esc(profile.user_id)}">${esc(profile.display_name || (profile.user_id === user?.id ? "Yo" : "Mi pareja"))}</option>`).join("")}</select></div>
-      <div class="field"><label for="taskDueDate">Fecha límite (opcional)</label><input id="taskDueDate" type="date"><small>Si asignas la tarea, esa persona recibe un aviso el día del vencimiento.</small></div>
+      <div class="field"><label for="taskDueDate">Fecha límite (opcional)</label><input id="taskDueDate" type="date"><small>Tu pareja recibe un aviso al añadir la tarea. Si tiene fecha límite y está asignada, también se avisa a quien le corresponda el día del vencimiento.</small></div>
       <button class="btn primary" type="submit">Añadir tarea</button>
       <button class="btn" type="button" onclick="closeAdvModal();openPlanDetail(this.form.dataset.plan,this.form.dataset.date)">Volver al plan</button>
     </form>`,
@@ -150,21 +150,61 @@ async function loadPlanTasks(container, planId, date) {
     : '<p class="advMeta">No hay tareas para esta fecha.</p>';
 }
 
+function notifyCalendarChange(event_type, title, description, planId, date) {
+  return createPartnerNotification({
+    event_type,
+    title,
+    body:
+      (myProfile?.display_name || defaultDisplayName()) +
+      " " +
+      description +
+      " · " +
+      dateES(date) +
+      ".",
+    target_tab: "calendar",
+    target_id: planId,
+    target_date: date,
+  });
+}
+
 async function addPlanTask(form) {
   const title = form.querySelector("#taskTitle").value.trim();
   if (!title) return;
   const list = $("planTaskList");
   const { plan, date } = form.dataset;
+  const assignedTo = form.querySelector("#taskAssignee").value || null;
+  const account = user?.id,
+    space = couple?.id;
   await runCalendarTool(form.querySelector('[type="submit"]'), async () => {
     const { error } = await sb.from("plan_tasks").insert({
       plan_id: plan,
       occurrence_date: date,
       title,
       due_date: form.querySelector("#taskDueDate").value || null,
-      assigned_to: form.querySelector("#taskAssignee").value || null,
+      assigned_to: assignedTo,
     });
     if (error) return appAlert("No se pudo añadir la tarea.");
+    if (account !== user?.id || space !== couple?.id) return;
+    const assignedToPartner = assignedTo && assignedTo !== account;
+    const planName = plans.find((item) => item.id === plan)?.title;
+    const context = planName ? " en «" + planName + "»" : "";
     form.reset();
+    await notifyCalendarChange(
+      assignedToPartner ? "plan_task_assigned" : "plan_task_created",
+      assignedToPartner
+        ? "Te asignaron una tarea"
+        : "Nuevo pendiente del calendario",
+      (assignedToPartner
+        ? "te asignó «"
+        : assignedTo === account
+          ? "se asignó «"
+          : "añadió «") +
+        title +
+        "»" +
+        context,
+      plan,
+      date,
+    );
     await loadPlanTasks(list, plan, date);
   });
 }
@@ -172,6 +212,8 @@ async function addPlanTask(form) {
 async function changePlanTask(button, completed) {
   const list = $("planTaskList");
   const { plan, date } = list.nextElementSibling.dataset;
+  const account = user?.id,
+    space = couple?.id;
   const row = button.closest(".advItem");
   const controls = Array.from(row.querySelectorAll("button"));
   if (controls.some((control) => control.disabled)) return;
@@ -183,13 +225,42 @@ async function changePlanTask(button, completed) {
   try {
     await runCalendarTool(button, async () => {
       const query = sb.from("plan_tasks");
-      const { error } = await (
+      const mutation = (
         completed === null ? query.delete() : query.update({ completed })
       )
         .eq("id", button.dataset.id)
         .eq("plan_id", plan)
         .eq("occurrence_date", date);
+      if (completed !== null) mutation.neq("completed", completed);
+      const { data: task, error } = await mutation
+        .select("title")
+        .maybeSingle();
       if (error) return appAlert("No se pudo actualizar la tarea.");
+      if (!task || account !== user?.id || space !== couple?.id) return;
+      const verb =
+        completed === null ? "eliminó" : completed ? "completó" : "reabrió";
+      const action =
+        completed === null
+          ? "eliminado"
+          : completed
+            ? "completado"
+            : "reabierto";
+      const planName = plans.find((item) => item.id === plan)?.title;
+      await notifyCalendarChange(
+        completed === null
+          ? "plan_task_deleted"
+          : completed
+            ? "plan_task_completed"
+            : "plan_task_reopened",
+        "Pendiente " + action,
+        verb +
+          " «" +
+          task.title +
+          "»" +
+          (planName ? " de «" + planName + "»" : ""),
+        plan,
+        date,
+      );
       await loadPlanTasks(list, plan, date);
     });
   } finally {
@@ -422,6 +493,8 @@ async function saveOccurrenceReschedule(form) {
   const time = form.querySelector("#rescheduleTime").value || null;
   const { plan, date: oldDate } = form.dataset;
   const original = plans.find((item) => item.id === plan);
+  const account = user?.id,
+    space = couple?.id;
   if (
     !original ||
     (date === oldDate && time === (original.plan_time?.slice(0, 5) || null))
@@ -438,6 +511,19 @@ async function saveOccurrenceReschedule(form) {
       });
       if (error || !data)
         return appAlert("No pudimos mover esta fecha del plan.");
+      if (account !== user?.id || space !== couple?.id) return;
+      await notifyCalendarChange(
+        "plan_occurrence_rescheduled",
+        "Plan reprogramado",
+        "movió «" +
+          original.title +
+          "» del " +
+          dateES(oldDate) +
+          " a esta fecha" +
+          (time ? " a las " + formatTime(time) : ""),
+        data,
+        date,
+      );
       await loadPlans();
       await advLoadAll(["memories", "dates"]);
       closeAdvModal();
@@ -472,6 +558,13 @@ async function togglePlanCancellation(button) {
     if (error || !data)
       return appAlert("No se pudo cambiar el estado del plan.");
     if (account !== user?.id || space !== couple?.id) return;
+    await notifyCalendarChange(
+      cancelling ? "plan_occurrence_cancelled" : "plan_occurrence_reactivated",
+      cancelling ? "Plan cancelado" : "Plan reactivado",
+      (cancelling ? "canceló" : "reactivó") + " «" + plan.title + "»",
+      plan.id,
+      date,
+    );
     await loadPlans();
     if (currentPlan?.id === plan.id && button.isConnected)
       openPlanDetail(plan.id, date);

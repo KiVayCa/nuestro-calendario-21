@@ -49,27 +49,36 @@ async function createPartnerNotification({
   body,
   target_tab,
   target_id,
+  target_date,
 }) {
   if (!user?.id || !couple?.id) return;
+  const space = couple.id;
+  const account = user.id;
+  const datedCalendarNotice =
+    target_tab === "calendar" && target_id && target_date;
   try {
     const { data: notification, error } = await sb.rpc(
-      "record_partner_notification",
+      datedCalendarNotice
+        ? "record_calendar_partner_notification"
+        : "record_partner_notification",
       {
-        p_couple_id: couple.id,
+        p_couple_id: space,
         p_event_type: event_type,
         p_title: title,
         p_body: body || "",
-        p_target_tab: target_tab || "notifications",
         p_target_id: target_id || null,
+        ...(datedCalendarNotice
+          ? { p_target_date: target_date }
+          : { p_target_tab: target_tab || "notifications" }),
       },
     );
     if (error) throw error;
-    if (!notification) return;
+    if (!notification || user?.id !== account || couple?.id !== space) return;
     const { error: pushError } = await sb.functions.invoke(
       "send-push-notification",
       {
         body: {
-          couple_id: couple.id,
+          couple_id: space,
           recipient_user_id: notification.recipient_user_id,
           notification_id: notification.id,
           title: notification.title,

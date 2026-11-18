@@ -152,3 +152,9 @@ guardados con la manuscrita anterior conservan su formato.
 
 La sección de recurrencia del editor de planes usa los colores del tema
 activo, incluidos el fondo del aviso y los días de la semana.
+
+El calendario avisa a la otra persona al añadir o asignar un pendiente, así
+como al completarlo, reabrirlo o eliminarlo. También avisa si se completa,
+reabre, cancela, reactiva o mueve una fecha de un plan. El enlace conserva la
+fecha exacta de la ocurrencia. Se verificaron el destinatario y la fecha en
+TEST y pasaron las 21 pruebas web.

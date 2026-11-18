@@ -131,6 +131,11 @@ function clearMemoryFilters() {
 }
 
 function reminderOccurrenceDate(note) {
+  if (
+    note?.target_tab === "calendar" &&
+    /^\d{4}-\d{2}-\d{2}$/.test(note.target_date || "")
+  )
+    return note.target_date;
   return ["plan_reminder", "task_reminder"].includes(note?.event_type)
     ? /^(?:plan|task):[^:]+:(\d{4}-\d{2}-\d{2}):/.exec(
         note.reminder_key || "",

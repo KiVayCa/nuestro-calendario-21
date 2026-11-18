@@ -795,6 +795,7 @@ async function toggleCurrentPlanCompleted(button) {
   if (!currentPlan || !couple || button.disabled) return;
   const plan = currentPlan;
   const space = couple.id;
+  const account = user?.id;
   const date = button.dataset.planDate;
   if (planCancelledOn(plan, date)) return;
   const completed = !planCompletedOn(plan, date);
@@ -815,7 +816,17 @@ async function toggleCurrentPlanCompleted(button) {
           .single();
     if (error || !data)
       return appAlert("No pudimos actualizar el plan. Vuelve a intentarlo.");
-    if (couple?.id !== space) return;
+    if (couple?.id !== space || user?.id !== account) return;
+    await notifyCalendarChange(
+      completed ? "plan_occurrence_completed" : "plan_occurrence_reopened",
+      completed ? "Plan completado" : "Plan reabierto",
+      (completed ? "marcó como completado" : "reabrió") +
+        " «" +
+        plan.title +
+        "»",
+      plan.id,
+      date,
+    );
     await loadPlans();
     if (currentPlan === plan && couple?.id === space)
       openPlanDetail(plan.id, date);

@@ -163,10 +163,11 @@ Deno.serve(async (req: Request) => {
 
     let notificationEventId = "";
     let targetId = "";
+    let targetDate = "";
     if (!isTest) {
       let query = admin
         .from("notifications")
-        .select("id,title,body,target_tab,target_id")
+        .select("id,title,body,target_tab,target_id,target_date")
         .eq("couple_id", coupleId)
         .eq("actor_user_id", user.id)
         .eq("recipient_user_id", recipientId)
@@ -191,6 +192,7 @@ Deno.serve(async (req: Request) => {
         ? event.target_tab
         : "notifications";
       targetId = event.target_id || "";
+      targetDate = tab === "calendar" ? event.target_date || "" : "";
     }
 
     webpush.setVapidDetails(vapidSubject, vapidPublic, vapidPrivate);
@@ -235,7 +237,8 @@ Deno.serve(async (req: Request) => {
       url:
         "/?tab=" +
         encodeURIComponent(tab) +
-        (targetId ? "&item=" + encodeURIComponent(targetId) : ""),
+        (targetId ? "&item=" + encodeURIComponent(targetId) : "") +
+        (targetDate ? "&date=" + encodeURIComponent(targetDate) : ""),
       // Etiqueta única para evitar que eventos del mismo tipo reemplacen avisos sin alertar.
       tag: "nc21-" + (notificationEventId || crypto.randomUUID()),
     });
