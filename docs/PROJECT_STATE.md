@@ -132,3 +132,5 @@ Cartas incorpora la tipografía manuscrita del dispositivo y seis fondos con
 motivos diferenciados. Android v11 refuerza el color de fondo de los temas
 claros de widgets y conserva los fondos oscuros. Pendiente prueba visual en
 el Motorola.
+
+Se verificaron la firma y la descarga de la v11 generada en la ejecución 44396524319. El descriptor de esta entrega anuncia la v11.

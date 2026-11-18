@@ -1,15 +1,14 @@
 {
   "format": 1,
   "packageName": "co.calendario21.app",
-  "versionCode": 10,
-  "versionName": "1.0.0-preview.10",
-  "apkUrl": "https://vz4dp1vu2kie6kny.public.blob.vercel-storage.com/android/nuestro-calendario-21-v10.apk",
-  "sha256": "5bd5d7c146b1564a7f217ff357be86e8e809c21ea7f4ded5ea0ef1e821281cfe",
+  "versionCode": 11,
+  "versionName": "1.0.0-preview.11",
+  "apkUrl": "https://vz4dp1vu2kie6kny.public.blob.vercel-storage.com/android/nuestro-calendario-21-v11.apk",
+  "sha256": "4555c284368e7a63b8a12d8b2a3dfa1a0d4507945cf55313cf752f3a34ba5cc3",
   "bytes": 5397130,
   "minSdk": 26,
-  "publishedAt": "2026-11-18T20:39:44.086Z",
+  "publishedAt": "2026-11-18T20:59:22.664Z",
   "notes": [
-    "Los widgets usan fondos de color que distinguen los temas claros del calendario.",
-    "Conserva el arranque directo y las notificaciones nativas."
+    "Refuerza los colores del fondo de los widgets claros y mantiene los temas oscuros."
   ]
 }
