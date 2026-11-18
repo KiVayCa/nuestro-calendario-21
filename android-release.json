@@ -1,14 +1,15 @@
 {
   "format": 1,
   "packageName": "co.calendario21.app",
-  "versionCode": 7,
-  "versionName": "1.0.0-preview.7",
-  "apkUrl": "https://vz4dp1vu2kie6kny.public.blob.vercel-storage.com/android/nuestro-calendario-21-v7.apk",
-  "sha256": "24cc328ed1b37c453ad3172cd3ddb0072dd72d75c7ad38e24c77a0e35e69f433",
-  "bytes": 4102038,
+  "versionCode": 10,
+  "versionName": "1.0.0-preview.10",
+  "apkUrl": "https://vz4dp1vu2kie6kny.public.blob.vercel-storage.com/android/nuestro-calendario-21-v10.apk",
+  "sha256": "5bd5d7c146b1564a7f217ff357be86e8e809c21ea7f4ded5ea0ef1e821281cfe",
+  "bytes": 5397130,
   "minSdk": 26,
-  "publishedAt": "2026-11-18T16:29:24.903Z",
+  "publishedAt": "2026-11-18T20:39:44.086Z",
   "notes": [
-    "Versión de prueba del arranque desde el icono del calendario."
+    "Los widgets usan fondos de color que distinguen los temas claros del calendario.",
+    "Conserva el arranque directo y las notificaciones nativas."
   ]
 }
