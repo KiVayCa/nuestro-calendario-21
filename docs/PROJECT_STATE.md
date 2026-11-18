@@ -99,3 +99,12 @@ La entrega de v8 incorpora el descriptor verificado al sitio de producción.
 Registro y funciones push desplegados en Supabase producción.
 Pendiente validar en los teléfonos el vínculo y la apertura desde un aviso
 con el calendario fuera de Recientes.
+
+## Android v8 retirada del actualizador
+
+Nicolás reportó que la v8 volvió a mostrar el aviso de Play Protect y se
+cerraba al abrirla. Se restableció la v7 en el descriptor público. Al comparar
+los APK se observó que v8 había recuperado el permiso de instalación de
+paquetes y la ruta de arranque anterior al lanzador directo de v7 RC2. La v9
+restaura el lanzador directo y elimina el instalador embebido, conservando el
+registro de avisos. Falta probar el arranque y Play Protect en el Motorola.

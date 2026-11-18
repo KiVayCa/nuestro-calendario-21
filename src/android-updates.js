@@ -85,7 +85,7 @@ async function openAndroidDownloads() {
     if (!container?.isConnected) return;
     const current =
       nativeAndroidCode > 0 && nativeAndroidCode >= release.versionCode;
-    container.innerHTML = `<p><b>${current ? "Tienes una versión actualizada" : "Última versión disponible"}: ${esc(release.versionName)}</b></p><p>${esc((release.bytes / 1048576).toFixed(1))} MB · ${esc(new Date(release.publishedAt).toLocaleDateString("es-CO"))}</p><ul>${release.notes.map((note) => `<li>${esc(note)}</li>`).join("")}</ul><div class="advActions">${nativeAndroidCode > 0 ? '<a class="btn primary" href="calendario21://updates">Buscar e instalar desde Android</a>' : ""}<a class="btn" href="${esc(release.apkUrl)}?download=1" download="NuestroCalendario21.apk" rel="noopener">Descargar archivo APK</a></div><p class="advMeta">Android te pedirá confirmar la instalación. La primera vez puede solicitar permiso para instalar desde el navegador o desde Nuestro Calendario #21.</p>`;
+    container.innerHTML = `<p><b>${current ? "Tienes una versión actualizada" : "Última versión disponible"}: ${esc(release.versionName)}</b></p><p>${esc((release.bytes / 1048576).toFixed(1))} MB · ${esc(new Date(release.publishedAt).toLocaleDateString("es-CO"))}</p><ul>${release.notes.map((note) => `<li>${esc(note)}</li>`).join("")}</ul><div class="advActions">${nativeAndroidCode > 0 && nativeAndroidCode < 9 ? '<a class="btn primary" href="calendario21://updates">Buscar e instalar desde Android</a>' : ""}<a class="btn" href="${esc(release.apkUrl)}?download=1" download="NuestroCalendario21.apk" rel="noopener">Descargar archivo APK</a></div><p class="advMeta">Android te pedirá confirmar la instalación. La primera vez puede solicitar permiso para instalar desde ${nativeAndroidCode >= 9 ? "el navegador" : "el navegador o desde Nuestro Calendario #21"}.</p>`;
   } catch {
     if (container?.isConnected)
       container.innerHTML =
@@ -125,7 +125,7 @@ async function checkAndroidAppUpdate() {
     banner.setAttribute("role", "status");
     banner.style.cssText =
       "position:fixed;top:calc(env(safe-area-inset-top,0px) + 12px);right:12px;left:12px;margin:auto;max-width:420px;padding:18px;border-radius:20px;background:var(--card,#fff);color:var(--ink,#35262b);border:1px solid var(--line,#efdee4);box-shadow:0 14px 45px #0004;z-index:12000";
-    banner.innerHTML = `<b>💚 Hay una actualización Android</b><p>Ya está disponible ${esc(release.versionName)}.</p><div class="advActions"><a class="btn primary" href="calendario21://updates">Actualizar</a><button class="btn" type="button" data-dismiss-android>Más tarde</button></div>`;
+    banner.innerHTML = `<b>💚 Hay una actualización Android</b><p>Ya está disponible ${esc(release.versionName)}.</p><div class="advActions">${nativeAndroidCode >= 9 ? '<button class="btn primary" type="button" onclick="openAndroidDownloads()">Actualizar</button>' : '<a class="btn primary" href="calendario21://updates">Actualizar</a>'}<button class="btn" type="button" data-dismiss-android>Más tarde</button></div>`;
     banner.querySelector("[data-dismiss-android]").onclick = () => {
       androidReleaseDismissed = release.versionCode;
       banner.remove();
