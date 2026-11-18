@@ -68,3 +68,4 @@ Cada persona puede elegir, cambiar o quitar su reacción en una carta abierta. L
 ## Android v7 en revisión
 
 Se retiró la instalación de paquetes desde Android tras el reporte de Play Protect. El aviso de nueva versión y la consulta manual siguen disponibles. Falta evaluar el APK firmado y su clasificación. Producción sigue ofreciendo v6.
+El icono conserva MainActivity y abre el calendario con el LauncherActivity de Android Browser Helper. La vinculación de widgets se intenta en su propia ruta, al tocar un widget. Queda pendiente una prueba de apertura tras cerrar la aplicación en un Motorola.

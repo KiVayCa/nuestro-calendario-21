@@ -7,7 +7,7 @@ import android.view.Gravity;
 import android.widget.*;
 import java.util.concurrent.*;
 
-/** Runs for every entry from the app icon or a widget, even if the TWA is already alive. */
+/** Checks release availability when a widget opens the calendar. */
 public class GateActivity extends Activity {
   private final ExecutorService executor = Executors.newSingleThreadExecutor();
 

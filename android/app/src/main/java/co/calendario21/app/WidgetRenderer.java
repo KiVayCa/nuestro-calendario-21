@@ -448,7 +448,7 @@ final class WidgetRenderer {
 
   private static PendingIntent open(Context c, int id, String url) {
     return PendingIntent.getActivity(
-        c, id, new Intent(c, MainActivity.class).setData(Uri.parse(url)), FLAGS);
+        c, id, new Intent(c, GateActivity.class).setData(Uri.parse(url)), FLAGS);
   }
 
   private static int dp(Context c, int value) {
