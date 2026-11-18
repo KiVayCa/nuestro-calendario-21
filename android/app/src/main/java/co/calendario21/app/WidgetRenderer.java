@@ -145,8 +145,8 @@ final class WidgetRenderer {
     if (!week && !month) views.setInt(R.id.widget_detail, "setMaxLines", compact ? 1 : 2);
     views.setViewVisibility(
         R.id.widget_updated, width < 240 || height < 160 ? View.GONE : View.VISIBLE);
-    String title = "Conecta tu calendario",
-        detail = "Toca ⚙ para iniciar sesión",
+    String title = "Abre Nuestro Calendario #21",
+        detail = "Los planes aparecerán al abrir la app con tu cuenta.",
         url = MainActivity.ORIGIN + "/",
         updated = "Nuestro Calendario #21";
     Instant now = Instant.now();

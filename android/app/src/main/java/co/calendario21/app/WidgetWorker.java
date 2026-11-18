@@ -67,6 +67,7 @@ public class WidgetWorker extends Worker {
       return Result.success();
     } catch (WidgetApi.AuthException e) {
       synchronized (SecureStore.LOCK) {
+        WidgetSessionActivity.disable(c);
         SecureStore.clear(c);
       }
       WidgetRenderer.updateAll(c);

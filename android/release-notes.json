@@ -1,6 +1,4 @@
 [
-  "Calendario mensual con nombres de planes y resumen del día seleccionado.",
-  "Los widgets siguen los 34 temas de la app, incluidos los temas oscuros.",
-  "Vínculo desde la sesión abierta, sin repetir correo y contraseña.",
-  "Sincronización automática al abrir y en segundo plano, sujeta a las restricciones de Android."
+  "Los cinco widgets se agregan directamente desde la pantalla de inicio.",
+  "Al abrir el calendario en Android, los widgets se conectan a la sesión iniciada."
 ]

@@ -46,3 +46,7 @@ Aplicación privada de pareja; evitar convertir los gastos en deudas entre los d
 
 Indicación breve recomendada: «Continúa Nuestro Calendario #21. Lee AGENTS.md y docs/PROJECT_STATE.md del repositorio; verifica main y la versión publicada antes de editar. La nueva tarea es: …».
 El historial del chat ayuda con decisiones; Git y este archivo conservan el estado técnico verificable. Actualizar este documento con cada entrega.
+
+## Android v5 en pruebas
+
+Los cinco proveedores se crean sin actividad de configuración. Al abrir la aplicación, un canal postMessage de la TWA validado con Digital Asset Links autoriza la lectura desde la sesión activa mediante el intercambio de un solo uso. La v4 conserva el vínculo manual. Un dispositivo desconectado o revocado no se vincula otra vez de forma automática. Pendiente prueba de instalación release y aceptación en teléfono. El descriptor público sigue en v4.
