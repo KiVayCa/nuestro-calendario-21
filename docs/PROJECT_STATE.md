@@ -103,3 +103,9 @@ con el calendario fuera de Recientes.
 ## Retirada de Android v8
 
 Se restauró v7 en producción tras el reporte de cierre al abrir v8 y el aviso de Play Protect. Se verificó el descriptor público. La rama `release/android-v9` prepara la corrección del lanzador y elimina el permiso de instalación de paquetes.
+
+Nicolás confirmó que la v9 de prueba corrigió el problema reportado.
+La lista de teléfonos vinculados retira el indicador de carga al mostrar
+resultados y permite asignar un nombre a cada teléfono. Los vínculos existentes
+conservan su vencimiento de 90 días. Se probó el cambio web (21 pruebas) y se
+aplicó la migración de nombres en TEST y producción.

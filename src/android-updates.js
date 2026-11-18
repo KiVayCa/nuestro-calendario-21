@@ -216,7 +216,7 @@ async function openAndroidPushDevices() {
   const node = $("androidPushDevices");
   const { data, error } = await sb
     .from("android_push_devices")
-    .select("id,expires_at")
+    .select("id,expires_at,display_name")
     .eq("user_id", account)
     .order("expires_at", { ascending: false });
   if (!node?.isConnected || user?.id !== account) return;
@@ -226,12 +226,48 @@ async function openAndroidPushDevices() {
       : "Aún no hay teléfonos vinculados.";
     return;
   }
-  for (const device of data) {
+  node.replaceChildren();
+  for (const [index, device] of data.entries()) {
     const row = document.createElement("p");
-    row.textContent =
-      "Vence el " +
-      new Date(device.expires_at).toLocaleDateString("es-CO") +
-      " ";
+    const name = document.createElement("strong");
+    const defaultName = "Teléfono " + (index + 1);
+    name.textContent = device.display_name || defaultName;
+    const expiry = document.createElement("span");
+    const date = new Date(device.expires_at);
+    expiry.textContent =
+      (date > new Date() ? " · Vence el " : " · Venció el ") +
+      date.toLocaleDateString("es-CO");
+    const rename = document.createElement("button");
+    rename.className = "btn";
+    rename.textContent = "Cambiar nombre";
+    rename.onclick = async () => {
+      rename.disabled = true;
+      try {
+        const value = await appPrompt(
+          "Ponle un nombre para reconocerlo en esta lista.",
+          "Cambiar nombre del teléfono",
+          device.display_name || "",
+          "Nombre",
+          "Mi Motorola",
+        );
+        if (value == null || user?.id !== account || !row.isConnected) return;
+        const label = value.trim();
+        if (label.length > 60)
+          return appAlert("Usa un nombre de hasta 60 caracteres.");
+        const { data: updated, error } = await sb
+          .from("android_push_devices")
+          .update({ display_name: label || null })
+          .eq("id", device.id)
+          .eq("user_id", account)
+          .select("id")
+          .maybeSingle();
+        if (error || !updated) return appAlert("No pudimos guardar el nombre.");
+        device.display_name = label;
+        name.textContent = label || defaultName;
+      } finally {
+        rename.disabled = false;
+      }
+    };
     const button = document.createElement("button");
     button.className = "btn";
     button.textContent = "Desvincular";
@@ -248,9 +284,18 @@ async function openAndroidPushDevices() {
         appAlert("No pudimos desvincular el teléfono.");
       } else {
         row.remove();
+        if (!node.childElementCount)
+          node.textContent = "Aún no hay teléfonos vinculados.";
       }
     };
-    row.append(button);
+    row.append(
+      name,
+      expiry,
+      document.createTextNode(" "),
+      rename,
+      document.createTextNode(" "),
+      button,
+    );
     node.append(row);
   }
 }
