@@ -880,15 +880,3 @@ async function performConfirmedPlanDeletion() {
 
   await loadPlans();
 }
-
-async function installCalendarApp() {
-  if (deferredInstallPrompt) {
-    deferredInstallPrompt.prompt();
-    await deferredInstallPrompt.userChoice;
-    deferredInstallPrompt = null;
-    return;
-  }
-  appAlert(
-    "En Android abre este sitio en Chrome, toca el menú ⋮ y elige “Instalar aplicación” o “Añadir a pantalla de inicio”. En PC, busca el icono de instalación en la barra de direcciones.",
-  );
-}

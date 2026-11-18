@@ -74,3 +74,7 @@ Nicolás confirmó en su teléfono que la RC2 abre desde el icono y que Play Pro
 ## Apertura de avisos push
 
 Al tocar un aviso, el service worker prioriza una instancia abierta desde el APK y conserva la información de versión al abrir el destino. Si la instancia ya se cerró, el navegador decide dónde abrir el enlace web. Pendiente comprobar la apertura en el teléfono con la app en segundo plano y estudiar el arranque en frío.
+
+## Instalación en Configuración
+
+Se retiró la tarjeta «Instalar en este dispositivo». «Aplicación Android y widgets» sigue disponible para instalar y consultar actualizaciones del APK.
