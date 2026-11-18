@@ -121,3 +121,5 @@ hasta la fecha de apertura. Los widgets de Android v10 usan un color de fondo
 visible en las paletas claras. La prueba de Android físico queda pendiente.
 
 Se desplegaron Cartas y el vínculo anual en producción. GitHub Actions compiló, firmó y alojó el APK v10 en la ejecución 44393155987. Se verificó la descarga, la firma y el descriptor antes de publicar la actualización. Falta aceptación en teléfonos reales.
+
+Las reacciones de Cartas se muestran en un selector plegado por defecto, con la reacción propia y el total visibles en su resumen.

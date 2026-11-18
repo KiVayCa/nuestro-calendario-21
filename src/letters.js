@@ -18,6 +18,7 @@ function renderLetterReactions(letterId) {
   );
   const mine = reactions.find((item) => item.user_id === user.id)?.emoji;
   return (
+    `<details class="letterReactionPicker"><summary class="btn">${esc(mine || "☺")} Reacciones${reactions.length ? ` · ${reactions.length}` : ""}</summary>` +
     '<div class="advActions letterReactions" role="group" aria-label="Reacciones a la carta">' +
     letterReactionOptions
       .map(([emoji, label], index) => {
@@ -25,7 +26,7 @@ function renderLetterReactions(letterId) {
         return `<button type="button" class="btn${mine === emoji ? " primary" : ""}" aria-pressed="${mine === emoji}" aria-label="${label} · ${count}" onclick="saveLetterReaction('${letterId}', ${index}, this)">${emoji} ${count || ""}</button>`;
       })
       .join("") +
-    "</div>"
+    "</div></details>"
   );
 }
 

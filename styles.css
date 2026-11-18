@@ -1554,3 +1554,17 @@ body:is([data-theme="night"], [data-theme="midnight"], [data-theme="charcoal"])
 .letterEditorTools { flex-wrap: wrap; margin-bottom: .7rem; }
 .letterAudioButton { margin-top: .65rem; }
 .letterContent audio { display: block; width: min(100%, 380px); margin-top: .65rem; }
+
+.letterReactionPicker {
+  margin-top: .65rem;
+}
+.letterReactionPicker > summary {
+  display: list-item;
+  width: fit-content;
+  cursor: pointer;
+}
+.letterReactionPicker .letterReactions {
+  flex-wrap: wrap;
+  gap: .35rem;
+  margin-top: .45rem;
+}
