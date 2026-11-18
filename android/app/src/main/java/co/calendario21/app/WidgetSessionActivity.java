@@ -40,7 +40,10 @@ public class WidgetSessionActivity extends Activity {
     }
 
     @Override public void onNavigationEvent(int event, Bundle extras) {
-      if (event == NAVIGATION_FINISHED) {
+      if (event == NAVIGATION_STARTED) {
+        loaded = false;
+        requested = false;
+      } else if (event == NAVIGATION_FINISHED) {
         loaded = true;
         requestChannel();
       }

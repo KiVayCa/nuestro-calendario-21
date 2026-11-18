@@ -1,5 +1,8 @@
 # Nuestro Calendario #21 · Android preview
 
+## Widgets · preview 5 (en pruebas)
+Agregar cualquiera de los cinco widgets desde Inicio crea la tarjeta inmediatamente. La primera vez, abrir el calendario en la APK con una sesión web iniciada permite conectar los widgets mediante el canal verificado de Chrome. Una sesión de widget existente se reutiliza. Con la cuenta cerrada, el widget espera al inicio de sesión. El menú ⚙ conserva los ajustes y la recuperación manual para permisos revocados o navegadores incompatibles.
+
 ## Widgets · preview 4
 
 Nuestro mes muestra nombres de planes y fechas especiales en cada día. Al ampliar aparecen hasta tres títulos por día; los adicionales se indican con +N. Tocar el día muestra su resumen; tocar un título abre ese registro en la web.
