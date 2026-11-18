@@ -70,7 +70,7 @@ async function fetchAndroidRelease() {
 
 function androidInstallCard() {
   if (!androidDevice()) return "";
-  return `<div class="settingsCard" style="margin-bottom:16px"><h3>💚 Aplicación Android y widgets</h3><p>Descarga la última versión de Nuestro Calendario #21. Incluye los widgets y el aviso de nuevas actualizaciones.${nativeAndroidCode > 0 ? ` Versión instalada: <b>${esc(nativeAndroidName || nativeAndroidCode)}</b>.` : ""}</p><button class="btn primary" type="button" onclick="openAndroidDownloads()">${nativeAndroidCode > 0 ? "Versión y actualizaciones" : "Descargar APK para Android"}</button><p class="advMeta">Instala como actualización, sin desinstalar la versión anterior, para conservar tu sesión y tus widgets.</p></div>`;
+  return `<div class="settingsCard" style="margin-bottom:16px"><h3>💚 Aplicación Android y widgets</h3><p>Descarga la última versión de Nuestro Calendario #21. Incluye los widgets y el aviso de nuevas actualizaciones.${nativeAndroidCode > 0 ? ` Versión instalada: <b>${esc(nativeAndroidName || nativeAndroidCode)}</b>.` : ""}</p><button class="btn primary" type="button" onclick="openAndroidDownloads()">${nativeAndroidCode > 0 ? "Versión y actualizaciones" : "Descargar APK para Android"}</button>${nativeAndroidCode >= 8 ? '<div class="advActions"><a class="btn" href="calendario21://push-link">Vincular este teléfono para avisos</a><button class="btn" onclick="openAndroidPushDevices()">Ver teléfonos vinculados</button></div>' : ""}<p class="advMeta">Instala como actualización, sin desinstalar la versión anterior, para conservar tu sesión y tus widgets.</p></div>`;
 }
 
 async function openAndroidDownloads() {
@@ -104,7 +104,11 @@ async function checkAndroidAppUpdate() {
   const check = ++androidForegroundCheck;
   try {
     const release = await fetchAndroidRelease();
-    if (check !== androidForegroundCheck || document.visibilityState === "hidden") return;
+    if (
+      check !== androidForegroundCheck ||
+      document.visibilityState === "hidden"
+    )
+      return;
     if (release.versionCode === nativeAndroidCode) {
       $("androidUpdateNotice")?.remove();
       showAppToast("Ya tienes la última versión de Nuestro Calendario #21.");
@@ -128,8 +132,14 @@ async function checkAndroidAppUpdate() {
     };
     document.body.appendChild(banner);
   } catch {
-    if (check === androidForegroundCheck && document.visibilityState !== "hidden")
-      showAppToast("No pudimos comprobar las actualizaciones. Revisa tu conexión.", "error");
+    if (
+      check === androidForegroundCheck &&
+      document.visibilityState !== "hidden"
+    )
+      showAppToast(
+        "No pudimos comprobar las actualizaciones. Revisa tu conexión.",
+        "error",
+      );
   }
 }
 
@@ -142,3 +152,105 @@ document.addEventListener("visibilitychange", () => {
     checkAndroidAppUpdate();
   }
 });
+
+const pushLinkChallenge = nativeAndroidParams.get("push_challenge") || "";
+const pushLinkState = nativeAndroidParams.get("push_state") || "";
+let pushLinkOffered = false;
+
+function maybeOfferAndroidPushLink() {
+  if (
+    pushLinkOffered ||
+    nativeAndroidCode < 8 ||
+    !user?.id ||
+    !couple?.id ||
+    !/^[a-f0-9]{64}$/.test(pushLinkChallenge) ||
+    !/^[a-f0-9]{32}$/.test(pushLinkState)
+  )
+    return false;
+  pushLinkOffered = true;
+  const cleanUrl = new URL(location.href);
+  cleanUrl.searchParams.delete("push_challenge");
+  cleanUrl.searchParams.delete("push_state");
+  history.replaceState(null, "", cleanUrl.href);
+  openAdvModal(
+    "Vincular este teléfono",
+    '<div id="pushLinkResult"><p>Vincula este teléfono con tu cuenta para abrir el calendario al tocar un aviso.</p><button class="btn primary" onclick="confirmAndroidPushLink(this)">Vincular con esta cuenta</button></div>',
+  );
+  return true;
+}
+
+async function confirmAndroidPushLink(button) {
+  const account = user?.id,
+    space = couple?.id,
+    node = $("pushLinkResult");
+  if (!account || !space || !node || button.disabled) return;
+  button.disabled = true;
+  try {
+    const { data: code, error } = await sb.rpc(
+      "create_android_push_pair_code",
+      {
+        p_couple_id: space,
+        p_challenge: pushLinkChallenge,
+        p_state: pushLinkState,
+      },
+    );
+    if (account !== user?.id || space !== couple?.id || !node.isConnected)
+      return;
+    if (error || !/^[a-f0-9]{64}$/.test(code || "")) throw new Error();
+    const link = `calendario21://push-link?code=${code}&state=${pushLinkState}`;
+    node.innerHTML = `<a class="btn primary" href="${esc(link)}">Terminar en Android</a>`;
+  } catch {
+    if (node.isConnected)
+      appAlert("No pudimos preparar el vínculo. Vuelve a intentarlo.");
+    button.disabled = false;
+  }
+}
+
+async function openAndroidPushDevices() {
+  const account = user?.id;
+  if (!account) return;
+  openAdvModal(
+    "Teléfonos vinculados para avisos",
+    '<div id="androidPushDevices" role="status">Cargando…</div>',
+  );
+  const node = $("androidPushDevices");
+  const { data, error } = await sb
+    .from("android_push_devices")
+    .select("id,expires_at")
+    .eq("user_id", account)
+    .order("expires_at", { ascending: false });
+  if (!node?.isConnected || user?.id !== account) return;
+  if (error || !data.length) {
+    node.textContent = error
+      ? "No pudimos cargar los teléfonos."
+      : "Aún no hay teléfonos vinculados.";
+    return;
+  }
+  for (const device of data) {
+    const row = document.createElement("p");
+    row.textContent =
+      "Vence el " +
+      new Date(device.expires_at).toLocaleDateString("es-CO") +
+      " ";
+    const button = document.createElement("button");
+    button.className = "btn";
+    button.textContent = "Desvincular";
+    button.onclick = async () => {
+      if (user?.id !== account) return;
+      button.disabled = true;
+      const { error } = await sb
+        .from("android_push_devices")
+        .delete()
+        .eq("id", device.id)
+        .eq("user_id", account);
+      if (error) {
+        button.disabled = false;
+        appAlert("No pudimos desvincular el teléfono.");
+      } else {
+        row.remove();
+      }
+    };
+    row.append(button);
+    node.append(row);
+  }
+}

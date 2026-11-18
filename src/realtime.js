@@ -222,7 +222,7 @@ async function initAdvanced() {
     for (const key of ["tab", "item", "date"]) cleanUrl.searchParams.delete(key);
     history.replaceState(null, "", cleanUrl.href);
   }
-  maybeOfferWidgetLink();
+  if (!maybeOfferAndroidPushLink()) maybeOfferWidgetLink();
   $("advModal")?.addEventListener("click", (e) => {
     if (e.target === $("advModal")) closeAdvModal();
   });

@@ -75,16 +75,16 @@ Nicolás confirmó en su teléfono que la RC2 abre desde el icono y que Play Pro
 
 Al tocar un aviso, el service worker prioriza una instancia abierta desde el APK y conserva la información de versión al abrir el destino. Si la instancia ya se cerró, el navegador decide dónde abrir el enlace web. Pendiente comprobar la apertura en el teléfono con la app en segundo plano y estudiar el arranque en frío.
 
+## Android v8 · registro de teléfonos en preparación
+
+La configuración de Android ofrece vincular y revocar teléfonos para avisos. El vínculo requiere permiso Android, una cuenta autenticada en la web y un código de un uso de 90 segundos ligado a un verificador privado del teléfono. El permiso de envío dura 90 días. La migración y las funciones de envío con FCM están en revisión y requieren validación. No se han registrado teléfonos reales con este cambio. El descriptor público sigue ofreciendo v7. Pasaron las 21 pruebas web. La compilación local de Android se detuvo al descargar Gradle por un fallo de red. Quedan pendientes la prueba en TEST, la firma, el despliegue y la prueba de apertura desde una notificación con la app cerrada.
 ## Instalación en Configuración
 
 Se retiró la tarjeta «Instalar en este dispositivo». «Aplicación Android y widgets» sigue disponible para instalar y consultar actualizaciones del APK.
 
-## Canal de publicación de APK
+La migración se aplicó en TEST. Una prueba SQL con reversión verificó el vínculo válido, el rechazo de un verificador ajeno, el rechazo de un código reutilizado y la protección del token FCM frente al rol autenticado.
 
-El flujo `publish-android.yml` prepara el APK y el descriptor desde ramas
-`release/android-v<N>`. Requiere configurar en GitHub Actions el respaldo de
-firma y el acceso de escritura al almacén Blob actual. La v7 sigue anunciada
-en producción mientras se valida la primera publicación automatizada.
+GitHub Actions completó la compilación Android de la primera revisión (44381359810). Para generar un APK con Firebase configurado, el flujo lee el secreto de GitHub Actions `FIREBASE_ANDROID_CONFIG` con el contenido de `google-services.json`. La cuenta de servicio de FCM permanece en Supabase.
 
 ## Canal de publicación de APK
 
