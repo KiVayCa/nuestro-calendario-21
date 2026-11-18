@@ -253,10 +253,8 @@ const dailyQuestionBank = [
 const PUSH_VAPID_PUBLIC_KEY =
   "BB0iqrnyRyEHM5I3OVVs5ZmRiDvDHkqHfGha7wG9QcqaGmpR4jO3KBxtQjQZ99sMjbPLjDX8bqrvzsTNI_xlumI";
 
-let deferredInstallPrompt = null;
 window.addEventListener("beforeinstallprompt", (e) => {
   e.preventDefault();
-  deferredInstallPrompt = e;
 });
 
 let advancedEditState = { key: null, id: null };
@@ -355,7 +353,6 @@ Object.assign(window, {
   markAllNotificationsRead,
   openNotificationTarget,
   enableBrowserNotifications,
-  installCalendarApp,
 });
 
 let ncTransactionDepth = 0;
