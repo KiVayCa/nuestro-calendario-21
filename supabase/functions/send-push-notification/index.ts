@@ -1,3 +1,4 @@
+import { sendCalendarPush, type PushDevice } from "../_shared/calendar-push.ts";
 import webpush from "npm:web-push@3.6.7";
 import { createClient } from "npm:@supabase/supabase-js@2.49.8";
 
@@ -200,7 +201,20 @@ Deno.serve(async (req: Request) => {
         { error: "No se pudieron consultar las suscripciones" },
         500,
       );
-    if (!subscriptions?.length)
+    const { data: androidDevices, error: androidError } = await admin
+      .from("android_push_devices")
+      .select("token")
+      .gt("expires_at", new Date().toISOString())
+      .eq("couple_id", coupleId)
+      .eq("user_id", recipientId);
+    if (androidError)
+      return reply(
+        origin,
+        { error: "No se pudieron consultar los dispositivos Android" },
+        500,
+      );
+    const devices: PushDevice[] = [...subscriptions, ...androidDevices];
+    if (!devices.length)
       return reply(origin, {
         ok: true,
         sent: 0,
@@ -221,15 +235,9 @@ Deno.serve(async (req: Request) => {
     let sent = 0;
     let failed = 0;
     let expired = 0;
-    for (const sub of subscriptions) {
+    for (const sub of devices) {
       try {
-        await webpush.sendNotification(
-          {
-            endpoint: sub.endpoint,
-            keys: { p256dh: sub.p256dh, auth: sub.auth },
-          },
-          payload,
-        );
+        await sendCalendarPush(sub, payload);
         sent++;
       } catch (error) {
         failed++;
@@ -238,11 +246,18 @@ Deno.serve(async (req: Request) => {
         );
         if (statusCode === 404 || statusCode === 410) {
           expired++;
-          const { error: deleteError } = await admin
-            .from("push_subscriptions")
-            .delete()
-            .eq("endpoint", sub.endpoint)
-            .eq("user_id", recipientId);
+          const { error: deleteError } =
+            "endpoint" in sub
+              ? await admin
+                  .from("push_subscriptions")
+                  .delete()
+                  .eq("endpoint", sub.endpoint)
+                  .eq("user_id", recipientId)
+              : await admin
+                  .from("android_push_devices")
+                  .delete()
+                  .eq("token", sub.token)
+                  .eq("user_id", recipientId);
           if (deleteError)
             console.error(
               "No se pudo eliminar la suscripción push vencida:",

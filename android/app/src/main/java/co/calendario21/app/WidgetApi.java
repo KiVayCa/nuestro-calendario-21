@@ -170,6 +170,13 @@ final class WidgetApi {
     return buildSnapshot(plans, settings, importantDates);
   }
 
+  boolean claimPushDevice(String code, String verifier, String state, String token) throws Exception {
+    config();
+    return "true".equals(request(BACKEND + "/rest/v1/rpc/claim_android_push_device", "POST",
+        new JSONObject().put("p_code", code).put("p_verifier", verifier)
+            .put("p_state", state).put("p_token", token), apiKey, null).trim());
+  }
+
   JSONObject claimLink(String code, String verifier, String state) throws Exception {
     config();
     String raw =

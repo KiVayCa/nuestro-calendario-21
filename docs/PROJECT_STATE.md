@@ -74,3 +74,7 @@ Nicolás confirmó en su teléfono que la RC2 abre desde el icono y que Play Pro
 ## Apertura de avisos push
 
 Al tocar un aviso, el service worker prioriza una instancia abierta desde el APK y conserva la información de versión al abrir el destino. Si la instancia ya se cerró, el navegador decide dónde abrir el enlace web. Pendiente comprobar la apertura en el teléfono con la app en segundo plano y estudiar el arranque en frío.
+
+## Android v8 · registro de teléfonos en preparación
+
+La configuración de Android ofrece vincular y revocar teléfonos para avisos. El vínculo requiere permiso Android, una cuenta autenticada en la web y un código de un uso de 90 segundos ligado a un verificador privado del teléfono. El permiso de envío dura 90 días. La migración y las funciones de envío con FCM están en revisión y requieren validación. No se han registrado teléfonos reales con este cambio. El descriptor público sigue ofreciendo v7. Pasaron las 21 pruebas web. La compilación local de Android se detuvo al descargar Gradle por un fallo de red. Quedan pendientes la prueba en TEST, la firma, el despliegue y la prueba de apertura desde una notificación con la app cerrada.
