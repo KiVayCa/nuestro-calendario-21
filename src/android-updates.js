@@ -228,7 +228,7 @@ async function openAndroidPushDevices() {
   }
   node.replaceChildren();
   for (const [index, device] of data.entries()) {
-    const row = document.createElement("p");
+    const row = document.createElement("div");
     const name = document.createElement("strong");
     const defaultName = "Teléfono " + (index + 1);
     name.textContent = device.display_name || defaultName;
@@ -240,34 +240,66 @@ async function openAndroidPushDevices() {
     const rename = document.createElement("button");
     rename.className = "btn";
     rename.textContent = "Cambiar nombre";
-    rename.onclick = async () => {
-      rename.disabled = true;
-      try {
-        const value = await appPrompt(
-          "Ponle un nombre para reconocerlo en esta lista.",
-          "Cambiar nombre del teléfono",
-          device.display_name || "",
-          "Nombre",
-          "Mi Motorola",
-        );
-        if (value == null || user?.id !== account || !row.isConnected) return;
-        const label = value.trim();
-        if (label.length > 60)
-          return appAlert("Usa un nombre de hasta 60 caracteres.");
-        const { data: updated, error } = await sb
-          .from("android_push_devices")
-          .update({ display_name: label || null })
-          .eq("id", device.id)
-          .eq("user_id", account)
-          .select("id")
-          .maybeSingle();
-        if (error || !updated) return appAlert("No pudimos guardar el nombre.");
-        device.display_name = label;
-        name.textContent = label || defaultName;
-      } finally {
-        rename.disabled = false;
+    const edit = document.createElement("form");
+    edit.className = "advActions";
+    edit.hidden = true;
+    edit.style.display = "none";
+    const input = document.createElement("input");
+    input.type = "text";
+    input.maxLength = 60;
+    input.placeholder = "Mi Motorola";
+    input.setAttribute("aria-label", "Nombre del teléfono");
+    const save = document.createElement("button");
+    save.className = "btn primary";
+    save.textContent = "Guardar";
+    const cancel = document.createElement("button");
+    cancel.type = "button";
+    cancel.className = "btn";
+    cancel.textContent = "Cancelar";
+    const status = document.createElement("span");
+    status.setAttribute("role", "status");
+    const toggleEdit = (open) => {
+      edit.hidden = !open;
+      edit.style.display = open ? "" : "none";
+      rename.disabled = open;
+      status.textContent = "";
+      if (open) {
+        input.value = device.display_name || "";
+        input.focus();
+      } else {
+        rename.focus();
       }
     };
+    rename.onclick = () => toggleEdit(true);
+    cancel.onclick = () => toggleEdit(false);
+    edit.onsubmit = async (event) => {
+      event.preventDefault();
+      if (save.disabled || user?.id !== account) return;
+      const label = input.value.trim();
+      save.disabled = input.disabled = cancel.disabled = true;
+      status.textContent = "Guardando…";
+      try {
+        const { data: saved, error } = await sb.rpc(
+          "rename_android_push_device",
+          {
+            p_id: device.id,
+            p_name: label,
+          },
+        );
+        if (user?.id !== account || !row.isConnected) return;
+        if (error || saved !== true) throw new Error();
+        device.display_name = label;
+        name.textContent = label || defaultName;
+        toggleEdit(false);
+        showAppToast("Nombre guardado.");
+      } catch {
+        status.textContent =
+          "No pudimos guardar el nombre. Inténtalo de nuevo.";
+      } finally {
+        save.disabled = input.disabled = cancel.disabled = false;
+      }
+    };
+    edit.append(input, save, cancel, status);
     const button = document.createElement("button");
     button.className = "btn";
     button.textContent = "Desvincular";
@@ -296,6 +328,7 @@ async function openAndroidPushDevices() {
       document.createTextNode(" "),
       button,
     );
+    row.append(edit);
     node.append(row);
   }
 }
