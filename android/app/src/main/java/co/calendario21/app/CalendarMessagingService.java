@@ -40,7 +40,7 @@ public final class CalendarMessagingService extends FirebaseMessagingService {
 
     try {
       notifications.notify(tag, 0, new NotificationCompat.Builder(this, CHANNEL_ID)
-          .setSmallIcon(android.R.drawable.ic_dialog_info)
+          .setSmallIcon(R.drawable.ic_notification_heart)
           .setContentTitle(data.getOrDefault("title", "Nuestro Calendario #21"))
           .setContentText(data.getOrDefault("body", "Tienes una novedad en el calendario."))
           .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)

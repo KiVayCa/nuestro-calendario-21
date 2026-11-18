@@ -1,4 +1,8 @@
-import { sendCalendarPush, type PushDevice } from "../_shared/calendar-push.ts";
+import {
+  isDesktopWebPush,
+  sendCalendarPush,
+  type PushDevice,
+} from "../_shared/calendar-push.ts";
 import webpush from "npm:web-push@3.6.7";
 import { createClient } from "npm:@supabase/supabase-js@2.49.8";
 
@@ -192,7 +196,7 @@ Deno.serve(async (req: Request) => {
     webpush.setVapidDetails(vapidSubject, vapidPublic, vapidPrivate);
     const { data: subscriptions, error: subscriptionError } = await admin
       .from("push_subscriptions")
-      .select("endpoint,p256dh,auth")
+      .select("endpoint,p256dh,auth,user_agent")
       .eq("couple_id", coupleId)
       .eq("user_id", recipientId);
     if (subscriptionError)
@@ -213,7 +217,10 @@ Deno.serve(async (req: Request) => {
         { error: "No se pudieron consultar los dispositivos Android" },
         500,
       );
-    const devices: PushDevice[] = [...subscriptions, ...androidDevices];
+    const devices: PushDevice[] = [
+      ...subscriptions.filter(isDesktopWebPush),
+      ...androidDevices,
+    ];
     if (!devices.length)
       return reply(origin, {
         ok: true,

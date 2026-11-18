@@ -1,4 +1,8 @@
-import { sendCalendarPush, type PushDevice } from "../_shared/calendar-push.ts";
+import {
+  isDesktopWebPush,
+  sendCalendarPush,
+  type PushDevice,
+} from "../_shared/calendar-push.ts";
 import webpush from "npm:web-push@3.6.7";
 import { createClient } from "npm:@supabase/supabase-js@2.49.8";
 
@@ -37,7 +41,7 @@ Deno.serve(async (request) => {
   for (const reminder of reminders) {
     const { data: subscriptions, error: queryError } = await admin
       .from("push_subscriptions")
-      .select("endpoint,p256dh,auth")
+      .select("endpoint,p256dh,auth,user_agent")
       .eq("couple_id", reminder.couple_id)
       .eq("user_id", reminder.recipient_user_id);
     if (queryError) {
@@ -54,7 +58,10 @@ Deno.serve(async (request) => {
       failed++;
       continue;
     }
-    const devices: PushDevice[] = [...subscriptions, ...androidDevices];
+    const devices: PushDevice[] = [
+      ...subscriptions.filter(isDesktopWebPush),
+      ...androidDevices,
+    ];
     const date = /^(?:plan|task):[^:]+:(\d{4}-\d{2}-\d{2}):/.exec(
       reminder.reminder_key,
     )?.[1];

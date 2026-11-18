@@ -139,3 +139,7 @@ Cartas añade cinco fuentes manuscritas y seis fondos. El color del papel se
 aplica también al texto interno del editor. Los comandos de formato conservan
 el tipo de letra al alternar negrita o cursiva. El servidor rechaza cambios al
 contenido de cartas bloqueadas hasta que se desbloqueen.
+
+Los avisos Web Push se limitan a navegadores de escritorio. Al iniciar sesión
+desde un teléfono se cancela su suscripción web local si existe. Las
+notificaciones nativas de Android usan un icono monocromo de corazón en v12.

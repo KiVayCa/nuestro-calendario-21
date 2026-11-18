@@ -5,6 +5,15 @@ type WebDevice = { endpoint: string; p256dh: string; auth: string };
 type AndroidDevice = { token: string };
 export type PushDevice = WebDevice | AndroidDevice;
 
+export function isDesktopWebPush(device: { user_agent?: string | null }) {
+  return (
+    Boolean(device.user_agent) &&
+    !/Android|iPhone|iPad|iPod|Mobile|Windows Phone|Opera Mini/i.test(
+      device.user_agent || "",
+    )
+  );
+}
+
 let credentials: { client: JWT; project: string } | undefined;
 
 export async function sendCalendarPush(device: PushDevice, payload: string) {

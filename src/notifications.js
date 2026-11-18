@@ -1,3 +1,17 @@
+function desktopBrowserNotifications() {
+  const platform = navigator.userAgent || "";
+  return (
+    !/Android|iPhone|iPad|iPod|Mobile|Windows Phone|Opera Mini/i.test(
+      platform,
+    ) &&
+    !(
+      navigator.userAgentData?.mobile ||
+      /^Android$/i.test(navigator.userAgentData?.platform || "") ||
+      (/Macintosh/i.test(platform) && navigator.maxTouchPoints > 1)
+    )
+  );
+}
+
 function updateNotificationBadge() {
   const b = $("notificationsTab"),
     badge = $("notificationBadge");
@@ -25,7 +39,7 @@ function renderAdvNotifications() {
       unread ? "✓ Marcar todo leído" : "🔄 Actualizar",
       unread ? "markAllNotificationsRead()" : "advLoadAll()",
     ) +
-    `<div class="advList">${arr.length ? arr.map((n) => `<div class="advItem ${n.read_at ? "notificationRead" : "notificationUnread"}"><div style="flex:1"><div class="advItemTitle">${n.read_at ? "" : "🔴 "}${esc(n.title)}</div><div class="advMeta">${esc(names.get(n.actor_user_id) || "Tu pareja")} · ${new Date(n.created_at).toLocaleString("es-CO")}</div><p>${esc(n.body || "Hay una novedad en su espacio compartido.")}</p></div><div class="advActions">${n.target_tab ? `<button class="btn" onclick="openNotificationTarget('${n.id}','${n.target_tab}')">Ver</button>` : ""}${!n.read_at ? `<button class="btn" onclick="markNotificationRead('${n.id}')">Marcar leído</button>` : ""}</div></div>`).join("") : `<div class="advEmpty">💌 Todavía no hay avisos. Cuando alguno de los dos agregue algo nuevo, aparecerá aquí.</div>`}</div><div class="advCard" style="margin-top:18px"><h3>🔔 Notificaciones del navegador</h3><p>Activa avisos push para este dispositivo. Una vez configurado el servidor, recibirás novedades de tu pareja incluso cuando la PWA no esté abierta.</p><button class="btn primary" onclick="enableBrowserNotifications()">Activar notificaciones del navegador</button></div>`
+    `<div class="advList">${arr.length ? arr.map((n) => `<div class="advItem ${n.read_at ? "notificationRead" : "notificationUnread"}"><div style="flex:1"><div class="advItemTitle">${n.read_at ? "" : "🔴 "}${esc(n.title)}</div><div class="advMeta">${esc(names.get(n.actor_user_id) || "Tu pareja")} · ${new Date(n.created_at).toLocaleString("es-CO")}</div><p>${esc(n.body || "Hay una novedad en su espacio compartido.")}</p></div><div class="advActions">${n.target_tab ? `<button class="btn" onclick="openNotificationTarget('${n.id}','${n.target_tab}')">Ver</button>` : ""}${!n.read_at ? `<button class="btn" onclick="markNotificationRead('${n.id}')">Marcar leído</button>` : ""}</div></div>`).join("") : `<div class="advEmpty">💌 Todavía no hay avisos. Cuando alguno de los dos agregue algo nuevo, aparecerá aquí.</div>`}</div>${desktopBrowserNotifications() ? '<div class="advCard" style="margin-top:18px"><h3>🔔 Notificaciones del navegador</h3><p>Recibe avisos del calendario en este computador.</p><button class="btn primary" onclick="enableBrowserNotifications()">Activar notificaciones del navegador</button></div>' : ""}`
   );
 }
 
@@ -125,7 +139,7 @@ function markReminderSent(key) {
 }
 
 async function sendLocalReminder(title, body, key, targetTab) {
-  if (reminderWasSent(key)) return;
+  if (!desktopBrowserNotifications() || reminderWasSent(key)) return;
   if (!("Notification" in window) || Notification.permission !== "granted")
     return;
   try {
@@ -145,6 +159,7 @@ async function sendLocalReminder(title, body, key, targetTab) {
 
 function checkLocalReminders() {
   if (
+    !desktopBrowserNotifications() ||
     !user ||
     !couple ||
     !("Notification" in window) ||
@@ -224,6 +239,27 @@ async function renewPushSubscription(reg, oldSubscription) {
 }
 
 async function repairPushSubscriptionIfMissing() {
+  if (!desktopBrowserNotifications()) {
+    try {
+      const registration = await navigator.serviceWorker?.ready;
+      const subscription = await registration?.pushManager?.getSubscription();
+      if (
+        subscription &&
+        (await subscription.unsubscribe()) &&
+        user?.id &&
+        sb
+      ) {
+        await sb
+          .from("push_subscriptions")
+          .delete()
+          .eq("user_id", user.id)
+          .eq("endpoint", subscription.endpoint);
+      }
+    } catch {
+      // The server also excludes mobile subscriptions.
+    }
+    return;
+  }
   if (
     !("Notification" in window) ||
     Notification.permission !== "granted" ||
@@ -240,7 +276,7 @@ async function repairPushSubscriptionIfMissing() {
     if (!subscription) return;
     const { data: known, error } = await sb
       .from("push_subscriptions")
-      .select("endpoint")
+      .select("endpoint,user_agent")
       .eq("user_id", user.id)
       .eq("endpoint", subscription.endpoint)
       .maybeSingle();
@@ -248,7 +284,10 @@ async function repairPushSubscriptionIfMissing() {
       console.warn("No se pudo verificar el registro push:", error.message);
       return;
     }
-    if (known) return;
+    if (known) {
+      if (!known.user_agent) await persistPushSubscription(subscription);
+      return;
+    }
     // El servidor pudo haber eliminado esta suscripción tras recibir 404/410.
     subscription = await renewPushSubscription(reg, subscription);
     console.info("Suscripción push recuperada para este dispositivo.");
@@ -261,6 +300,11 @@ async function repairPushSubscriptionIfMissing() {
 }
 
 async function enableBrowserNotifications() {
+  if (!desktopBrowserNotifications()) {
+    return appAlert(
+      "En Android, vincula este teléfono desde Aplicación Android y widgets.",
+    );
+  }
   if (!("Notification" in window))
     return appAlert(
       "Este navegador no admite notificaciones. Prueba Chrome en Android o PC.",

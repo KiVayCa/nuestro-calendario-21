@@ -160,6 +160,7 @@ async function setupAdvancedRealtime(force = false) {
           if (document.visibilityState === "visible")
             showAppToast(note.title || "Nueva notificación de tu pareja ❤️");
           if (
+            desktopBrowserNotifications() &&
             "Notification" in window &&
             Notification.permission === "granted" &&
             document.visibilityState !== "visible"
@@ -219,7 +220,8 @@ async function initAdvanced() {
     );
     pendingDeepLink = new URLSearchParams();
     const cleanUrl = new URL(location.href);
-    for (const key of ["tab", "item", "date"]) cleanUrl.searchParams.delete(key);
+    for (const key of ["tab", "item", "date"])
+      cleanUrl.searchParams.delete(key);
     history.replaceState(null, "", cleanUrl.href);
   }
   if (!maybeOfferAndroidPushLink()) maybeOfferWidgetLink();
