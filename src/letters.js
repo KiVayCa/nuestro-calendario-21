@@ -97,7 +97,7 @@ function renderAdvLetters() {
                 x.unlock_at && new Date(x.unlock_at) > new Date();
               const locked = !!x.is_locked;
               const pendingForRecipient = scheduled && x.created_by !== user.id;
-              return `<div class="advItem letterItem" data-advanced-id="${x.id}"><div class="letterContent"><div class="advItemTitle">${locked ? "🔒 " : scheduled ? "🕒 " : "💌 "}${esc(x.title)}</div><div class="advMeta">${esc(x.category)}${x.place_id && advCache.places.find((p) => p.id === x.place_id) ? " · 📍 " + placeLinkHtml(x.place_id, advCache.places.find((p) => p.id === x.place_id).name) : ""} · ${scheduled ? "Se desbloquea " + new Date(x.unlock_at).toLocaleString("es-CO") + " · " + letterCountdown(x.unlock_at) : "Disponible"} · ${locked ? "Carta protegida" : "Sin bloqueo"}</div>${scheduled ? "<p>Esta carta está guardada para el futuro. ❤️</p>" : `<div class="letterPaper letterPaper-${letterPaperName(x.paper)}">${x.content_html ? cleanLetterMarkup(x.content_html) : esc(x.content).replace(/\r?\n/g, "<br>")}</div>${x.audio_path ? `<button type="button" class="btn letterAudioButton" onclick="playLetterAudio('${x.id}',this)">♫ Escuchar audio</button>` : ""}`}${scheduled ? "" : renderLetterReactions(x.id)}</div><div class="advActions letterActions">${pendingForRecipient ? "<span>Disponible en la fecha indicada ❤️</span>" : `${!scheduled && x.opened_at ? "✓ Leída" : ""}<button type="button" class="btn" onclick="openAdvancedEdit('letters','${x.id}')">✏️ Editar</button><button type="button" class="btn" onclick="toggleLetterLock('${x.id}')">${locked ? "🔓 Desbloquear" : "🔒 Bloquear"}</button><button type="button" class="btn danger" ${locked ? 'disabled title="Desbloquea la carta para poder eliminarla" aria-label="Eliminar carta bloqueada"' : ""} onclick="deleteAdvanced('letters','${x.id}')">🗑️ Eliminar</button>`}</div></div>`;
+              return `<div class="advItem letterItem" data-advanced-id="${x.id}"><div class="letterContent"><div class="advItemTitle">${locked ? "🔒 " : scheduled ? "🕒 " : "💌 "}${esc(x.title)}</div><div class="advMeta">${esc(x.category)}${x.place_id && advCache.places.find((p) => p.id === x.place_id) ? " · 📍 " + placeLinkHtml(x.place_id, advCache.places.find((p) => p.id === x.place_id).name) : ""} · ${scheduled ? "Se desbloquea " + new Date(x.unlock_at).toLocaleString("es-CO") + " · " + letterCountdown(x.unlock_at) : "Disponible"} · ${locked ? "Carta protegida" : "Sin bloqueo"}</div>${scheduled ? "<p>Esta carta está guardada para el futuro. ❤️</p>" : `<div class="letterPaper letterPaper-${letterPaperName(x.paper)}">${x.content_html ? cleanLetterMarkup(x.content_html) : esc(x.content).replace(/\r?\n/g, "<br>")}</div>${x.audio_path ? `<button type="button" class="btn letterAudioButton" onclick="playLetterAudio('${x.id}',this)">♫ Escuchar audio</button>` : ""}`}${scheduled ? "" : renderLetterReactions(x.id)}</div><div class="advActions letterActions">${pendingForRecipient ? "<span>Disponible en la fecha indicada ❤️</span>" : `${!scheduled && x.opened_at ? "✓ Leída" : ""}<button type="button" class="btn" ${locked ? 'disabled title="Desbloquea la carta para editarla"' : ""} onclick="openAdvancedEdit('letters','${x.id}')">✏️ Editar</button><button type="button" class="btn" onclick="toggleLetterLock('${x.id}')">${locked ? "🔓 Desbloquear" : "🔒 Bloquear"}</button><button type="button" class="btn danger" ${locked ? 'disabled title="Desbloquea la carta para poder eliminarla" aria-label="Eliminar carta bloqueada"' : ""} onclick="deleteAdvanced('letters','${x.id}')">🗑️ Eliminar</button>`}</div></div>`;
             })
             .join("")
         : `<div class="advEmpty">💌 Escriban su primera carta. Puede ser para hoy, para un aniversario o para un día difícil.</div>`
@@ -223,6 +223,12 @@ const letterPapers = [
   ["sea", "Azul océano"],
   ["gold", "Dorado cálido"],
   ["night", "Noche estrellada"],
+  ["sakura", "Jardín de cerezos"],
+  ["forest", "Bosque de helechos"],
+  ["sunset", "Atardecer coral"],
+  ["moon", "Luna y constelaciones"],
+  ["ocean", "Mar de medianoche"],
+  ["daisy", "Margaritas de verano"],
 ];
 const letterFonts = [
   "Georgia",
@@ -231,6 +237,11 @@ const letterFonts = [
   "Times New Roman",
   "Courier New",
   "cursive",
+  "Dancing Script",
+  "Caveat",
+  "Great Vibes",
+  "Kalam",
+  "Sacramento",
 ];
 const letterMarkupTags = new Set([
   "B",
@@ -285,7 +296,11 @@ function cleanLetterMarkup(html) {
       : parent;
     if (element !== parent) {
       if (bold) element.style.fontWeight = "bold";
+      else if (["normal", "400"].includes(node.style?.fontWeight))
+        element.style.fontWeight = "normal";
       if (italic) element.style.fontStyle = "italic";
+      else if (node.style?.fontStyle === "normal")
+        element.style.fontStyle = "normal";
       if (font) element.style.fontFamily = font;
       parent.append(element);
     }
@@ -328,25 +343,68 @@ function bindLetterEditor(letter) {
   };
   paper.onchange = updatePaper;
   updatePaper();
+  const fontControl = $("letterFont");
   let selection;
+  let typingFont;
+  let typingBold = false;
+  let typingItalic = false;
+  const currentFont = () => {
+    const value = String(document.queryCommandValue("fontName") || "")
+      .split(",")[0]
+      .replace(/['"]/g, "")
+      .trim()
+      .toLowerCase();
+    return letterFonts.find((font) => font.toLowerCase() === value);
+  };
   const remember = () => {
     const current = window.getSelection();
     if (
       current?.rangeCount &&
       editor.contains(current.anchorNode) &&
       editor.contains(current.focusNode)
-    )
+    ) {
       selection = current.getRangeAt(0).cloneRange();
+    }
+  };
+  const trackCaret = () => {
+    remember();
+    typingFont = currentFont();
+    typingBold = document.queryCommandState("bold");
+    typingItalic = document.queryCommandState("italic");
+    if (typingFont) fontControl.value = typingFont;
   };
   editor.addEventListener("blur", remember);
+  editor.addEventListener("pointerup", trackCaret);
+  editor.addEventListener("keyup", trackCaret);
+  editor.addEventListener("input", remember);
   const format = (command, value) => {
-    editor.focus();
-    if (selection) {
-      const current = window.getSelection();
-      current.removeAllRanges();
-      current.addRange(selection);
+    if (document.activeElement === editor) remember();
+    editor.focus({ preventScroll: true });
+    const current = window.getSelection();
+    if (!selection || !editor.contains(selection.commonAncestorContainer)) {
+      selection = document.createRange();
+      selection.selectNodeContents(editor);
+      selection.collapse(false);
     }
-    document.execCommand(command, false, value);
+    current.removeAllRanges();
+    current.addRange(selection);
+    document.execCommand("styleWithCSS", false, true);
+    if (current.isCollapsed) {
+      if (command === "fontName") typingFont = value;
+      if (command === "bold") typingBold = !typingBold;
+      if (command === "italic") typingItalic = !typingItalic;
+      if (typingFont && currentFont() !== typingFont) {
+        document.execCommand("fontName", false, typingFont);
+      }
+      if (document.queryCommandState("bold") !== typingBold) {
+        document.execCommand("bold", false);
+      }
+      if (document.queryCommandState("italic") !== typingItalic) {
+        document.execCommand("italic", false);
+      }
+    } else {
+      document.execCommand(command, false, value);
+    }
     remember();
   };
   for (const button of editor.previousElementSibling.querySelectorAll(
@@ -358,7 +416,7 @@ function bindLetterEditor(letter) {
     };
     button.onclick = () => format(button.dataset.command);
   }
-  $("letterFont").onchange = (event) => format("fontName", event.target.value);
+  fontControl.onchange = (event) => format("fontName", event.target.value);
   editor.addEventListener("paste", (event) => {
     event.preventDefault();
     const html = event.clipboardData?.getData("text/html");

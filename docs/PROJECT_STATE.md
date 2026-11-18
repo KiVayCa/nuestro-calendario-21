@@ -134,3 +134,8 @@ claros de widgets y conserva los fondos oscuros. Pendiente prueba visual en
 el Motorola.
 
 Se verificaron la firma y la descarga de la v11 generada en la ejecución 44396524319. El descriptor de esta entrega anuncia la v11.
+
+Cartas añade cinco fuentes manuscritas y seis fondos. El color del papel se
+aplica también al texto interno del editor. Los comandos de formato conservan
+el tipo de letra al alternar negrita o cursiva. El servidor rechaza cambios al
+contenido de cartas bloqueadas hasta que se desbloqueen.

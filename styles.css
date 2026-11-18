@@ -1623,3 +1623,51 @@ body:is([data-theme="night"], [data-theme="midnight"], [data-theme="charcoal"])
     radial-gradient(circle at 64% 59%, #e6dfff83 1px, transparent 1.8px) 0 0 / 83px 61px,
     radial-gradient(ellipse at top right, #454368, #242339 70%);
 }
+
+/* Paper contrast follows the chosen paper, including text inside dark modals. */
+.letterPaper, .letterPaper * {
+  color: var(--paper-ink) !important;
+}
+#letterEditor { caret-color: var(--paper-ink); }
+.letterPaper [style*="Dancing Script"] { font-family: "Dancing Script", cursive !important; }
+.letterPaper [style*="Caveat"] { font-family: "Caveat", cursive !important; }
+.letterPaper [style*="Great Vibes"] { font-family: "Great Vibes", cursive !important; }
+.letterPaper [style*="Kalam"] { font-family: "Kalam", cursive !important; }
+.letterPaper [style*="Sacramento"] { font-family: "Sacramento", cursive !important; }
+
+.letterPaper-sakura {
+  --paper-ink: #502339; --paper-border: #e5a8ba;
+  --paper-decoration: "✿ ❀ ✿"; --paper-decoration-color: #ad4268;
+  --paper-bg: radial-gradient(ellipse at 95% 0, #f5a5c47a, transparent 55%),
+    radial-gradient(ellipse at 0 100%, #f9c9d8b5, transparent 46%), #fff6f8;
+}
+.letterPaper-forest {
+  --paper-ink: #213c2d; --paper-border: #8fad94;
+  --paper-decoration: "❧ ❧"; --paper-decoration-color: #486d50;
+  --paper-bg: radial-gradient(ellipse at 12% 100%, #8dbca36f, transparent 62%),
+    linear-gradient(145deg, #f3fbf2, #cee7d0);
+}
+.letterPaper-sunset {
+  --paper-ink: #532d29; --paper-border: #df9b77;
+  --paper-decoration: "☼ ✧"; --paper-decoration-color: #9a512d;
+  --paper-bg: radial-gradient(ellipse at 90% 0, #f9b76cb3, transparent 52%),
+    linear-gradient(140deg, #fff1d9, #f7c9c3);
+}
+.letterPaper-moon {
+  --paper-ink: #f3f0ff; --paper-border: #656c9a;
+  --paper-decoration: "✧ ☽ ✧"; --paper-decoration-color: #e6d7ff;
+  --paper-bg: radial-gradient(circle at 38% 26%, #ddd6fc77 1px, transparent 1.8px) 0 0 / 91px 65px,
+    radial-gradient(ellipse at 100% 0, #4a5087, #22243e 70%);
+}
+.letterPaper-ocean {
+  --paper-ink: #e9fbff; --paper-border: #527e8b;
+  --paper-decoration: "≋ ✧ ≋"; --paper-decoration-color: #b5e3ec;
+  --paper-bg: repeating-linear-gradient(-14deg, transparent 0 23px, #6fa8b520 24px, transparent 30px),
+    linear-gradient(155deg, #254d63, #112b3b);
+}
+.letterPaper-daisy {
+  --paper-ink: #40401d; --paper-border: #c6ae57;
+  --paper-decoration: "✿ ❁ ✿"; --paper-decoration-color: #84651c;
+  --paper-bg: radial-gradient(ellipse at 0 100%, #e5eaa6ab, transparent 50%),
+    linear-gradient(145deg, #fffbe6, #f9e7a8);
+}

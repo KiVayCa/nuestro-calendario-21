@@ -601,6 +601,8 @@ function setAdvField(id, value) {
 function openAdvancedEdit(key, id) {
   const x = (advCache[key] || []).find((i) => i.id === id);
   if (!x) return appAlert("No encontramos este elemento.");
+  if (key === "letters" && x.is_locked)
+    return appAlert("Desbloquea la carta antes de editarla.");
   advancedEditState = { key, id };
   const fn = {
     memories: openMemoryForm,
@@ -702,6 +704,8 @@ async function saveAdvancedEdit() {
     if (!title || !draft.content)
       return appAlert("Completa el título y la carta ❤️");
     const letter = advCache.letters.find((item) => item.id === id);
+    if (letter?.is_locked)
+      return appAlert("Desbloquea la carta antes de editarla.");
     priorLetterAudio = letter?.audio_path;
     try {
       letterAudio = await uploadLetterAudio(letter);
