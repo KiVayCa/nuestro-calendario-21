@@ -64,3 +64,7 @@ El descriptor anuncia la v6 con APK firmado y SHA-256 verificado. Pasaron las 20
 ## Reacciones en Cartas
 
 Cada persona puede elegir, cambiar o quitar su reacción en una carta abierta. Los dos ven los conteos. Se incorporó la migración original de TEST y se añadieron controles de apertura y una prueba SQL de permisos.
+
+## Android v7 RC2 · canal de actualización
+
+El descriptor anuncia la v7 RC2 (`1.0.0-preview.7`) para probar el arranque desde el icono. El APK alojado tiene 4.102.038 bytes y SHA-256 `24cc328ed1b37c453ad3172cd3ddb0072dd72d75c7ad38e24c77a0e35e69f433`. Se verificaron la descarga, la firma existente y el paquete. Queda pendiente confirmar la apertura y el resultado de Play Protect en el Motorola. Este cambio activa el descriptor del APK RC2 ya alojado.

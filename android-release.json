@@ -1,15 +1,14 @@
 {
   "format": 1,
   "packageName": "co.calendario21.app",
-  "versionCode": 6,
-  "versionName": "1.0.0-preview.6",
-  "apkUrl": "https://vz4dp1vu2kie6kny.public.blob.vercel-storage.com/android/nuestro-calendario-21-v6.apk",
-  "sha256": "486bc6aa26ba557e231a0a41252e6ade3c60f7bc9a7790e29c0e7116346c1891",
-  "bytes": 4106190,
+  "versionCode": 7,
+  "versionName": "1.0.0-preview.7",
+  "apkUrl": "https://vz4dp1vu2kie6kny.public.blob.vercel-storage.com/android/nuestro-calendario-21-v7.apk",
+  "sha256": "24cc328ed1b37c453ad3172cd3ddb0072dd72d75c7ad38e24c77a0e35e69f433",
+  "bytes": 4102038,
   "minSdk": 26,
-  "publishedAt": "2026-11-18T13:45:12.897Z",
+  "publishedAt": "2026-11-18T16:29:24.903Z",
   "notes": [
-    "Corrige la apertura de la aplicación desde su icono.",
-    "Corrige el intercambio automático de sesión con los widgets."
+    "Versión de prueba del arranque desde el icono del calendario."
   ]
 }
