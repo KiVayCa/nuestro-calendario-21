@@ -123,6 +123,7 @@ async function setupAdvancedRealtime(force = false) {
   const tables = [
     "memories",
     "love_letters",
+    "letter_reactions",
     "dreams",
     "challenges",
     "important_dates",

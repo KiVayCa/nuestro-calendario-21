@@ -1,3 +1,62 @@
+const letterReactionOptions = [
+  ["❤️", "Me encanta"],
+  ["🥹", "Me emocionó"],
+  ["😍", "Me enamora"],
+  ["🥰", "Me dio ternura"],
+  ["🤗", "Un abrazo"],
+  ["🙏", "Gracias"],
+];
+
+function renderLetterReactions(letterId) {
+  const reactions = advCache.letterReactions.filter(
+    (item) => item.letter_id === letterId,
+  );
+  const mine = reactions.find((item) => item.user_id === user.id)?.emoji;
+  return (
+    '<div class="advActions letterReactions" role="group" aria-label="Reacciones a la carta">' +
+    letterReactionOptions
+      .map(([emoji, label], index) => {
+        const count = reactions.filter((item) => item.emoji === emoji).length;
+        return `<button type="button" class="btn${mine === emoji ? " primary" : ""}" aria-pressed="${mine === emoji}" aria-label="${label} · ${count}" onclick="saveLetterReaction('${letterId}', ${index}, this)">${emoji} ${count || ""}</button>`;
+      })
+      .join("") +
+    "</div>"
+  );
+}
+
+async function saveLetterReaction(letterId, index, button) {
+  const letter = advCache.letters.find((item) => item.id === letterId);
+  const emoji = letterReactionOptions[index]?.[0];
+  if (
+    !letter ||
+    !emoji ||
+    (letter.unlock_at && new Date(letter.unlock_at) > new Date())
+  )
+    return;
+  const mine = advCache.letterReactions.find(
+    (item) => item.letter_id === letterId && item.user_id === user.id,
+  );
+  const group = button.closest(".letterReactions");
+  const buttons = [...group.querySelectorAll("button")];
+  buttons.forEach((item) => {
+    item.disabled = true;
+  });
+  try {
+    const { error } = await sb.rpc("set_letter_reaction", {
+      p_letter_id: letterId,
+      p_emoji: mine?.emoji === emoji ? null : emoji,
+    });
+    if (error) throw error;
+    await advLoadAll(["letterReactions"]);
+  } catch {
+    appAlert("No pudimos guardar la reacción. Inténtalo de nuevo.");
+  } finally {
+    buttons.forEach((item) => {
+      item.disabled = false;
+    });
+  }
+}
+
 function letterCountdown(date) {
   const minutes = Math.ceil((new Date(date) - Date.now()) / 60000);
   if (minutes <= 0) return "Disponible";
@@ -32,7 +91,7 @@ function renderAdvLetters() {
                 x.unlock_at && new Date(x.unlock_at) > new Date();
               const locked = !!x.is_locked;
               const pendingForRecipient = scheduled && x.created_by !== user.id;
-              return `<div class="advItem letterItem" data-advanced-id="${x.id}"><div class="letterContent"><div class="advItemTitle">${locked ? "🔒 " : scheduled ? "🕒 " : "💌 "}${esc(x.title)}</div><div class="advMeta">${esc(x.category)}${x.place_id && advCache.places.find((p) => p.id === x.place_id) ? " · 📍 " + placeLinkHtml(x.place_id, advCache.places.find((p) => p.id === x.place_id).name) : ""} · ${scheduled ? "Se desbloquea " + new Date(x.unlock_at).toLocaleString("es-CO") + " · " + letterCountdown(x.unlock_at) : "Disponible"} · ${locked ? "Carta protegida" : "Sin bloqueo"}</div><p>${scheduled ? "Esta carta está guardada para el futuro. ❤️" : esc(x.content)}</p></div><div class="advActions letterActions">${pendingForRecipient ? "<span>Disponible en la fecha indicada ❤️</span>" : `${!scheduled && x.opened_at ? "✓ Leída" : ""}<button type="button" class="btn" onclick="openAdvancedEdit('letters','${x.id}')">✏️ Editar</button><button type="button" class="btn" onclick="toggleLetterLock('${x.id}')">${locked ? "🔓 Desbloquear" : "🔒 Bloquear"}</button><button type="button" class="btn danger" ${locked ? 'disabled title="Desbloquea la carta para poder eliminarla" aria-label="Eliminar carta bloqueada"' : ""} onclick="deleteAdvanced('letters','${x.id}')">🗑️ Eliminar</button>`}</div></div>`;
+              return `<div class="advItem letterItem" data-advanced-id="${x.id}"><div class="letterContent"><div class="advItemTitle">${locked ? "🔒 " : scheduled ? "🕒 " : "💌 "}${esc(x.title)}</div><div class="advMeta">${esc(x.category)}${x.place_id && advCache.places.find((p) => p.id === x.place_id) ? " · 📍 " + placeLinkHtml(x.place_id, advCache.places.find((p) => p.id === x.place_id).name) : ""} · ${scheduled ? "Se desbloquea " + new Date(x.unlock_at).toLocaleString("es-CO") + " · " + letterCountdown(x.unlock_at) : "Disponible"} · ${locked ? "Carta protegida" : "Sin bloqueo"}</div><p>${scheduled ? "Esta carta está guardada para el futuro. ❤️" : esc(x.content)}</p>${scheduled ? "" : renderLetterReactions(x.id)}</div><div class="advActions letterActions">${pendingForRecipient ? "<span>Disponible en la fecha indicada ❤️</span>" : `${!scheduled && x.opened_at ? "✓ Leída" : ""}<button type="button" class="btn" onclick="openAdvancedEdit('letters','${x.id}')">✏️ Editar</button><button type="button" class="btn" onclick="toggleLetterLock('${x.id}')">${locked ? "🔓 Desbloquear" : "🔒 Bloquear"}</button><button type="button" class="btn danger" ${locked ? 'disabled title="Desbloquea la carta para poder eliminarla" aria-label="Eliminar carta bloqueada"' : ""} onclick="deleteAdvanced('letters','${x.id}')">🗑️ Eliminar</button>`}</div></div>`;
             })
             .join("")
         : `<div class="advEmpty">💌 Escriban su primera carta. Puede ser para hoy, para un aniversario o para un día difícil.</div>`
