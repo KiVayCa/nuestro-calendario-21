@@ -31,7 +31,7 @@ public class WidgetLinkActivity extends Activity {
               .build();
       activity.setResult(
           RESULT_OK, new Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId));
-      activity.startActivity(new Intent(activity, MainActivity.class).setData(url));
+      activity.startActivity(new Intent(activity, CalendarActivity.class).setData(url));
       activity.finish();
     } catch (Exception error) {
       Toast.makeText(
