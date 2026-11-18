@@ -58,3 +58,5 @@ Publicación v5: APK firmado de 4.106.190 bytes, SHA-256 bc47a04e5caff89b336835c
 ## Corrección de Android v6
 
 Chrome entrega primero el puerto y envía el desafío después por ese canal. El calendario escucha ambos pasos. La actividad que abre el navegador conserva la conexión durante la sesión y recurre al inicio normal si el navegador no está disponible. Pendiente validar arranque y vínculo automático en Android físico.
+
+El descriptor anuncia la v6 con APK firmado y SHA-256 verificado. Pasaron las 20 pruebas web y las pruebas unitarias, lint y compilación de Android en GitHub Actions (ejecución 44315850054). Queda pendiente validar la apertura y el vínculo automático en los teléfonos.
