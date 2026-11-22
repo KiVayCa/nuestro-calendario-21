@@ -241,5 +241,5 @@ el calendario ocupa todo el ancho y la tarjeta de próximo plan queda debajo;
 se reducen márgenes y rellenos, se respetan zonas seguras y se conserva scroll
 vertical en vez de forzar el mes a una pantalla de poca altura.
 Pasaron 25 pruebas web, incluida estructura de 42 celdas y reglas responsive.
-Pendiente comprobar visualmente la rotación en el Motorola y publicación web.
+HTML y CSS verificados en producción. Pendiente comprobar visualmente la rotación en el Motorola.
 Se mantiene APK v14.
