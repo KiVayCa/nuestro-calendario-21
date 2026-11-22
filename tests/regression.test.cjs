@@ -35,6 +35,8 @@ test("Colombian holidays apply fixed dates, Monday transfers, Easter and the new
   assert.equal(h(2027).size, 19);
   for (const key of ["2028-04-13", "2028-04-14", "2028-05-29", "2028-06-19", "2028-06-26", "2029-03-29", "2029-06-11", "2030-07-01"]) assert.ok(h(Number(key.slice(0,4))).has(key), key);
   assert.equal([...h(2030).values()].flat().length, 19);
+  const descriptions = vm.runInContext("COLOMBIAN_HOLIDAY_DESCRIPTIONS", c);
+  for (const names of h(2027).values()) for (const name of names) assert.ok(descriptions[name]?.length > 25, name);
 });
 test("saving a changed theme requests widget sync only after persistence", async () => {
   const calls = [];

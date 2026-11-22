@@ -213,9 +213,9 @@ function formatMoney(value) {
 }
 
 function handleDayClick(date) {
-  // El cuerpo del día siempre abre el formulario de plan normal.
-  // Los eventos avanzados se abren únicamente al pulsar su propio bloque/icono.
-  openModal(date);
+  // El festivo ofrece información y una acción explícita para crear un plan.
+  if (colombianHolidayNames(parseDateOnly(date)).length) openCalendarHoliday(date);
+  else openModal(date);
 }
 
 function dateKeyLocal(d) {

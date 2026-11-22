@@ -67,14 +67,14 @@ function render() {
         class="day
         ${d.getMonth() !== m ? "muted" : ""}
         ${k === iso(new Date()) ? "today" : ""}"
-
+        data-date="${k}"
         onclick="handleDayClick('${k}')"
       >
 
         <b class="${restDay ? "calendarRestNumber" : ""}"${restDay ? ` title="${escapeHtml(holiday.length ? holiday.join(" · ") : "Domingo")}"` : ""}>
           ${d.getDate()}
         </b>
-        ${holiday.length ? `<span class="calendarHolidayLabel" title="${escapeHtml(holiday.join(" · "))}">${escapeHtml(holiday.join(" · "))}</span>` : ""}
+        ${holiday.length ? `<button type="button" class="calendarHolidayLabel" onclick="event.stopPropagation();openCalendarHoliday('${k}')" aria-label="Ver festivo: ${escapeHtml(holiday.join(" · "))}" title="${escapeHtml(holiday.join(" · "))}">${escapeHtml(holiday.join(" · "))}</button>` : ""}
 
         ${events
           .map(
@@ -424,11 +424,49 @@ function colombianHolidayNames(date) {
   return colombianHolidays(date.getFullYear()).get(iso(date)) || [];
 }
 
+const COLOMBIAN_HOLIDAY_DESCRIPTIONS = {
+  "Año Nuevo": "Celebra el comienzo de un nuevo año del calendario gregoriano.",
+  "Reyes Magos": "La Epifanía recuerda la visita de los Reyes Magos al niño Jesús. Se conmemora el 6 de enero; el descanso se traslada al lunes cuando corresponde.",
+  "San José": "La tradición católica honra a San José, esposo de María y padre adoptivo de Jesús. Su fecha es el 19 de marzo.",
+  "Jueves Santo": "Recuerda la Última Cena de Jesús con sus discípulos, el lavatorio de los pies y el inicio del Triduo Pascual.",
+  "Viernes Santo": "Conmemora la pasión y muerte de Jesucristo en la cruz.",
+  "Día del Trabajo": "Reconoce la labor de los trabajadores y la historia de la lucha por sus derechos. Se celebra el 1 de mayo.",
+  "Ascensión del Señor": "Conmemora la ascensión de Jesucristo al cielo, cuarenta días después de la Resurrección. El descanso se celebra el lunes siguiente.",
+  "Corpus Christi": "Solemnidad católica dedicada al Cuerpo y la Sangre de Cristo y al sacramento de la Eucaristía. El descanso se traslada al lunes.",
+  "Sagrado Corazón": "Celebración católica del Sagrado Corazón de Jesús, símbolo de su amor y misericordia. El descanso se traslada al lunes.",
+  "San Pedro y San Pablo": "Honra a los apóstoles Pedro y Pablo por su papel en los orígenes de la Iglesia cristiana. Se conmemora el 29 de junio.",
+  "Virgen de Chiquinquirá": "Honra a Nuestra Señora del Rosario de Chiquinquirá, patrona de Colombia, y la tradición religiosa y cultural de Boyacá. Se conmemora el 9 de julio; es festivo nacional desde 2026.",
+  "Independencia de Colombia": "Recuerda los acontecimientos del 20 de julio de 1810, que impulsaron el proceso de independencia de Colombia.",
+  "Batalla de Boyacá": "Conmemora la victoria del ejército libertador el 7 de agosto de 1819, decisiva para la independencia.",
+  "Asunción de la Virgen": "Solemnidad católica que celebra la asunción de María al cielo. Su fecha tradicional es el 15 de agosto.",
+  "Diversidad Étnica y Cultural": "Es una jornada de reconocimiento y reflexión sobre la diversidad cultural, los pueblos indígenas y el encuentro histórico de culturas. Se conmemora el 12 de octubre.",
+  "Todos los Santos": "La tradición cristiana honra a todos los santos, conocidos y desconocidos. Su fecha tradicional es el 1 de noviembre.",
+  "Independencia de Cartagena": "Recuerda la declaración de independencia absoluta de Cartagena de Indias el 11 de noviembre de 1811.",
+  "Inmaculada Concepción": "Solemnidad católica que celebra la concepción de María libre del pecado original, el 8 de diciembre.",
+  "Navidad": "Celebra el nacimiento de Jesucristo, el 25 de diciembre.",
+};
+
+function openCalendarHoliday(date) {
+  const holidays = colombianHolidayNames(parseDateOnly(date));
+  if (!holidays.length) return;
+  const details = holidays.map(name => `<section class="calendarHolidayDetail"><h3>${escapeHtml(name)}</h3><p>${escapeHtml(COLOMBIAN_HOLIDAY_DESCRIPTIONS[name])}</p></section>`).join("");
+  openAdvModal("🇨🇴 Día festivo en Colombia", `<p class="advMeta">${escapeHtml(formatDate(date))}</p>${details}<p class="advMeta">Día de descanso según el calendario nacional de Colombia.</p><button type="button" class="btn primary" onclick="closeAdvModal();openModal('${date}')">+ Agregar plan para este día</button>`);
+}
+
+function showPlanModal() {
+  const modal = $("modal");
+  const selection = window.getSelection?.();
+  if (selection?.anchorNode && $("grid").contains(selection.anchorNode)) selection.removeAllRanges();
+  document.activeElement?.blur();
+  modal.classList.remove("is-closing");
+  modal.style.display = "grid";
+  modal.querySelector(".modalBox").scrollTop = 0;
+  // Focus the heading, not a text field: opening the form must not summon a keyboard.
+  $("modalTitle").focus({ preventScroll: true });
+}
+
 function openModal(d) {
   $("modalTitle").textContent = "Agregar un plan ♡";
-
-  $("modal").classList.remove("is-closing");
-  $("modal").style.display = "grid";
 
   $("date").value = d || iso(view);
 
@@ -450,13 +488,11 @@ function openModal(d) {
 
   $("modal").dataset.editingId = "";
 
-  setTimeout(() => $("title").focus(), 50);
+  showPlanModal();
 }
 
 function openEditModal(plan) {
   $("modalTitle").textContent = "Editar plan ✏️";
-
-  $("modal").style.display = "grid";
 
   $("date").value = plan.plan_date || "";
 
@@ -478,7 +514,7 @@ function openEditModal(plan) {
 
   $("modal").dataset.editingId = plan.id;
 
-  setTimeout(() => $("title").focus(), 50);
+  showPlanModal();
 }
 
 function closeModal() {

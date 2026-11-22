@@ -273,8 +273,13 @@ body.auth-pending #login{visibility:hidden}
 .calendarToolbar .calendarMonthControls .btn:nth-child(2){min-width:54px}
 .calendarNativeMonthPicker{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:1}
 .calendarMonthHeading:focus-within{outline:2px solid var(--rose);outline-offset:3px}
-.workspace .day > .calendarRestNumber{color:var(--rose);color:color-mix(in srgb,var(--rose) 50%,var(--ink));font-weight:900}
-.workspace .day > .calendarHolidayLabel{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:clamp(7px,1.6vw,10px);line-height:1.2;color:var(--rose);color:color-mix(in srgb,var(--rose) 45%,var(--ink));font-weight:600;margin-top:2px}
+.workspace{--calendar-rest-ink:var(--rose);--calendar-rest-ink:color-mix(in srgb,var(--rose) 70%,#000)}
+body:is([data-theme="night"],[data-theme="midnight"],[data-theme="charcoal"]) .workspace{--calendar-rest-ink:color-mix(in srgb,var(--rose) 75%,#fff)}
+.workspace .day > .calendarRestNumber{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;padding:0 3px;border-radius:50%;color:var(--calendar-rest-ink);background:var(--soft);border:1px solid var(--rose);font-weight:900;line-height:1}
+.workspace .day > .calendarHolidayLabel{display:block;width:100%;text-align:left;padding:0;border:0;background:transparent;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:clamp(7px,1.6vw,10px);line-height:1.2;color:var(--calendar-rest-ink);font-weight:700;margin-top:2px;cursor:pointer}
+.calendarHolidayDetail{border-bottom:1px solid var(--line);padding:10px 0;margin-bottom:10px}
+.calendarHolidayDetail h3{color:var(--rose);margin:0 0 5px;font-size:18px}
+.calendarHolidayDetail p{margin:0;line-height:1.55;color:var(--ink)}
 
 .workspace .week,
 .workspace .grid{
@@ -284,6 +289,8 @@ body.auth-pending #login{visibility:hidden}
 }
 .workspace > .card,.workspace .day,.workspace .week > div{min-width:0;max-width:100%}
 .workspace .day{overflow:hidden}
+.workspace .day,.workspace .day *{-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+#modalTitle:focus{outline:none}
 
 .week div{
   padding:9px;
@@ -1771,3 +1778,13 @@ body:has(#appDialog.show) .ncTransactionIndicator {
   .workspace .day{min-height:54px;padding:4px 5px}
   .workspace .event{font-size:11px}
 }
+
+/* Plan editor: low-cost compositor animation on mobile, without blur/3D or keyboard-driven resize. */
+@keyframes planModalEnter{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes planModalExit{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(6px)}}
+@media(hover:none), (max-width:800px), (orientation:landscape) and (max-height:600px){
+  #modal,#modal.is-closing{backdrop-filter:none;-webkit-backdrop-filter:none}
+  #modal[style*="display: grid"] .modalBox{animation:planModalEnter .16s ease-out both;filter:none;box-shadow:0 10px 32px #35182233}
+  #modal.is-closing .modalBox{animation:planModalExit .13s ease-in both;filter:none}
+}
+@media(prefers-reduced-motion:reduce){#modal[style*="display: grid"] .modalBox,#modal.is-closing .modalBox{animation:none!important}}

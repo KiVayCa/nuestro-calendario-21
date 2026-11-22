@@ -243,3 +243,15 @@ vertical en vez de forzar el mes a una pantalla de poca altura.
 Pasaron 25 pruebas web, incluida estructura de 42 celdas y reglas responsive.
 HTML y CSS verificados en producción. Pendiente comprobar visualmente la rotación en el Motorola.
 Se mantiene APK v14.
+## Calendario · información de festivos y fluidez del editor
+
+Nicolás confirmó que el calendario responsive se ve bien. Los números de
+domingos/festivos ahora tienen una insignia circular contrastada con la paleta
+activa. Tocar un festivo abre una ficha con nombre, fecha, celebración y botón
+para agregar un plan en esa fecha; las 19 celebraciones tienen descripción.
+Se conserva la creación directa al tocar días no festivos. Se elimina el
+autofoco de inputs al crear/editar planes, se enfoca el encabezado y se limpia
+la selección del calendario. Se suprime el resaltado táctil azul solo en las
+celdas y se simplifican las animaciones móviles a traslación/opacidad sin blur.
+Pasaron 25 pruebas web, incluidas fichas de festivos y ausencia de autofoco.
+Pendiente verificar publicación y comportamiento físico en Android; APK v14.
