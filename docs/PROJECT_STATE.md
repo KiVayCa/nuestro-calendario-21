@@ -254,4 +254,4 @@ autofoco de inputs al crear/editar planes, se enfoca el encabezado y se limpia
 la selección del calendario. Se suprime el resaltado táctil azul solo en las
 celdas y se simplifican las animaciones móviles a traslación/opacidad sin blur.
 Pasaron 25 pruebas web, incluidas fichas de festivos y ausencia de autofoco.
-Pendiente verificar publicación y comportamiento físico en Android; APK v14.
+JS y CSS publicados verificados en producción. Pendiente comprobar fluidez y resaltado en Android físico; APK v14.
