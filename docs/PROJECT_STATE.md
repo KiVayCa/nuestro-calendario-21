@@ -185,4 +185,4 @@ Cada proveedor cuenta con una vista de ejemplo propia (`previewLayout`) y una
 imagen PNG de respaldo (`previewImage`) para otros lanzadores. Son datos ficticios
 en la paleta Romance; los widgets colocados usan sus datos y el tema activo.
 Regenerar con `python scripts/build-widget-previews.py` (Pillow). Pasaron 22
-pruebas web. CI 45034359196 completó pruebas JVM, lint, compilación release, firma y alojamiento. Se comprobó firma idéntica a v13, descarga, SHA-256, tamaño y versión del APK. El descriptor anuncia v14; pendiente comprobar el despliegue público y las vistas previas en el Motorola.
+pruebas web. CI 45034359196 completó pruebas JVM, lint, compilación release, firma y alojamiento. Se comprobó firma idéntica a v13, descarga, SHA-256, tamaño y versión del APK. El descriptor anuncia v14; se verificó el descriptor público de producción anunciando v14. Pendiente aceptación de las vistas previas y datos reales en el Motorola.
