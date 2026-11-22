@@ -38,6 +38,7 @@ function render() {
     populatePlanCategorySelect(categoryFilter, "", true);
   const selectedCategory = categoryFilter?.value || "";
   $("month").textContent = months[view.getMonth()] + " " + view.getFullYear();
+  syncCalendarMonthPicker();
 
   const y = view.getFullYear();
 
@@ -338,40 +339,46 @@ function move(n) {
   const next = new Date(view.getFullYear(), view.getMonth() + n, 1);
   if (next.getFullYear() < 1984 || next.getFullYear() > 2199) return;
   view = next;
-  closeCalendarMonthPicker();
   render();
 }
 
 function today() {
   view = new Date();
-  closeCalendarMonthPicker();
   render();
 }
 
-function closeCalendarMonthPicker() {
-  $("calendarMonthPicker").hidden = true;
-  $("month").setAttribute("aria-expanded", "false");
+function syncCalendarMonthPicker() {
+  const picker = $("calendarMonthPicker");
+  if (!picker) return;
+  // Browsers without a native month picker use their native date picker instead.
+  if (picker.type !== "month") {
+    picker.type = "date";
+    picker.min = "1984-01-01";
+    picker.max = "2199-12-31";
+  }
+  const selected = `${view.getFullYear()}-${String(view.getMonth() + 1).padStart(2, "0")}`;
+  picker.value = picker.type === "date" ? selected + "-01" : selected;
 }
 
-function toggleCalendarMonthPicker() {
+function openCalendarMonthPicker(event) {
   const picker = $("calendarMonthPicker");
-  if (!picker.hidden) return closeCalendarMonthPicker();
-  const selector = $("calendarPickMonth");
-  selector.innerHTML = months.map((name, month) => `<option value="${month}">${name}</option>`).join("");
-  selector.value = String(view.getMonth());
-  $("calendarPickYear").value = view.getFullYear();
-  picker.hidden = false;
-  $("month").setAttribute("aria-expanded", "true");
-  selector.focus();
+  if (typeof picker.showPicker === "function") {
+    try {
+      picker.showPicker();
+      event?.preventDefault();
+    } catch (_) { /* Native input activation is the fallback. */ }
+  }
 }
 
 function selectCalendarMonth() {
-  const year = Number($("calendarPickYear").value);
-  const month = Number($("calendarPickMonth").value);
+  const value = $("calendarMonthPicker").value;
+  const match = /^(\d{4})-(\d{2})(?:-\d{2})?$/.exec(value);
+  if (!match) return syncCalendarMonthPicker();
+  const year = Number(match[1]);
+  const month = Number(match[2]) - 1;
   if (!Number.isInteger(year) || year < 1984 || year > 2199 ||
-      !Number.isInteger(month) || month < 0 || month > 11) return;
+      !Number.isInteger(month) || month < 0 || month > 11) return syncCalendarMonthPicker();
   view = new Date(year, month, 1);
-  closeCalendarMonthPicker();
   render();
 }
 

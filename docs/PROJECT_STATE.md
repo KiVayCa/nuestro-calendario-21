@@ -223,3 +223,11 @@ Se verificaron ejemplos 2026–2030, 24 pruebas web y selector/estilos de fuente
 La comprobación visual en Chromium local no fue posible por restricciones de
 ejecución; pendiente aceptación en teléfonos. Se verificaron HTML, JS y CSS publicados en producción.
 No requiere nuevo APK: se mantiene v14.
+## Selector nativo de mes y año
+
+El título centrado del calendario activa un `input type=month` mediante
+`showPicker`, sin formulario propio. Se usa `type=date` como alternativa nativa
+si el navegador no admite meses, y se ignora el día elegido. El cambio navega
+al mes seleccionado y las flechas/Hoy mantienen el valor sincronizado.
+Pasaron 24 pruebas web, incluida la selección y la alternativa. Pendiente
+comprobar el diálogo nativo en el Motorola y el despliegue web. Se mantiene v14.

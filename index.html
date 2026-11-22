@@ -338,12 +338,10 @@
         <label for="planCategoryFilter">Filtrar calendario por categoría</label>
         <select id="planCategoryFilter" onchange="render()"><option value="">Todas las categorías</option></select>
       </div>
-      <h2 class="calendarMonthHeading"><button id="month" class="calendarMonthButton" type="button" onclick="toggleCalendarMonthPicker()" aria-expanded="false" aria-controls="calendarMonthPicker"></button></h2>
-      <form id="calendarMonthPicker" class="calendarMonthPicker" hidden onsubmit="event.preventDefault(); selectCalendarMonth()">
-        <div class="field"><label for="calendarPickMonth">Mes</label><select id="calendarPickMonth"></select></div>
-        <div class="field"><label for="calendarPickYear">Año</label><input type="number" id="calendarPickYear" min="1984" max="2199" step="1" required></div>
-        <button class="btn primary" type="submit">Ir al mes</button>
-      </form>
+      <h2 class="calendarMonthHeading">
+        <span id="month" class="calendarMonthButton" aria-hidden="true"></span>
+        <input id="calendarMonthPicker" class="calendarNativeMonthPicker" type="month" min="1984-01" max="2199-12" aria-label="Elegir mes y año" onclick="openCalendarMonthPicker(event)" onchange="selectCalendarMonth()">
+      </h2>
       <div class="controls calendarMonthControls">
         <button class="btn" type="button" onclick="move(-1)" aria-label="Mes anterior">‹</button>
         <button class="btn" type="button" onclick="today()">Hoy</button>
