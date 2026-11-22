@@ -196,4 +196,4 @@ La restricción `plans_category_check` se amplió en TEST y producción,
 con migración registrada en ambos entornos. Una prueba transaccional en TEST
 guardó las 22 categorías con rol autenticado y editó una de ellas; se revirtió
 la prueba. Pasaron 22 pruebas web, incluida creación, edición y filtro.
-No requiere otro APK; se mantiene Android v14. Pendiente verificar despliegue web.
+No requiere otro APK; se mantiene Android v14. Se verificó en producción el selector y las nuevas categorías del bundle.
