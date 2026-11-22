@@ -172,4 +172,4 @@ señal FCM silenciosa a los teléfonos registrados de ambos miembros. Es una se�
 sin datos privados; cada widget sigue consultando su permiso de lectura vigente.
 Se solicita actualización también al recibir avisos nativos. Se conserva la
 sincronización periódica para dispositivos sin FCM o con entrega demorada por Android.
-CI 45033354541 completó las 22 pruebas web, pruebas JVM, lint y compilación release. La firma coincide con v12 y se verificaron la descarga, tamaño y SHA-256. La función FCM se desplegó en TEST y producción; en ambos rechaza solicitudes sin sesión. El descriptor de esta entrega anuncia v13. Pendiente validar el despliegue público y la sincronización en los teléfonos de Nicolás y Ana.
+CI 45033354541 completó las 22 pruebas web, pruebas JVM, lint y compilación release. La firma coincide con v12 y se verificaron la descarga, tamaño y SHA-256. La función FCM se desplegó en TEST y producción; en ambos rechaza solicitudes sin sesión. El descriptor de esta entrega anuncia v13. Se verificó el descriptor público de producción anunciando v13. Pendiente comprobar la sincronización automática y manual en los teléfonos de Nicolás y Ana.
