@@ -718,11 +718,12 @@ function openPlansModal(date) {
     openModal(currentDay);
   };
 
+  $("plansModal").classList.remove("is-closing");
   $("plansModal").style.display = "grid";
 }
 
 function closePlansModal() {
-  $("plansModal").style.display = "none";
+  closeInlineCalendarModal("plansModal");
 }
 
 function openPlanDetail(id, occurrenceDate) {
@@ -911,6 +912,7 @@ function openPlanDetail(id, occurrenceDate) {
   }
   $("detailRows").innerHTML = rows;
 
+  $("detailModal").classList.remove("is-closing");
   $("detailModal").style.display = "grid";
 }
 

@@ -231,7 +231,6 @@ function openExpenseForm() {
       ? localISODate()
       : budgetSelectedMonth + "-01";
   setBudgetEntryType("expense");
-  $("adv_title")?.focus();
 }
 
 function setBudgetEntryType(type) {

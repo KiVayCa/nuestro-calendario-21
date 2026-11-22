@@ -255,3 +255,14 @@ la selección del calendario. Se suprime el resaltado táctil azul solo en las
 celdas y se simplifican las animaciones móviles a traslación/opacidad sin blur.
 Pasaron 25 pruebas web, incluidas fichas de festivos y ausencia de autofoco.
 JS y CSS publicados verificados en producción. Pendiente comprobar fluidez y resaltado en Android físico; APK v14.
+## Animaciones de formularios y ventanas
+
+Los seis modales principales comparten entrada de 380 ms con desplazamiento,
+escala suave y rebote leve, y salida de 190 ms. Se animan opacidad y transform
+sin desenfoque dinámico; se conserva el brillo de la barra de módulos intacto.
+Las transiciones de módulos se agilizan sin reiniciar durante actualizaciones
+realtime. Se respeta la preferencia de movimiento reducido. Se evita enfocar
+campos de escritura al abrir planes, presupuesto y diálogos de texto.
+Pasaron 25 pruebas web, incluidas reapertura durante cierre y foco sin teclado.
+Pendiente comprobar visualmente en Android físico y verificar despliegue web.
+Se mantiene APK v14.

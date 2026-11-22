@@ -245,9 +245,20 @@ function occurrenceAllowed(plan, d) {
 }
 
 function closeDetailModal() {
-  $("detailModal").style.display = "none";
+  closeInlineCalendarModal("detailModal");
 
   currentPlan = null;
+}
+
+function closeInlineCalendarModal(id) {
+  const modal = $(id);
+  if (modal.style.display !== "grid" || modal.classList.contains("is-closing")) return;
+  modal.classList.add("is-closing");
+  window.setTimeout(() => {
+    if (!modal.classList.contains("is-closing")) return;
+    modal.style.display = "none";
+    modal.classList.remove("is-closing");
+  }, 210);
 }
 
 function esc(v) {

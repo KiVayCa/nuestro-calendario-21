@@ -109,8 +109,9 @@ function appDialogOpen({
     $("appDialogOk").className = "btn " + (danger ? "danger" : "primary");
     $("appDialog").classList.add("show");
     requestAnimationFrame(() => {
-      if (mode === "prompt") $("appDialogInput").focus();
-      else $("appDialogOk").focus();
+      if (!$("appDialog").classList.contains("show") || $("appDialog").classList.contains("is-closing")) return;
+      if (mode === "prompt") $("appDialogTitle").focus({ preventScroll: true });
+      else $("appDialogOk").focus({ preventScroll: true });
     });
   });
 }

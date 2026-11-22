@@ -138,10 +138,14 @@ function renderAdvanced({ preserveInputs = false } = {}) {
 
 function openAdvModal(title, body) {
   const modal = $("advModal");
+  document.activeElement?.blur();
   modal.classList.remove("is-closing");
   $("advModalTitle").textContent = title;
   $("advModalBody").innerHTML = body;
   modal.classList.add("show");
+  modal.querySelector(".modalBox").scrollTop = 0;
+  $("advModalTitle").setAttribute("tabindex", "-1");
+  $("advModalTitle").focus({ preventScroll: true });
 }
 
 function closeAdvModal() {

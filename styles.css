@@ -1779,12 +1779,35 @@ body:has(#appDialog.show) .ncTransactionIndicator {
   .workspace .event{font-size:11px}
 }
 
-/* Plan editor: low-cost compositor animation on mobile, without blur/3D or keyboard-driven resize. */
-@keyframes planModalEnter{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-@keyframes planModalExit{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(6px)}}
-@media(hover:none), (max-width:800px), (orientation:landscape) and (max-height:600px){
-  #modal,#modal.is-closing{backdrop-filter:none;-webkit-backdrop-filter:none}
-  #modal[style*="display: grid"] .modalBox{animation:planModalEnter .16s ease-out both;filter:none;box-shadow:0 10px 32px #35182233}
-  #modal.is-closing .modalBox{animation:planModalExit .13s ease-in both;filter:none}
+/* Shared, expressive motion for every form and dialog. Only opacity and
+   transform animate; the navigation bar and its shimmer are untouched. */
+@keyframes ncDialogBloom{
+  0%{opacity:0;transform:translateY(26px) scale(.95)}
+  65%{opacity:1;transform:translateY(-3px) scale(1.006)}
+  100%{opacity:1;transform:translateY(0) scale(1)}
 }
-@media(prefers-reduced-motion:reduce){#modal[style*="display: grid"] .modalBox,#modal.is-closing .modalBox{animation:none!important}}
+@keyframes ncDialogDismiss{from{opacity:1;transform:translateY(0) scale(1)}to{opacity:0;transform:translateY(12px) scale(.98)}}
+@keyframes ncDialogBackdropIn{from{opacity:0}to{opacity:1}}
+@keyframes ncDialogBackdropOut{from{opacity:1}to{opacity:0}}
+:is(#modal,#advModal,#profileModal,#plansModal,#detailModal,#appDialog):is(.show,[style*="display: grid"]){animation:ncDialogBackdropIn .20s ease-out both;backdrop-filter:none;-webkit-backdrop-filter:none}
+:is(#modal,#advModal,#profileModal,#plansModal,#detailModal,#appDialog):is(.show,[style*="display: grid"]) .modalBox{animation:ncDialogBloom .38s cubic-bezier(.18,.78,.24,1) both;transform-origin:50% 65%;filter:none}
+:is(#modal,#advModal,#profileModal,#plansModal,#detailModal,#appDialog).is-closing{animation:ncDialogBackdropOut .19s ease-in both;pointer-events:none;z-index:999}
+:is(#modal,#advModal,#profileModal,#plansModal,#detailModal,#appDialog).is-closing .modalBox{animation:ncDialogDismiss .19s ease-in both;pointer-events:none;filter:none}
+:is(#advModal,#profileModal) :is(.advForm .field,.settingsCard){animation:none}
+#advModalTitle:focus,#appDialogTitle:focus{outline:none}
+@keyframes ncDialogContentEnter{from{opacity:.65;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+#advModal.show:not(.is-closing) #advModalBody,#profileModal.show:not(.is-closing) #profileModalBody{animation:ncDialogContentEnter .32s ease-out both}
+@media(hover:none), (max-width:800px), (orientation:landscape) and (max-height:600px){
+  :is(#modal,#advModal,#profileModal,#plansModal,#detailModal,#appDialog) .modalBox{box-shadow:0 14px 36px #35182240;transform-origin:50% 85%}
+}
+/* Module changes keep the existing stagger behavior but do not animate blur. */
+@keyframes ncModuleSlideIn{from{opacity:0;transform:translateY(18px) scale(.99)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes ncHeroGlide{from{opacity:0;transform:translateY(14px) scale(.99)}to{opacity:1;transform:translateY(0) scale(1)}}
+#advancedContent.tab-enter > *{animation-duration:.42s!important}
+#advancedContent.tab-enter :is(.advHero,.homeWelcome,.homeNext){animation-duration:.46s!important}
+#advancedContent.tab-enter :is(.advGrid > *, .advList > *, .achievementGrid > *, .homeStats > *){animation-duration:.34s!important}
+@media(prefers-reduced-motion:reduce){
+  :is(#modal,#advModal,#profileModal,#plansModal,#detailModal,#appDialog):is(.show,.is-closing,[style*="display: grid"]),
+  :is(#modal,#advModal,#profileModal,#plansModal,#detailModal,#appDialog):is(.show,.is-closing,[style*="display: grid"]) .modalBox,
+  #advModal.show #advModalBody,#profileModal.show #profileModalBody{animation:none!important}
+}
