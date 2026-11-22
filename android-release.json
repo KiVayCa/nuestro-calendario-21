@@ -1,15 +1,15 @@
 {
   "format": 1,
   "packageName": "co.calendario21.app",
-  "versionCode": 13,
-  "versionName": "1.0.0-preview.13",
-  "apkUrl": "https://vz4dp1vu2kie6kny.public.blob.vercel-storage.com/android/nuestro-calendario-21-v13.apk",
-  "sha256": "09f7456ce94b63d6d55b6e343f063c83989dbb07a66a3e9d74891324c6a1f509",
-  "bytes": 5397186,
+  "versionCode": 14,
+  "versionName": "1.0.0-preview.14",
+  "apkUrl": "https://vz4dp1vu2kie6kny.public.blob.vercel-storage.com/android/nuestro-calendario-21-v14.apk",
+  "sha256": "da40d68ce8ff2ffa95c9034af21ef59204117dd0b513b0e88c44c96509630df5",
+  "bytes": 5533420,
   "minSdk": 26,
-  "publishedAt": "2026-11-22T14:33:30.924Z",
+  "publishedAt": "2026-11-22T14:44:40.924Z",
   "notes": [
-    "Los widgets solicitan una sincronización automática al guardar un tema.",
-    "Actualización manual prioritaria y sincronización al recibir avisos del calendario."
+    "Tres nuevos widgets: Nuestro día, Próxima fecha especial y Balance del mes.",
+    "Vistas previas con ejemplos realistas de los ocho widgets en el selector de Android."
   ]
 }
