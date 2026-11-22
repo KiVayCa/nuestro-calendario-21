@@ -230,4 +230,4 @@ El título centrado del calendario activa un `input type=month` mediante
 si el navegador no admite meses, y se ignora el día elegido. El cambio navega
 al mes seleccionado y las flechas/Hoy mantienen el valor sincronizado.
 Pasaron 24 pruebas web, incluida la selección y la alternativa. Pendiente
-comprobar el diálogo nativo en el Motorola y el despliegue web. Se mantiene v14.
+comprobar el diálogo nativo en el Motorola. HTML y JS del cambio verificados en producción. Se mantiene v14.
