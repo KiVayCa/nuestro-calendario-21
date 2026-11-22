@@ -207,4 +207,4 @@ independientemente del envío visible. El servidor valida la sesión, pertenenci
 y el aviso reciente del actor y admite únicamente los ocho tipos de evento.
 El mecanismo de temas permanece intacto. La función se desplegó en TEST y
 producción; 23 pruebas web pasaron, incluida la cobertura de los ocho eventos.
-No requiere APK nuevo. Pendiente verificar despliegue web y prueba en celulares.
+No requiere APK nuevo. Se verificó el bundle público de producción; pendiente confirmar entrega en ambos celulares.
