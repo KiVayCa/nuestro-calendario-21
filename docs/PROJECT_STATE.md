@@ -173,3 +173,16 @@ sin datos privados; cada widget sigue consultando su permiso de lectura vigente.
 Se solicita actualización también al recibir avisos nativos. Se conserva la
 sincronización periódica para dispositivos sin FCM o con entrega demorada por Android.
 CI 45033354541 completó las 22 pruebas web, pruebas JVM, lint y compilación release. La firma coincide con v12 y se verificaron la descarga, tamaño y SHA-256. La función FCM se desplegó en TEST y producción; en ambos rechaza solicitudes sin sesión. El descriptor de esta entrega anuncia v13. Se verificó el descriptor público de producción anunciando v13. Pendiente comprobar la sincronización automática y manual en los teléfonos de Nicolás y Ana.
+## Android v14 · colección y previsualización de widgets
+
+Se amplía de cinco a ocho tarjetas: Nuestro día muestra los eventos de hoy,
+incluidas fechas importantes y planes realizados; Próxima fecha especial muestra
+la cuenta regresiva de la siguiente fecha importante recurrente o individual;
+Balance del mes cuenta ocurrencias de planes realizadas y pendientes, sin contar
+cancelaciones o fechas reprogramadas. Se reutilizan la sesión de lectura y la
+sincronización de v13. No se amplían las autorizaciones de lectura.
+Cada proveedor cuenta con una vista de ejemplo propia (`previewLayout`) y una
+imagen PNG de respaldo (`previewImage`) para otros lanzadores. Son datos ficticios
+en la paleta Romance; los widgets colocados usan sus datos y el tema activo.
+Regenerar con `python scripts/build-widget-previews.py` (Pillow). Pasaron 22
+pruebas web; pendiente CI de Android, publicación y aceptación en el Motorola.

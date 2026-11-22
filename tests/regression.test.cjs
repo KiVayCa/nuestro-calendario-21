@@ -445,12 +445,21 @@ test("Android widget links wait for login and return a one-use code only to the 
   assert.equal(calls, 1);
 });
 
-test("all five Android widgets may be placed before a session exists", () => {
+test("all eight Android widgets have distinct populated previews and can be placed without a session", () => {
   const xml = "android/app/src/main/res/xml";
   const providers = fs.readdirSync(xml).filter(name => name.endsWith("_widget.xml"));
-  assert.equal(providers.length, 5);
-  for (const name of providers)
-    assert.doesNotMatch(fs.readFileSync(xml + "/" + name, "utf8"), /android:configure=/);
+  assert.equal(providers.length, 8);
+  const previews = new Set();
+  for (const name of providers) {
+    const provider = fs.readFileSync(xml + "/" + name, "utf8");
+    assert.doesNotMatch(provider, /android:configure=/);
+    const layout = provider.match(/android:previewLayout="@layout\/(preview_[a-z_]+)"/)[1];
+    const image = provider.match(/android:previewImage="@drawable\/(preview_[a-z_]+)"/)[1];
+    assert.match(fs.readFileSync(`android/app/src/main/res/layout/${layout}.xml`, "utf8"), /Ejemplo/);
+    assert.ok(fs.existsSync(`android/app/src/main/res/drawable-nodpi/${image}.png`));
+    previews.add(layout);
+  }
+  assert.equal(previews.size, 8);
 });
 
 test("Android checks on every return and only confirms an equal published version", async () => {

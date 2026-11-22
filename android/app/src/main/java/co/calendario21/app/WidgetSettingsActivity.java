@@ -204,8 +204,8 @@ public class WidgetSettingsActivity extends Activity {
     text(
         box,
         "Después de guardar: mantén pulsada la pantalla de inicio → Widgets → Nuestro Calendario"
-            + " #21. Elige Próximo plan, Cuenta regresiva, Nuestro mes, Nuestra historia o Nuestra"
-            + " semana. Toca ⚙ para volver aquí.",
+            + " #21. Elige cualquiera de los ocho widgets, incluidos Nuestro día, Próxima fecha"
+            + " especial y Balance del mes. Toca ⚙ para volver aquí.",
         15);
     text(
         box,

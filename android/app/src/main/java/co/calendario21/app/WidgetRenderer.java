@@ -21,7 +21,10 @@ final class WidgetRenderer {
     CountdownWidget.class,
     MonthWidget.class,
     RelationshipWidget.class,
-    WeekWidget.class
+    WeekWidget.class,
+    TodayWidget.class,
+    ImportantDateWidget.class,
+    MonthlySummaryWidget.class
   };
   private static final Locale ES = new Locale("es", "CO");
 
@@ -81,13 +84,17 @@ final class WidgetRenderer {
       Context c, int id, Class<?> kind, JSONObject snapshot, int width, int height) {
     boolean month = kind == MonthWidget.class,
         relationship = kind == RelationshipWidget.class,
-        week = kind == WeekWidget.class;
+        week = kind == WeekWidget.class,
+        todayWidget = kind == TodayWidget.class,
+        special = kind == ImportantDateWidget.class,
+        summary = kind == MonthlySummaryWidget.class;
+    boolean agenda = week || todayWidget;
     int layout =
         month
             ? R.layout.widget_month
             : relationship
                 ? R.layout.widget_relationship
-                : week ? R.layout.widget_week : R.layout.widget;
+                : agenda ? R.layout.widget_week : R.layout.widget;
     RemoteViews views = new RemoteViews(c.getPackageName(), layout);
     SharedPreferences appearance = c.getSharedPreferences("appearance", 0);
     WidgetPalette palette = palette(c, snapshot, appearance.getString("frame", "app"));
@@ -113,7 +120,7 @@ final class WidgetRenderer {
       views.setTextColor(R.id.calendar_agenda, palette.ink);
     }
     String heading =
-        month
+        todayWidget ? "NUESTRO DÍA ♡" : special ? "NUESTRA PRÓXIMA FECHA ♡" : summary ? "ASÍ VA NUESTRO MES ♡" : month
             ? "NUESTRO MES ♡"
             : relationship
                 ? "DOS FECHAS, UNA HISTORIA ♡"
@@ -140,9 +147,9 @@ final class WidgetRenderer {
             ? Math.min(26, chosen)
             : relationship
                 ? 18
-                : WidgetDates.titleSize(chosen, width, height, kind == CountdownWidget.class));
+                : WidgetDates.titleSize(chosen, width, height, kind == CountdownWidget.class || special));
     views.setInt(R.id.widget_title, "setMaxLines", relationship || month || compact ? 1 : 2);
-    if (!week && !month) views.setInt(R.id.widget_detail, "setMaxLines", compact ? 1 : 2);
+    if (!agenda && !month) views.setInt(R.id.widget_detail, "setMaxLines", compact ? 1 : 2);
     views.setViewVisibility(
         R.id.widget_updated, width < 240 || height < 160 ? View.GONE : View.VISIBLE);
     String title = "Abre Nuestro Calendario #21",
@@ -205,6 +212,42 @@ final class WidgetRenderer {
           monthAction(c, views, id, R.id.month_previous, -1);
           monthAction(c, views, id, R.id.month_next, 1);
           monthAction(c, views, id, R.id.widget_title, 0);
+        } else if (todayWidget) {
+          JSONArray dates = snapshot.optJSONArray("dates");
+          List<WidgetDates.CalendarEntry> entries = WidgetDates.eventsOn(plans, dates == null ? new JSONArray() : dates, today);
+          title = entries.isEmpty() ? "Un día para nosotros" : entries.size() + (entries.size() == 1 ? " evento hoy" : " eventos hoy");
+          StringBuilder lines = new StringBuilder();
+          int count = Math.min(height < 230 ? 2 : height < 310 ? 3 : 5, entries.size());
+          for (int i = 0; i < count; i++) {
+            WidgetDates.CalendarEntry entry = entries.get(i);
+            if (i > 0) lines.append('\n');
+            if (entry.completed) lines.append("✓ ");
+            if (!entry.time.isEmpty()) lines.append(LocalTime.parse(entry.time).format(DateTimeFormatter.ofPattern("HH:mm"))).append(" · ");
+            lines.append(entry.title);
+          }
+          if (entries.size() > count) lines.append("\n+").append(entries.size() - count).append(" más");
+          detail = entries.isEmpty() ? "Sin eventos para hoy. ¡Creemos un recuerdo!" : lines.toString();
+          views.setInt(R.id.widget_detail, "setMaxLines", height < 230 ? 3 : height < 310 ? 5 : 7);
+          views.setTextViewTextSize(R.id.widget_detail, TypedValue.COMPLEX_UNIT_SP, width < 240 ? 13 : 15);
+          url += "?tab=calendar&date=" + today;
+        } else if (special) {
+          JSONArray dates = snapshot.optJSONArray("dates");
+          WidgetDates.SpecialDate next = WidgetDates.nextImportantDate(dates == null ? new JSONArray() : dates, today);
+          url += "?tab=dates";
+          if (next == null) {
+            title = "Una fecha por celebrar";
+            detail = "Añade una fecha importante en la app";
+          } else {
+            long days = java.time.temporal.ChronoUnit.DAYS.between(today, next.date);
+            title = days == 0 ? "¡Es hoy!" : days + (days == 1 ? " día" : " días");
+            detail = next.entry.optString("title") + " · " + next.date.format(DateTimeFormatter.ofPattern("d MMM yyyy", ES));
+            url += "&item=" + Uri.encode(next.entry.optString("id")) + "&date=" + next.date;
+          }
+        } else if (summary) {
+          int[] counts = WidgetDates.monthSummary(plans, YearMonth.from(today));
+          title = counts[0] + " realizados";
+          detail = counts[1] + " pendientes · " + (counts[0] + counts[1]) + " planes en " + today.format(DateTimeFormatter.ofPattern("MMMM", ES));
+          url += "?tab=calendar&date=" + today.withDayOfMonth(1);
         } else if (week) {
           List<PlanEngine.Occurrence> list = WidgetDates.week(plans, now);
           title =

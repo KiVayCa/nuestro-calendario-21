@@ -86,6 +86,33 @@ final class WidgetDates {
     return eventsOn(plans, dates, day).size();
   }
 
+  static final class SpecialDate {
+    final JSONObject entry;
+    final LocalDate date;
+    SpecialDate(JSONObject entry, LocalDate date) { this.entry = entry; this.date = date; }
+  }
+
+  static SpecialDate nextImportantDate(JSONArray dates, LocalDate today) throws Exception {
+    for (int n = 0; n <= 730; n++) {
+      LocalDate day = today.plusDays(n);
+      for (int i = 0; i < dates.length(); i++) {
+        JSONObject entry = dates.getJSONObject(i);
+        if (importantOccurs(entry, day)) return new SpecialDate(entry, day);
+      }
+    }
+    return null;
+  }
+
+  static int[] monthSummary(JSONArray plans, YearMonth month) throws Exception {
+    int completed = 0, pending = 0;
+    for (int day = 1; day <= month.lengthOfMonth(); day++) {
+      for (CalendarEntry entry : eventsOn(plans, new JSONArray(), month.atDay(day))) {
+        if (entry.completed) completed++; else pending++;
+      }
+    }
+    return new int[] {completed, pending};
+  }
+
   static List<PlanEngine.Occurrence> week(JSONArray plans, Instant now) throws Exception {
     List<PlanEngine.Occurrence> out = new ArrayList<>();
     LocalDate today = now.atZone(PlanEngine.ZONE).toLocalDate();

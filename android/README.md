@@ -1,5 +1,9 @@
 # Nuestro Calendario #21 · Android preview
 
+## Widgets · preview 14
+
+Ocho widgets disponibles, incluidos **Nuestro día** (agenda de hoy), **Próxima fecha especial** (cuenta regresiva de la próxima fecha importante) y **Balance del mes** (planes realizados y pendientes). Todos comparten el vínculo y la sincronización de v13. Las vistas previas del selector utilizan ejemplos ficticios, incluyendo una cuadrícula del calendario mensual y números de ejemplo para Nuestra historia. Los widgets instalados usan datos reales y el tema de la aplicación. Las vistas XML y PNG se regeneran con `python scripts/build-widget-previews.py` desde la raíz (requiere Pillow).
+
 ## Widgets · preview 5 (en pruebas)
 Agregar cualquiera de los cinco widgets desde Inicio crea la tarjeta inmediatamente. La primera vez, abrir el calendario en la APK con una sesión web iniciada permite conectar los widgets mediante el canal verificado de Chrome. Una sesión de widget existente se reutiliza. Con la cuenta cerrada, el widget espera al inicio de sesión. El menú ⚙ conserva los ajustes y la recuperación manual para permisos revocados o navegadores incompatibles.
 

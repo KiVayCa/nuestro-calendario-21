@@ -120,4 +120,21 @@ public class WidgetDatesTest {
     assertTrue(
         WidgetDates.titleSize(40, 320, 260, false) > WidgetDates.titleSize(28, 320, 260, false));
   }
+
+  @Test
+  public void monthlySummaryCountsOccurrencesAndExcludesCancelled() throws Exception {
+    JSONObject weekly = plan("2026-11-03", "10:00:00").put("recurrence_enabled", true)
+        .put("recurrence_type", "weekly")
+        .put("completed_occurrences", new JSONArray("[\"2026-11-03\"]"))
+        .put("cancelled_occurrences", new JSONArray("[\"2026-11-10\"]"));
+    assertArrayEquals(new int[] {1, 2}, WidgetDates.monthSummary(new JSONArray().put(weekly), YearMonth.of(2026, 11)));
+  }
+
+  @Test
+  public void nextImportantDateIncludesTodayAndRepeats() throws Exception {
+    JSONObject yearly = new JSONObject().put("event_date", "2025-11-17").put("recurring", true);
+    WidgetDates.SpecialDate date = WidgetDates.nextImportantDate(new JSONArray().put(yearly), LocalDate.of(2026, 11, 17));
+    assertEquals(LocalDate.of(2026, 11, 17), date.date);
+    assertNull(WidgetDates.nextImportantDate(new JSONArray(), LocalDate.of(2026, 11, 17)));
+  }
 }
