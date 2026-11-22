@@ -1,0 +1,1 @@
+alter table public.plans drop constraint plans_category_check, add constraint plans_category_check check (category in ('cita','paseo','viaje','aniversario','compras','otro','comida','cine','celebracion','sorpresa','aventura','deporte','cultura','descanso','familia','amigos','iglesia','hogar','salud','estudio','trabajo','tramites'));

@@ -371,6 +371,11 @@
     </div>
 
 
+    <div class="field" style="margin: 0 0 12px">
+      <label for="planCategoryFilter">Filtrar calendario por categoría</label>
+      <select id="planCategoryFilter" onchange="render()"><option value="">Todas las categorías</option></select>
+    </div>
+
     <div class="week">
 
       <div>Lun</div>
@@ -524,33 +529,7 @@
         Categoría
       </label>
 
-      <select id="cat">
-
-        <option value="cita">
-          ♡ Cita
-        </option>
-
-        <option value="paseo">
-          🏍 Paseo
-        </option>
-
-        <option value="viaje">
-          ✈ Viaje
-        </option>
-
-        <option value="aniversario">
-          💜 Aniversario
-        </option>
-
-        <option value="compras">
-          🛍 Compras
-        </option>
-
-        <option value="otro">
-          ☆ Otro
-        </option>
-
-      </select>
+      <select id="cat"><option value="cita">♡ Cita</option></select>
 
     </div>
 

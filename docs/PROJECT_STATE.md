@@ -186,3 +186,14 @@ imagen PNG de respaldo (`previewImage`) para otros lanzadores. Son datos fictici
 en la paleta Romance; los widgets colocados usan sus datos y el tema activo.
 Regenerar con `python scripts/build-widget-previews.py` (Pillow). Pasaron 22
 pruebas web. CI 45034359196 completó pruebas JVM, lint, compilación release, firma y alojamiento. Se comprobó firma idéntica a v13, descarga, SHA-256, tamaño y versión del APK. El descriptor anuncia v14; se verificó el descriptor público de producción anunciando v14. Pendiente aceptación de las vistas previas y datos reales en el Motorola.
+## Categorías de planes del calendario
+
+Se amplía el selector de 6 a 22 categorías, agrupadas en Momentos juntos,
+Experiencias y Vida compartida. Los iconos y nombres se centralizan en
+`src/utils.js`; se conservan las claves anteriores. El calendario mensual
+permite filtrar por categoría (sin filtro muestra todos los eventos).
+La restricción `plans_category_check` se amplió en TEST y producción,
+con migración registrada en ambos entornos. Una prueba transaccional en TEST
+guardó las 22 categorías con rol autenticado y editó una de ellas; se revirtió
+la prueba. Pasaron 22 pruebas web, incluida creación, edición y filtro.
+No requiere otro APK; se mantiene Android v14. Pendiente verificar despliegue web.

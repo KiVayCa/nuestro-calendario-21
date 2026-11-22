@@ -33,6 +33,10 @@ async function loadPlans() {
 }
 
 function render() {
+  const categoryFilter = $("planCategoryFilter");
+  if (categoryFilter && categoryFilter.options.length <= 1)
+    populatePlanCategorySelect(categoryFilter, "", true);
+  const selectedCategory = categoryFilter?.value || "";
   $("month").textContent = months[view.getMonth()] + " " + view.getFullYear();
 
   const y = view.getFullYear();
@@ -50,7 +54,9 @@ function render() {
 
     const k = iso(d);
 
-    const events = getCalendarEventsForRange(k, k);
+    const events = getCalendarEventsForRange(k, k).filter((event) =>
+      !selectedCategory || (event.source === "plan" && event.category === selectedCategory),
+    );
 
     html += `
 
@@ -349,7 +355,7 @@ function openModal(d) {
 
   $("time").value = "";
 
-  $("cat").value = "cita";
+  populatePlanCategorySelect($("cat"), $("planCategoryFilter")?.value || "cita");
 
   $("location").value = "";
 
@@ -377,7 +383,7 @@ function openEditModal(plan) {
 
   $("time").value = plan.plan_time ? plan.plan_time.slice(0, 5) : "";
 
-  $("cat").value = plan.category || "cita";
+  populatePlanCategorySelect($("cat"), plan.category || "cita");
 
   $("location").value = plan.location || "";
 

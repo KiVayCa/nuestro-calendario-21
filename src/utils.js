@@ -149,36 +149,41 @@ function escapeHtml(value) {
     .replace(/'/g, "&#039;");
 }
 
+const PLAN_CATEGORY_GROUPS = [
+  ["Momentos juntos", [
+    ["cita", "♡", "Cita"], ["comida", "🍽️", "Comida y restaurantes"],
+    ["cine", "🎬", "Cine y entretenimiento"], ["aniversario", "💜", "Aniversario"],
+    ["celebracion", "🎉", "Celebración y cumpleaños"], ["sorpresa", "🎁", "Sorpresa y regalo"],
+  ]],
+  ["Experiencias", [
+    ["paseo", "🏍️", "Paseo"], ["viaje", "✈️", "Viaje"],
+    ["aventura", "⛰️", "Aventura y naturaleza"], ["deporte", "⚽", "Deporte y ejercicio"],
+    ["cultura", "🎭", "Cultura y eventos"], ["descanso", "☕", "Descanso y relajación"],
+  ]],
+  ["Vida compartida", [
+    ["familia", "👨‍👩‍👧", "Familia"], ["amigos", "🤝", "Amigos"],
+    ["iglesia", "⛪", "Iglesia y vida espiritual"], ["hogar", "🏡", "Hogar"],
+    ["compras", "🛍️", "Compras"], ["salud", "🩺", "Salud y bienestar"],
+    ["estudio", "📚", "Estudio"], ["trabajo", "💼", "Trabajo"],
+    ["tramites", "📋", "Trámites y compromisos"], ["otro", "⭐", "Otro"],
+  ]],
+];
+
+const PLAN_CATEGORY_BY_KEY = new Map(PLAN_CATEGORY_GROUPS.flatMap(([, items]) => items.map(([key, icon, name]) => [key, { icon, name }])));
+
 function categoryIcon(category) {
-  if (category === "viaje") return "✈️";
-
-  if (category === "paseo") return "🏍️";
-
-  if (category === "aniversario") return "💜";
-
-  if (category === "compras") return "🛍️";
-
-  if (category === "otro") return "⭐";
-
-  return "♡";
+  return PLAN_CATEGORY_BY_KEY.get(category)?.icon || "♡";
 }
 
 function categoryName(category) {
-  const names = {
-    cita: "Cita",
+  return PLAN_CATEGORY_BY_KEY.get(category)?.name || "Cita";
+}
 
-    paseo: "Paseo",
-
-    viaje: "Viaje",
-
-    aniversario: "Aniversario",
-
-    compras: "Compras",
-
-    otro: "Otro",
-  };
-
-  return names[category] || "Cita";
+function populatePlanCategorySelect(select, selected = "cita", filter = false) {
+  if (!select) return;
+  select.innerHTML = (filter ? '<option value="">Todas las categorías</option>' : "") +
+    PLAN_CATEGORY_GROUPS.map(([group, items]) => `<optgroup label="${group}">${items.map(([key, icon, name]) => `<option value="${key}">${icon} ${name}</option>`).join("")}</optgroup>`).join("");
+  select.value = PLAN_CATEGORY_BY_KEY.has(selected) ? selected : filter ? "" : "cita";
 }
 
 function formatTime(time) {
