@@ -53,6 +53,8 @@ function render() {
     const d = new Date(y, m, i - start + 1);
 
     const k = iso(d);
+    const holiday = colombianHolidayNames(d);
+    const restDay = d.getDay() === 0 || holiday.length > 0;
 
     const events = getCalendarEventsForRange(k, k).filter((event) =>
       !selectedCategory || (event.source === "plan" && event.category === selectedCategory),
@@ -68,9 +70,10 @@ function render() {
         onclick="handleDayClick('${k}')"
       >
 
-        <b>
+        <b class="${restDay ? "calendarRestNumber" : ""}"${restDay ? ` title="${escapeHtml(holiday.length ? holiday.join(" · ") : "Domingo")}"` : ""}>
           ${d.getDate()}
         </b>
+        ${holiday.length ? `<span class="calendarHolidayLabel" title="${escapeHtml(holiday.join(" · "))}">${escapeHtml(holiday.join(" · "))}</span>` : ""}
 
         ${events
           .map(
@@ -332,15 +335,86 @@ function openCalendarEvent(source, id, date) {
 }
 
 function move(n) {
-  view.setMonth(view.getMonth() + n);
-
+  const next = new Date(view.getFullYear(), view.getMonth() + n, 1);
+  if (next.getFullYear() < 1984 || next.getFullYear() > 2199) return;
+  view = next;
+  closeCalendarMonthPicker();
   render();
 }
 
 function today() {
   view = new Date();
-
+  closeCalendarMonthPicker();
   render();
+}
+
+function closeCalendarMonthPicker() {
+  $("calendarMonthPicker").hidden = true;
+  $("month").setAttribute("aria-expanded", "false");
+}
+
+function toggleCalendarMonthPicker() {
+  const picker = $("calendarMonthPicker");
+  if (!picker.hidden) return closeCalendarMonthPicker();
+  const selector = $("calendarPickMonth");
+  selector.innerHTML = months.map((name, month) => `<option value="${month}">${name}</option>`).join("");
+  selector.value = String(view.getMonth());
+  $("calendarPickYear").value = view.getFullYear();
+  picker.hidden = false;
+  $("month").setAttribute("aria-expanded", "true");
+  selector.focus();
+}
+
+function selectCalendarMonth() {
+  const year = Number($("calendarPickYear").value);
+  const month = Number($("calendarPickMonth").value);
+  if (!Number.isInteger(year) || year < 1984 || year > 2199 ||
+      !Number.isInteger(month) || month < 0 || month > 11) return;
+  view = new Date(year, month, 1);
+  closeCalendarMonthPicker();
+  render();
+}
+
+// Colombia: Ley 51 de 1983 (traslado al lunes); Ley 2578 de 2026 (9 de julio).
+const colombianHolidayCache = new Map();
+function colombianHolidays(year) {
+  if (colombianHolidayCache.has(year)) return colombianHolidayCache.get(year);
+  const result = new Map();
+  const plusDays = (date, delta) => new Date(date.getFullYear(), date.getMonth(), date.getDate() + delta, 12);
+  const add = (date, name, monday = false) => {
+    const observed = monday ? plusDays(date, (8 - date.getDay()) % 7) : date;
+    const key = iso(observed);
+    result.set(key, [...(result.get(key) || []), name]);
+  };
+  const fixed = [
+    [1, 1, "Año Nuevo", false], [1, 6, "Reyes Magos", true],
+    [3, 19, "San José", true], [5, 1, "Día del Trabajo", false],
+    [6, 29, "San Pedro y San Pablo", true], [7, 20, "Independencia de Colombia", false],
+    [8, 7, "Batalla de Boyacá", false], [8, 15, "Asunción de la Virgen", true],
+    [10, 12, "Diversidad Étnica y Cultural", true], [11, 1, "Todos los Santos", true],
+    [11, 11, "Independencia de Cartagena", true], [12, 8, "Inmaculada Concepción", false],
+    [12, 25, "Navidad", false],
+  ];
+  if (year >= 2026) fixed.push([7, 9, "Virgen de Chiquinquirá", true]);
+  for (const [month, day, name, monday] of fixed) add(new Date(year, month - 1, day, 12), name, monday);
+
+  // Gregorian Easter computus (Meeus/Jones/Butcher), then offsets from Easter Sunday.
+  const a = year % 19, b = Math.floor(year / 100), c = year % 100;
+  const d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25);
+  const g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30;
+  const i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7;
+  const m = Math.floor((a + 11 * h + 22 * l) / 451), n = h + l - 7 * m + 114;
+  const easter = new Date(year, Math.floor(n / 31) - 1, n % 31 + 1, 12);
+  for (const [offset, name, monday] of [
+    [-3, "Jueves Santo", false], [-2, "Viernes Santo", false],
+    [39, "Ascensión del Señor", true], [60, "Corpus Christi", true], [68, "Sagrado Corazón", true],
+  ]) add(plusDays(easter, offset), name, monday);
+  colombianHolidayCache.set(year, result);
+  return result;
+}
+
+function colombianHolidayNames(date) {
+  return colombianHolidays(date.getFullYear()).get(iso(date)) || [];
 }
 
 function openModal(d) {

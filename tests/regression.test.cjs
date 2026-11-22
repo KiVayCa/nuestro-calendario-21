@@ -18,6 +18,18 @@ function context(file, extra = {}) {
   vm.runInContext(fs.readFileSync(file, "utf8"), sandbox);
   return sandbox;
 }
+test("Colombian holidays apply fixed dates, Monday transfers, Easter and the new July holiday", () => {
+  const c = context("src/calendar.js", { iso: d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}` });
+  const h = year => c.colombianHolidays(year);
+  assert.equal(h(2025).has("2025-07-14"), false);
+  assert.equal(h(2026).get("2026-07-13")[0], "Virgen de Chiquinquirá");
+  assert.equal(h(2027).get("2027-07-12")[0], "Virgen de Chiquinquirá");
+  assert.equal(h(2027).has("2027-07-09"), false);
+  for (const key of ["2027-01-01", "2027-01-11", "2027-03-25", "2027-03-26", "2027-05-10", "2027-05-31", "2027-06-07", "2027-07-20", "2027-12-08", "2027-12-25"]) assert.ok(h(2027).has(key), key);
+  assert.equal(h(2027).size, 19);
+  for (const key of ["2028-04-13", "2028-04-14", "2028-05-29", "2028-06-19", "2028-06-26", "2029-03-29", "2029-06-11", "2030-07-01"]) assert.ok(h(Number(key.slice(0,4))).has(key), key);
+  assert.equal([...h(2030).values()].flat().length, 19);
+});
 test("saving a changed theme requests widget sync only after persistence", async () => {
   const calls = [];
   const c = context("src/settings.js", {

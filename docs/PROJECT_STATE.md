@@ -208,3 +208,18 @@ y el aviso reciente del actor y admite únicamente los ocho tipos de evento.
 El mecanismo de temas permanece intacto. La función se desplegó en TEST y
 producción; 23 pruebas web pasaron, incluida la cobertura de los ocho eventos.
 No requiere APK nuevo. Se verificó el bundle público de producción; pendiente confirmar entrega en ambos celulares.
+## Calendario · navegación mensual y festivos de Colombia
+
+Encabezado vertical: agregar plan, filtro, mes/año centrado seleccionable y
+controles anterior/Hoy/siguiente centrados. El selector permite saltar a mes y
+año (1984–2199). Las flechas conservan el mes correcto incluso desde el día 31.
+Domingos y festivos resaltan sus números con la paleta activa; los festivos
+incluyen nombre y no son planes ni desaparecen al aplicar filtros.
+El calendario calcula fechas fijas, traslados al lunes y Semana Santa según la
+Ley 51 de 1983 y el artículo 6 de la Ley 2578 de 2026 (Virgen de Chiquinquirá).
+Fuentes normativas: https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=4954
+y https://lector.ramajudicial.gov.co/SIDN/NORMATIVA/TEXTOS_COMPLETOS/7_LEYES/LEYES%202026/Ley%202578%20de%202026.pdf.
+Se verificaron ejemplos 2026–2030, 24 pruebas web y selector/estilos de fuentes.
+La comprobación visual en Chromium local no fue posible por restricciones de
+ejecución; pendiente aceptación en teléfonos y verificar publicación web.
+No requiere nuevo APK: se mantiene v14.

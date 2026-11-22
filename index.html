@@ -332,48 +332,23 @@
 
   <div class="card">
 
-    <div class="toolbar">
-
-      <div class="controls">
-
-        <button
-          class="btn"
-          onclick="move(-1)"
-        >
-          ‹
-        </button>
-
-        <button
-          class="btn"
-          onclick="today()"
-        >
-          Hoy
-        </button>
-
-        <button
-          class="btn"
-          onclick="move(1)"
-        >
-          ›
-        </button>
-
+    <div class="calendarToolbar">
+      <button class="btn primary calendarAddPlan" type="button" onclick="openModal()">+ Agregar plan</button>
+      <div class="field calendarFilter">
+        <label for="planCategoryFilter">Filtrar calendario por categoría</label>
+        <select id="planCategoryFilter" onchange="render()"><option value="">Todas las categorías</option></select>
       </div>
-
-      <h2 id="month"></h2>
-
-      <button
-        class="btn primary"
-        onclick="openModal()"
-      >
-        + Agregar plan
-      </button>
-
-    </div>
-
-
-    <div class="field" style="margin: 0 0 12px">
-      <label for="planCategoryFilter">Filtrar calendario por categoría</label>
-      <select id="planCategoryFilter" onchange="render()"><option value="">Todas las categorías</option></select>
+      <h2 class="calendarMonthHeading"><button id="month" class="calendarMonthButton" type="button" onclick="toggleCalendarMonthPicker()" aria-expanded="false" aria-controls="calendarMonthPicker"></button></h2>
+      <form id="calendarMonthPicker" class="calendarMonthPicker" hidden onsubmit="event.preventDefault(); selectCalendarMonth()">
+        <div class="field"><label for="calendarPickMonth">Mes</label><select id="calendarPickMonth"></select></div>
+        <div class="field"><label for="calendarPickYear">Año</label><input type="number" id="calendarPickYear" min="1984" max="2199" step="1" required></div>
+        <button class="btn primary" type="submit">Ir al mes</button>
+      </form>
+      <div class="controls calendarMonthControls">
+        <button class="btn" type="button" onclick="move(-1)" aria-label="Mes anterior">‹</button>
+        <button class="btn" type="button" onclick="today()">Hoy</button>
+        <button class="btn" type="button" onclick="move(1)" aria-label="Mes siguiente">›</button>
+      </div>
     </div>
 
     <div class="week">
