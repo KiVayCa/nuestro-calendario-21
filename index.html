@@ -330,12 +330,12 @@
 
 <section class="workspace">
 
-  <div class="card">
+  <div class="card calendarCard">
 
     <div class="calendarToolbar">
       <button class="btn primary calendarAddPlan" type="button" onclick="openModal()">+ Agregar plan</button>
       <div class="field calendarFilter">
-        <label for="planCategoryFilter">Filtrar calendario por categoría</label>
+        <label class="calendarFilterLabel" for="planCategoryFilter">Filtrar calendario por categoría</label>
         <select id="planCategoryFilter" onchange="render()"><option value="">Todas las categorías</option></select>
       </div>
       <h2 class="calendarMonthHeading">

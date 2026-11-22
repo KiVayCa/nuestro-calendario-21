@@ -231,3 +231,15 @@ si el navegador no admite meses, y se ignora el día elegido. El cambio navega
 al mes seleccionado y las flechas/Hoy mantienen el valor sincronizado.
 Pasaron 24 pruebas web, incluida la selección y la alternativa. Pendiente
 comprobar el diálogo nativo en el Motorola. HTML y JS del cambio verificados en producción. Se mantiene v14.
+## Calendario · espacio móvil y orientación horizontal
+
+Agregar plan y filtro comparten una fila compacta, con etiqueta accesible sin
+ocupar espacio adicional. Mes/año nativo y anterior/Hoy/siguiente permanecen
+centrados. La cuadrícula usa siempre siete columnas de ancho igual y limita
+el texto largo. En móviles (incluidos los horizontales que superan 800 px),
+el calendario ocupa todo el ancho y la tarjeta de próximo plan queda debajo;
+se reducen márgenes y rellenos, se respetan zonas seguras y se conserva scroll
+vertical en vez de forzar el mes a una pantalla de poca altura.
+Pasaron 25 pruebas web, incluida estructura de 42 celdas y reglas responsive.
+Pendiente comprobar visualmente la rotación en el Motorola y publicación web.
+Se mantiene APK v14.

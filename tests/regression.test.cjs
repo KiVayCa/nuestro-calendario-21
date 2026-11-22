@@ -18,6 +18,12 @@ function context(file, extra = {}) {
   vm.runInContext(fs.readFileSync(file, "utf8"), sandbox);
   return sandbox;
 }
+test("calendar constrains all seven tracks and uses a full-width layout for rotated phones", () => {
+  const css = fs.readFileSync("styles.css", "utf8");
+  assert.match(css, /\.workspace \.week,\s*\.workspace \.grid\s*\{[^}]*grid-template-columns:repeat\(7,minmax\(0,1fr\)\)/);
+  assert.match(css, /\(orientation:landscape\) and \(max-height:600px\) and \(max-width:1200px\)\s*\{\s*\.workspace\{grid-template-columns:minmax\(0,1fr\)/);
+  assert.match(css, /\.workspace \.calendarToolbar\{grid-template-columns:max-content minmax\(0,1fr\)/);
+});
 test("Colombian holidays apply fixed dates, Monday transfers, Easter and the new July holiday", () => {
   const c = context("src/calendar.js", { iso: d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}` });
   const h = year => c.colombianHolidays(year);

@@ -259,23 +259,31 @@ body.auth-pending #login{visibility:hidden}
   gap:7px;
 }
 
-.calendarToolbar{display:flex;flex-direction:column;align-items:stretch;gap:12px;margin-bottom:15px}
-.calendarAddPlan{align-self:center;width:100%;max-width:420px}
-.calendarFilter{width:100%;max-width:420px;align-self:center;margin:0}
+.calendarToolbar{display:grid;grid-template-columns:max-content minmax(0,260px);justify-content:center;align-items:center;gap:7px 10px;margin-bottom:10px;min-width:0}
+.calendarToolbar .calendarAddPlan{width:auto;min-height:40px;padding:8px 12px;font-size:13px;white-space:nowrap}
+.calendarToolbar .calendarFilter{width:100%;min-width:0;margin:0;position:relative}
+.calendarToolbar .calendarFilterLabel{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.calendarToolbar .calendarFilter select{width:100%;min-width:0;min-height:40px;font-size:13px;padding:7px 9px;white-space:nowrap;text-overflow:ellipsis}
+.calendarMonthHeading,.calendarMonthControls{grid-column:1/-1;justify-self:center}
 .calendarMonthHeading{margin:0;text-align:center;align-self:center;position:relative;max-width:100%;border-radius:10px}
-.calendarMonthButton{border:0;background:transparent;color:var(--ink);font:clamp(24px,5vw,30px) Georgia,serif;cursor:pointer;padding:6px 12px;max-width:100%}
+.calendarMonthButton{border:0;background:transparent;color:var(--ink);font:clamp(22px,4.8vw,28px) Georgia,serif;cursor:pointer;padding:3px 9px;max-width:100%}
 .calendarMonthButton::after{content:' ▾';font-size:.55em;color:var(--rose);vertical-align:middle}
-.calendarMonthControls{justify-content:center;align-self:center}
+.calendarMonthControls{justify-content:center;align-self:center;flex-wrap:nowrap}
+.calendarToolbar .calendarMonthControls .btn{min-height:36px;min-width:38px;padding:5px 11px;font-size:13px;line-height:1.2}
+.calendarToolbar .calendarMonthControls .btn:nth-child(2){min-width:54px}
 .calendarNativeMonthPicker{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:1}
 .calendarMonthHeading:focus-within{outline:2px solid var(--rose);outline-offset:3px}
 .workspace .day > .calendarRestNumber{color:var(--rose);color:color-mix(in srgb,var(--rose) 50%,var(--ink));font-weight:900}
 .workspace .day > .calendarHolidayLabel{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:clamp(7px,1.6vw,10px);line-height:1.2;color:var(--rose);color:color-mix(in srgb,var(--rose) 45%,var(--ink));font-weight:600;margin-top:2px}
 
-.week,
-.grid{
+.workspace .week,
+.workspace .grid{
   display:grid;
-  grid-template-columns:repeat(7,1fr);
+  grid-template-columns:repeat(7,minmax(0,1fr));
+  width:100%;min-width:0;
 }
+.workspace > .card,.workspace .day,.workspace .week > div{min-width:0;max-width:100%}
+.workspace .day{overflow:hidden}
 
 .week div{
   padding:9px;
@@ -1740,4 +1748,26 @@ body:has(#appDialog.show) .ncTransactionIndicator {
 }
 .dailyAnswerHistory summary {
   cursor: pointer;
+}
+
+/* A phone can exceed the portrait breakpoint when rotated. Keep the seven
+   columns and the upcoming-plan card on separate rows on short screens. */
+@media(max-width:800px), (orientation:landscape) and (max-height:600px) and (max-width:1200px){
+  .workspace{grid-template-columns:minmax(0,1fr);min-width:0;gap:10px}
+  .workspace .calendarCard{padding:8px;border-radius:13px;min-width:0}
+  .workspace .calendarToolbar{grid-template-columns:max-content minmax(0,1fr);gap:6px 8px;margin-bottom:8px}
+  .workspace .calendarToolbar .calendarAddPlan{padding:6px 9px;font-size:12px;min-height:38px}
+  .workspace .calendarToolbar .calendarFilter select{font-size:12px;min-height:38px;padding:6px 7px}
+  .workspace .calendarMonthControls .btn{min-height:36px;padding:5px 10px}
+  .workspace .day{min-height:clamp(62px,16vw,80px);padding:4px 2px;font-size:12px}
+  .workspace .event{font-size:clamp(8px,2.4vw,11px);line-height:1.2;padding:2px;margin-top:3px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .workspace .week div{padding:6px 1px;font-size:10px}
+}
+@media(orientation:landscape) and (max-height:600px) and (max-width:1200px){
+  .workspace{margin-inline:0;max-width:100%}
+  .workspace .calendarCard{padding:8px max(8px,env(safe-area-inset-right)) 8px max(8px,env(safe-area-inset-left))}
+  .workspace .calendarToolbar{grid-template-columns:max-content minmax(0,250px);justify-content:center;gap:4px 8px}
+  .workspace .calendarMonthButton{font-size:23px}
+  .workspace .day{min-height:54px;padding:4px 5px}
+  .workspace .event{font-size:11px}
 }
