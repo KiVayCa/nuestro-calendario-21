@@ -74,6 +74,21 @@ async function createPartnerNotification({
     );
     if (error) throw error;
     if (!notification || user?.id !== account || couple?.id !== space) return;
+    const refreshWidgets = target_tab === "calendar" && [
+      "plan_created", "plan_updated", "plan_deleted",
+      "plan_occurrence_completed", "plan_occurrence_reopened",
+      "plan_occurrence_cancelled", "plan_occurrence_reactivated",
+      "plan_occurrence_rescheduled",
+    ].includes(event_type) && notification.id;
+    // Refresh BOTH phones independently of visible partner notifications.
+    const refresh = refreshWidgets ? (async () => {
+      try {
+        const { error } = await sb.functions.invoke("refresh-calendar-widgets", {
+          body: { couple_id: space, notification_id: notification.id },
+        });
+        if (error) console.warn("Los widgets se actualizarán en la siguiente sincronización.");
+      } catch (_) { /* Periodic native sync remains available. */ }
+    })() : Promise.resolve();
     const { error: pushError } = await sb.functions.invoke(
       "send-push-notification",
       {
@@ -89,6 +104,7 @@ async function createPartnerNotification({
         },
       },
     );
+    await refresh;
     if (pushError)
       console.warn(
         "El aviso quedó guardado, pero el envío push falló.",

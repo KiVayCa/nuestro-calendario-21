@@ -38,6 +38,34 @@ test("saving a changed theme requests widget sync only after persistence", async
   await c.saveCoupleSettings({ theme: "night" });
   assert.deepEqual(calls, ["saved", "refresh-calendar-widgets", "saved"]);
 });
+test("all persisted plan changes request a silent widget refresh alongside the partner notice", async () => {
+  const calls = [];
+  const c = context("src/notifications.js", {
+    couple: { id: "pair" }, user: { id: "one" },
+    sb: {
+      rpc: async (name, args) => {
+        calls.push("saved");
+        return { data: { id: "notice", recipient_user_id: "two", event_type: args.p_event_type } };
+      },
+      functions: { invoke: async (name, options) => {
+        calls.push(name);
+        if (name === "refresh-calendar-widgets") {
+          assert.equal(options.body.couple_id, "pair");
+          assert.equal(options.body.notification_id, "notice");
+        }
+        return {};
+      } },
+    },
+  });
+  for (const event_type of ["plan_created", "plan_updated", "plan_deleted", "plan_occurrence_completed", "plan_occurrence_reopened", "plan_occurrence_cancelled", "plan_occurrence_reactivated", "plan_occurrence_rescheduled"]) {
+    calls.length = 0;
+    await c.createPartnerNotification({ event_type, target_tab: "calendar" });
+    assert.deepEqual(calls, ["saved", "refresh-calendar-widgets", "send-push-notification"]);
+  }
+  calls.length = 0;
+  await c.createPartnerNotification({ event_type: "plan_task_created", target_tab: "calendar" });
+  assert.deepEqual(calls, ["saved", "send-push-notification"]);
+});
 test("old signed URLs and storage paths resolve to the same object", () => {
   const c = context("src/enhancements.js");
   assert.equal(

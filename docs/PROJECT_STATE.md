@@ -197,3 +197,14 @@ con migración registrada en ambos entornos. Una prueba transaccional en TEST
 guardó las 22 categorías con rol autenticado y editó una de ellas; se revirtió
 la prueba. Pasaron 22 pruebas web, incluida creación, edición y filtro.
 No requiere otro APK; se mantiene Android v14. Se verificó en producción el selector y las nuevas categorías del bundle.
+## Sincronización automática de planes en widgets
+
+Confirmado por Nicolás: el cambio de temas de v13 funciona automáticamente.
+Se reutiliza esa señal FCM silenciosa al crear, editar, eliminar, completar,
+reabrir, cancelar, reactivar o reprogramar un plan. La solicitud se envía a
+los dispositivos vigentes de ambos miembros tras registrar el aviso de calendario,
+independientemente del envío visible. El servidor valida la sesión, pertenencia
+y el aviso reciente del actor y admite únicamente los ocho tipos de evento.
+El mecanismo de temas permanece intacto. La función se desplegó en TEST y
+producción; 23 pruebas web pasaron, incluida la cobertura de los ocho eventos.
+No requiere APK nuevo. Pendiente verificar despliegue web y prueba en celulares.

@@ -26,15 +26,25 @@ Deno.serve(async (req: Request) => {
     const client = createClient(url, anon, { auth: { persistSession: false, autoRefreshToken: false } });
     const { data: auth, error: authError } = await client.auth.getUser(authorization.slice(7));
     if (authError || !auth.user) return reply(401, { error: "Sesión inválida" });
-    const { couple_id: coupleId } = await req.json();
+    const { couple_id: coupleId, notification_id: notificationId } = await req.json();
     if (typeof coupleId !== "string" || !/^[a-f0-9-]{36}$/i.test(coupleId)) return reply(400, { error: "Pareja inválida" });
     const admin = createClient(url, secret, { auth: { persistSession: false, autoRefreshToken: false } });
     const { data: members, error: memberError } = await admin.from("couple_members").select("user_id").eq("couple_id", coupleId);
     if (memberError || !members?.some(m => m.user_id === auth.user.id)) return reply(403, { error: "Acceso denegado" });
-    const { data: settings, error: settingsError } = await admin.from("couple_settings")
-      .select("updated_by,updated_at").eq("couple_id", coupleId).maybeSingle();
-    if (settingsError || !settings || settings.updated_by !== auth.user.id ||
-        Date.now() - Date.parse(settings.updated_at) > 60_000) return reply(403, { error: "No hay un cambio reciente de configuración" });
+    if (notificationId !== undefined) {
+      if (typeof notificationId !== "string" || !/^[a-f0-9-]{36}$/i.test(notificationId)) return reply(400, { error: "Aviso inválido" });
+      const { data: event, error: eventError } = await admin.from("notifications")
+        .select("id").eq("id", notificationId).eq("couple_id", coupleId)
+        .eq("actor_user_id", auth.user.id).eq("target_tab", "calendar")
+        .in("event_type", ["plan_created", "plan_updated", "plan_deleted", "plan_occurrence_completed", "plan_occurrence_reopened", "plan_occurrence_cancelled", "plan_occurrence_reactivated", "plan_occurrence_rescheduled"])
+        .gte("created_at", new Date(Date.now() - 60_000).toISOString()).maybeSingle();
+      if (eventError || !event) return reply(403, { error: "No hay un cambio reciente de calendario autorizado" });
+    } else {
+      const { data: settings, error: settingsError } = await admin.from("couple_settings")
+        .select("updated_by,updated_at").eq("couple_id", coupleId).maybeSingle();
+      if (settingsError || !settings || settings.updated_by !== auth.user.id ||
+          Date.now() - Date.parse(settings.updated_at) > 60_000) return reply(403, { error: "No hay un cambio reciente de configuración" });
+    }
     const { data: devices, error: deviceError } = await admin.from("android_push_devices").select("token")
       .eq("couple_id", coupleId).in("user_id", members.map(m => m.user_id))
       .gt("expires_at", new Date().toISOString());
