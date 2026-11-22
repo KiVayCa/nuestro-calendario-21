@@ -264,5 +264,5 @@ Las transiciones de módulos se agilizan sin reiniciar durante actualizaciones
 realtime. Se respeta la preferencia de movimiento reducido. Se evita enfocar
 campos de escritura al abrir planes, presupuesto y diálogos de texto.
 Pasaron 25 pruebas web, incluidas reapertura durante cierre y foco sin teclado.
-Pendiente comprobar visualmente en Android físico y verificar despliegue web.
+CSS y JS verificados en producción. Pendiente comprobar visualmente en Android físico.
 Se mantiene APK v14.
