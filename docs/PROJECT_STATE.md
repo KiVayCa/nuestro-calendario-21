@@ -164,3 +164,13 @@ diálogos de validación quedan accesibles aunque haya un guardado pendiente.
 La pregunta diaria usa la fecha de Bogotá, una respuesta por persona y una
 edición explícita. El servidor guarda el antes, el después y la fecha de cada
 edición. Se verificaron la interfaz, la unicidad y el historial en TEST.
+## Android v13 · sincronización de widgets
+
+Se solicita trabajo prioritario al tocar refrescar; una nueva solicitud reemplaza
+la anterior pendiente. Al guardar un cambio de apariencia, la web solicita una
+señal FCM silenciosa a los teléfonos registrados de ambos miembros. Es una señal
+sin datos privados; cada widget sigue consultando su permiso de lectura vigente.
+Se solicita actualización también al recibir avisos nativos. Se conserva la
+sincronización periódica para dispositivos sin FCM o con entrega demorada por Android.
+Pendientes: validación de CI, publicación del descriptor y aceptación en teléfonos.
+

@@ -111,6 +111,9 @@ async function applyHomePhoto() {
 }
 
 async function saveCoupleSettings(patch) {
+  const appearanceChanged = ["theme", "accent_color", "background_color"].some(
+    (key) => Object.hasOwn(patch, key) && patch[key] !== coupleSettings[key],
+  );
   const payload = {
     ...patch,
     couple_id: couple.id,
@@ -127,6 +130,14 @@ async function saveCoupleSettings(patch) {
   }
   coupleSettings = { ...coupleSettings, ...data };
   applyCoupleSettings();
+  if (appearanceChanged) {
+    try {
+      const { error: syncError } = await sb.functions.invoke("refresh-calendar-widgets", {
+        body: { couple_id: payload.couple_id },
+      });
+      if (syncError) console.warn("La actualización de widgets se reintentará periódicamente.");
+    } catch (_) { /* Periodic native sync remains available. */ }
+  }
   await applyHomePhoto();
   return true;
 }

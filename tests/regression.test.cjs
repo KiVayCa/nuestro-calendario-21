@@ -18,6 +18,26 @@ function context(file, extra = {}) {
   vm.runInContext(fs.readFileSync(file, "utf8"), sandbox);
   return sandbox;
 }
+test("saving a changed theme requests widget sync only after persistence", async () => {
+  const calls = [];
+  const c = context("src/settings.js", {
+    couple: { id: "pair" }, user: { id: "one" }, coupleSettings: { theme: "romance" },
+    sb: {
+      from: () => ({ upsert: (payload) => ({ select: () => ({ single: async () => {
+        calls.push("saved"); return { data: payload };
+      } }) }) }),
+      functions: { invoke: async (name, options) => {
+        calls.push(name); assert.equal(options.body.couple_id, "pair"); return {};
+      } },
+    },
+  });
+  c.applyCoupleSettings = () => {};
+  c.applyHomePhoto = async () => {};
+  assert.equal(await c.saveCoupleSettings({ theme: "night" }), true);
+  assert.deepEqual(calls, ["saved", "refresh-calendar-widgets"]);
+  await c.saveCoupleSettings({ theme: "night" });
+  assert.deepEqual(calls, ["saved", "refresh-calendar-widgets", "saved"]);
+});
 test("old signed URLs and storage paths resolve to the same object", () => {
   const c = context("src/enhancements.js");
   assert.equal(

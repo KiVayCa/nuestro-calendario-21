@@ -35,13 +35,16 @@ public class WidgetWorker extends Worker {
   }
 
   static void refresh(Context c) {
+    if (!WidgetRenderer.hasWidgets(c)) return;
+    OneTimeWorkRequest.Builder request = new OneTimeWorkRequest.Builder(WidgetWorker.class)
+        .setConstraints(constraints());
+    if (android.os.Build.VERSION.SDK_INT >= 31)
+      request.setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST);
     WorkManager.getInstance(c)
         .enqueueUniqueWork(
             "nc21-widget-now",
-            ExistingWorkPolicy.KEEP,
-            new OneTimeWorkRequest.Builder(WidgetWorker.class)
-                .setConstraints(constraints())
-                .build());
+            ExistingWorkPolicy.REPLACE,
+            request.build());
   }
 
   static void sync(Context c) throws Exception {
@@ -73,6 +76,7 @@ public class WidgetWorker extends Worker {
       WidgetRenderer.updateAll(c);
       return Result.success();
     } catch (Exception e) {
+      android.util.Log.w("Calendar21", "Widget refresh failed: " + e.getClass().getSimpleName());
       WidgetRenderer.updateAll(c);
       return getRunAttemptCount() < 3 ? Result.retry() : Result.failure();
     }

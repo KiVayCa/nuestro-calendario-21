@@ -21,8 +21,13 @@ public final class CalendarMessagingService extends FirebaseMessagingService {
   @Override
   public void onMessageReceived(RemoteMessage message) {
     Map<String, String> data = message.getData();
+    if ("widget_refresh".equals(data.get("type"))) {
+      WidgetWorker.refresh(this);
+      return;
+    }
     String tag = data.get("tag");
     if (tag == null || tag.isEmpty()) return;
+    WidgetWorker.refresh(this);
     NotificationManagerCompat notifications = NotificationManagerCompat.from(this);
     if (!notifications.areNotificationsEnabled()) return;
     if (Build.VERSION.SDK_INT >= 33 &&

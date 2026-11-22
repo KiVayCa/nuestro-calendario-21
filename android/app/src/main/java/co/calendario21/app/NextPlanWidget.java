@@ -25,7 +25,6 @@ public class NextPlanWidget extends AppWidgetProvider {
   public void onReceive(Context c, Intent i) {
     super.onReceive(c, i);
     if (REFRESH.equals(i.getAction())) {
-      WidgetRenderer.updateAll(c);
       WidgetWorker.refresh(c);
     }
     if (MONTH.equals(i.getAction())) {

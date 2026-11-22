@@ -61,7 +61,9 @@ export async function sendCalendarPush(device: PushDevice, payload: string) {
         message: {
           token: device.token,
           data: JSON.parse(payload),
-          android: { priority: "HIGH", ttl: "900s" },
+          android: JSON.parse(payload).type === "widget_refresh"
+            ? { priority: "NORMAL", ttl: "900s", collapse_key: "widget_refresh" }
+            : { priority: "HIGH", ttl: "900s" },
         },
       }),
       signal: AbortSignal.timeout(5000),
