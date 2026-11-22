@@ -221,5 +221,5 @@ Fuentes normativas: https://www.funcionpublica.gov.co/eva/gestornormativo/norma.
 y https://lector.ramajudicial.gov.co/SIDN/NORMATIVA/TEXTOS_COMPLETOS/7_LEYES/LEYES%202026/Ley%202578%20de%202026.pdf.
 Se verificaron ejemplos 2026–2030, 24 pruebas web y selector/estilos de fuentes.
 La comprobación visual en Chromium local no fue posible por restricciones de
-ejecución; pendiente aceptación en teléfonos y verificar publicación web.
+ejecución; pendiente aceptación en teléfonos. Se verificaron HTML, JS y CSS publicados en producción.
 No requiere nuevo APK: se mantiene v14.
