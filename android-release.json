@@ -1,15 +1,15 @@
 {
   "format": 1,
   "packageName": "co.calendario21.app",
-  "versionCode": 12,
-  "versionName": "1.0.0-preview.12",
-  "apkUrl": "https://vz4dp1vu2kie6kny.public.blob.vercel-storage.com/android/nuestro-calendario-21-v12.apk",
-  "sha256": "751bcdc93245de529d1c41dac347ac9703a9d551570a4d0401afbe40ec51ce43",
+  "versionCode": 13,
+  "versionName": "1.0.0-preview.13",
+  "apkUrl": "https://vz4dp1vu2kie6kny.public.blob.vercel-storage.com/android/nuestro-calendario-21-v13.apk",
+  "sha256": "09f7456ce94b63d6d55b6e343f063c83989dbb07a66a3e9d74891324c6a1f509",
   "bytes": 5397186,
   "minSdk": 26,
-  "publishedAt": "2026-11-18T21:25:33.049Z",
+  "publishedAt": "2026-11-22T14:33:30.924Z",
   "notes": [
-    "Las notificaciones de Android usan el icono de corazón del calendario.",
-    "Los avisos del navegador se reservan para computadores."
+    "Los widgets solicitan una sincronización automática al guardar un tema.",
+    "Actualización manual prioritaria y sincronización al recibir avisos del calendario."
   ]
 }
