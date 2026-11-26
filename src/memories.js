@@ -1,23 +1,3 @@
-function renderAdvStory() {
-  const arr = advCache.memories
-    .map((x) => ({
-      ...x,
-      date: x.memory_date,
-      category: x.category,
-      memory: true,
-    }))
-    .sort((a, b) => (a.date || "").localeCompare(b.date || ""));
-  return (
-    advHeader(
-      "Nuestra historia",
-      "Una línea de tiempo visual de los recuerdos que ustedes decidan guardar.",
-      "📸 Añadir recuerdo",
-      "openMemoryForm()",
-    ) +
-    `<div class="advList storyTimeline">${arr.length ? arr.map((x) => `<div class="advItem storyMemoryItem" role="button" tabindex="0" onclick="openCalendarEvent('memory','${x.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openCalendarEvent('memory','${x.id}')}"><div class="storyThumbWrap">${x.photo_url ? `<img class="storyThumb" data-memory-path="${esc(x.photo_url)}" alt="Foto de ${esc(x.title)}" loading="lazy">` : '<div class="storyThumb storyNoPhoto">📸<span>Sin foto</span></div>'}</div><div class="storyMemoryText"><div class="advItemTitle">${x.favorite ? "❤️ " : ""}${esc(x.title)}</div><div class="advMeta">${dateES(x.date)} · ${esc(x.category || "momento")}</div><p>${esc(x.description || "")}</p><span class="storyOpenHint">Ver en Recuerdos ↗</span></div></div>`).join("") : '<div class="advEmpty">❤️ Aquí aparecerán los recuerdos que ustedes creen manualmente en Recuerdos.</div>'}</div>`
-  );
-}
-
 function memoryAdventureLinks(memory) {
   return (advCache.adventures||[]).filter(a=>a.memory_id===memory.id)
     .map(a=>`<button class="btn" data-adventure="${esc(a.id)}" onclick="navigateToItem('aventuras',this.dataset.adventure)">🧭 Ver experiencia</button>`).join("");

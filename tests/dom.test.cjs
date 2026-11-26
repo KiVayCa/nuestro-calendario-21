@@ -234,6 +234,18 @@ const wait = () => new Promise((r) => setTimeout(r, 400));
   assert.equal(w.document.getElementById("cat").value,"iglesia");
   assert.equal(w.document.getElementById("title").value,"Orar y leer la Biblia juntos");
   w.closeModal();
+  w.showAdvancedTab("story");
+  assert.ok(w.document.querySelector(".storyMilestones"));
+  assert.ok(w.document.querySelector(".storyChapterList .storyEntry"));
+  w.setStoryView("gallery");
+  assert.ok(w.document.querySelector(".storyGallery img[data-memory-path]"));
+  w.document.getElementById("storySearch").value="no matching record";
+  w.applyStoryFilters();
+  assert.equal(w.document.querySelectorAll(".storyGallery .storyEntry").length,0);
+  w.clearStoryFilters();
+  const storyMemory=w.document.querySelector('.storyEntry[data-kind="memory"]');
+  w.storyOpen(storyMemory);
+  assert.equal(w.document.querySelector(".advTab.active").getAttribute("onclick"),"showAdvancedTab('memories')");
   assert.deepEqual(errors, []);
   console.log(
     "PASS DOM: 21 tabs, legacy photo hydration, filters, idea-to-plan with place, save plan, goal RPC, memory edit.",

@@ -354,3 +354,17 @@ Migración en TEST y producción. Prueba SQL de atomicidad, permisos, vínculos
 y conservación de datos aprobada en TEST; 28 pruebas web superadas (21
 pestañas, creación, checklist, aporte vinculado y agendamiento).
 Sin nuevo APK. Pendiente aceptación visual y recepción push en teléfonos.
+
+## Nuestra historia · fase 5
+
+Se amplía la pestaña Historia existente con una línea de tiempo agrupada por
+mes, galería de fotografías, búsqueda, filtros por tipo/mes/favoritos y orden
+cronológico. Resumen del capítulo mensual, recuerdos de la misma fecha o día
+de otro mes y recuerdo destacado rotativo. Contadores de hitos del 21/01/2026
+y 21/04/2026. Acceso directo a la exportación de álbum y collage existente.
+Se combinan recuerdos, aventuras vividas, planes completados, fechas,
+sueños y retos cumplidos, cartas abiertas. No se repiten planes/aventuras
+con recuerdo vinculado ni se muestran cartas bloqueadas o su contenido.
+Cada tarjeta abre su módulo y registro original. Realtime y temas conservados.
+29 pruebas web aprobadas, incluida deduplicación, privacidad y galería.
+No hay nueva tabla ni APK. Pendiente aceptación visual en teléfonos.

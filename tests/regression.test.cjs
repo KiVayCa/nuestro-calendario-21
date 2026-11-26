@@ -19,6 +19,25 @@ function context(file, extra = {}) {
     vm.runInContext(fs.readFileSync(name, "utf8"), sandbox);
   return sandbox;
 }
+test("story combines history without repeating linked memories or revealing locked letters", () => {
+  const c=context("src/story.js",{categoryIcon:()=>"🗓️"});
+  const cache={
+    memories:[{id:"m",title:"Café en el parque",memory_date:"2026-10-26",favorite:true,photo_url:"pair/photo.png",source_plan_id:"p",source_occurrence_date:"2026-10-26"}],
+    adventures:[{id:"a",title:"Café",status:"done",kind:"experience",memory_id:"m",plan_id:"p",target_date:"2026-10-26"},{id:"pending",title:"Future",status:"pending",kind:"surprise"}],
+    dates:[{id:"d",title:"Fecha especial",event_date:"2026-10-27"}],
+    dreams:[{id:"dream",title:"Sueño",status:"cumplido",completed_at:"2026-11-01T15:00:00Z"}],
+    letters:[{id:"locked",title:"Hidden",content:"SECRET",unlock_at:"2026-12-01T12:00:00Z"},{id:"open",title:"Carta",content:"PRIVATE BODY",created_at:"2026-11-03T12:00:00Z"}],
+  };
+  const plans=[{id:"p",title:"Café",plan_date:"2026-10-26",completed:true},{id:"r",title:"Weekly",recurrence_enabled:true,completed_occurrences:["2026-11-01","2026-11-02"],cancelled_occurrences:["2026-11-02"]}];
+  const entries=c.collectStoryEntries(cache,plans,"2026-11-26",Date.parse("2026-11-26T12:00:00Z"));
+  assert.equal(entries.length,5);
+  assert.ok(entries.find(x=>x.id==="m").badge);
+  assert.ok(!entries.some(x=>["p","a","locked","pending"].includes(x.id)));
+  assert.ok(!JSON.stringify(entries).includes("PRIVATE BODY"));
+  const filters={month:"",kind:"adventure",query:"cafe",favorites:true,view:"gallery",order:"oldest"};
+  assert.equal(c.filterStoryEntries(entries,filters)[0].id,"m");
+  assert.equal(c.storyThrowbacks(entries,"2026-11-26").entries[0].id,"m");
+});
 test("faith devotional is deterministic by date, supports both partners, and escapes journal text", () => {
   const c=context(["src/faith-readings.js","src/faith.js"],{
     countdownToday:()=>"2026-11-26", user:{id:"a"},

@@ -423,6 +423,7 @@ setInterval(() => {
   if (!user || !couple || document.visibilityState !== "visible") return;
   if (advancedTab === "home") renderAdvanced({ preserveInputs: true });
   if (advancedTab === "fe" && $("faithToday")?.dataset.date !== countdownToday()) renderAdvanced();
+  if (advancedTab === "story" && $("storyToday")?.dataset.date !== countdownToday()) renderAdvanced();
   if (advancedTab === "question" && !window.__nc21SelectedQuestionDate) {
     const shownDate = $("dailyQuestionDate")?.dataset.date;
     if (shownDate && shownDate !== todayQuestion().date) renderAdvanced();

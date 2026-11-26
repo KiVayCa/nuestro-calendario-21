@@ -21,6 +21,7 @@ const sources = [
   "calendar",
   "features",
   "memories",
+  "story",
   "budget",
   "settings",
   "profile",

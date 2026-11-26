@@ -161,6 +161,7 @@ async function init() {
         adventureChoice = null;
         adventureFilter = "all";
         futureFilter = "all";
+        storyFilters = {month:"",kind:"all",query:"",favorites:false,view:"timeline",order:"newest"};
         coupleProfiles = [];
         myProfile = null;
         if (window.advancedRealtime) {
