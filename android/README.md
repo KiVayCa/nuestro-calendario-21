@@ -1,5 +1,12 @@
 # Nuestro Calendario #21 · Android preview
 
+## Widgets · preview 15
+
+**Nuestro vínculo** es el noveno widget y sigue la paleta seleccionada. Tocar
+su corazón abre la pestaña de conexión en la app; enviar un abrazo, corazón
+o cumplido requiere la sesión web autenticada. No otorga permisos de escritura
+al dispositivo vinculado.
+
 ## Widgets · preview 14
 
 Ocho widgets disponibles, incluidos **Nuestro día** (agenda de hoy), **Próxima fecha especial** (cuenta regresiva de la próxima fecha importante) y **Balance del mes** (planes realizados y pendientes). Todos comparten el vínculo y la sincronización de v13. Las vistas previas del selector utilizan ejemplos ficticios, incluyendo una cuadrícula del calendario mensual y números de ejemplo para Nuestra historia. Los widgets instalados usan datos reales y el tema de la aplicación. Las vistas XML y PNG se regeneran con `python scripts/build-widget-previews.py` desde la raíz (requiere Pillow).

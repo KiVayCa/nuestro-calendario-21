@@ -18,6 +18,34 @@ function context(file, extra = {}) {
   vm.runInContext(fs.readFileSync(file, "utf8"), sandbox);
   return sandbox;
 }
+test("connection sends once, uses the authenticated sender and keeps private text off notifications", async () => {
+  const inserted = [], notifications = [];
+  const input = {value: "Eres increíble <3"};
+  const c = context("src/vinculo.js", {
+    user:{id:"one"}, couple:{id:"pair"}, advCache:{connection:[]},
+    advancedTab:"home",
+    $: id => id === "bondCompliment" ? input : null,
+    showAppToast: () => {},
+    sb:{from: table => {
+      assert.equal(table,"couple_connection");
+      return {insert: row => {
+        inserted.push(row);
+        return {select: () => ({single: async () => ({data:{...row,id:"detail",created_at:"2026-11-26T12:00:00Z"}})})};
+      }};
+    }},
+    createPartnerNotification: async notice => notifications.push(notice),
+    esc: value => String(value).replaceAll("<","&lt;").replaceAll(">","&gt;"),
+  });
+  await Promise.all([c.sendConnection("compliment"),c.sendConnection("compliment")]);
+  assert.equal(inserted.length,1);
+  assert.equal(inserted[0].sender_user_id,"one");
+  assert.equal(inserted[0].body,"Eres increíble <3");
+  assert.equal(input.value,"");
+  assert.equal(notifications.length,1);
+  assert.equal(notifications[0].target_tab,"vinculo");
+  assert.ok(!JSON.stringify(notifications[0]).includes("increíble"));
+  assert.ok(c.renderAdvVinculo().includes("Eres increíble &lt;3"));
+});
 test("calendar constrains all seven tracks and uses a full-width layout for rotated phones", () => {
   const css = fs.readFileSync("styles.css", "utf8");
   assert.match(css, /\.workspace \.week,\s*\.workspace \.grid\s*\{[^}]*grid-template-columns:repeat\(7,minmax\(0,1fr\)\)/);

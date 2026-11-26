@@ -254,6 +254,10 @@ RLS de pertenencia y solo permite insertar como el usuario autenticado.
 El nuevo widget Android v15 abre el módulo autenticado para enviar un gesto
 con un toque adicional; no amplía las credenciales de lectura de widgets.
 Prueba SQL de aislamiento, identidad y validación superada en TEST.
+Migración y función de avisos desplegadas en TEST y producción. Web en
+producción verificada. APK v15 compilado con pruebas y lint, firmado con
+el certificado anterior y verificado por SHA-256, tamaño y versionCode.
+Pendiente confirmar recepción push y apariencia física en ambos teléfonos.
 ## Calendario · información de festivos y fluidez del editor
 
 Nicolás confirmó que el calendario responsive se ve bien. Los números de
