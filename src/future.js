@@ -71,7 +71,7 @@ function openFutureProject(category="other",id=null){
     select("future_status","Estado",Object.entries(futureStatuses))+
     select("future_goal","Meta de ahorro existente",futureLinkOptions(advCache.goals,"Sin meta vinculada"))+
     select("future_dream","Sueño existente",futureLinkOptions(advCache.dreams,"Sin sueño vinculado"))+
-    (!p?'<div class="field"><label><input id="futureSuggested" type="checkbox" checked> Añadir pasos sugeridos para esta categoría</label><div id="futureSuggestions" class="advMeta"></div></div>':""),
+    (!p?'<div class="futureSuggestedField"><label class="futureSuggestedLabel" for="futureSuggested"><input id="futureSuggested" type="checkbox" aria-describedby="futureSuggestions" checked><span>Añadir pasos sugeridos para esta categoría</span></label><div id="futureSuggestions" class="advMeta"></div></div>':""),
     `saveFutureProject('${id||""}')`));
   $("adv_future_title").value=p?.title||type[2];
   $("adv_future_category").value=category;

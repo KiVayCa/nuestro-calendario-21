@@ -398,3 +398,10 @@ portada conservan su original. La galería y la historia respetan el encuadre.
 Migración aditiva aplicada en TEST y producción; pruebas SQL de aislamiento,
 vínculos y conservación aprobadas en TEST. 31 pruebas web aprobadas. Sin nueva
 APK; pendiente validación visual en teléfonos.
+
+## Nuestro futuro · alineación de pasos sugeridos
+
+El checkbox de creación de proyecto deja de heredar el ancho de los campos de
+texto. Se alinea a la izquierda del texto, con la lista sugerida debajo y
+colores del tema. Toda la etiqueta permite activarlo o desactivarlo.
+31 pruebas web aprobadas; sin cambios en datos, vínculos ni APK v15.
