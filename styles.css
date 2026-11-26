@@ -1864,3 +1864,11 @@ body:has(#appDialog.show) .ncTransactionIndicator {
 .adventureCard p { white-space:pre-wrap; }.adventureActions { margin-top:10px; }.adventureMemory { display:flex; align-items:center; gap:9px; margin:8px 0; }.adventureMemory img { width:56px; height:56px; object-fit:cover; border-radius:10px; }
 @media(max-width:380px) { .adventureCreate .bondGesture { font-size:12px; padding:10px 4px; }.adventureStats { gap:5px; }.adventureActions .btn { padding:8px 10px; } }
 @media(prefers-reduced-motion:reduce) { .adventureSpin { animation:none; } }
+.faithReading { border:1px solid var(--line); background:linear-gradient(145deg,var(--card),var(--soft)); color:var(--ink); }
+.faithReading h3 { font-size:clamp(21px,4vw,30px); color:var(--ink); margin:12px 0 8px; }
+.faithTitle { display:block; font-size:18px; color:var(--rose); }
+.faithPrompt { padding:14px; margin:16px 0; border-radius:14px; border-left:3px solid var(--rose); background:var(--card); color:var(--ink); }
+.faithPrompt p { margin:6px 0 0; }
+.faithPair { display:flex; gap:10px; flex-wrap:wrap; }
+.faithPair span { flex:1; text-align:center; padding:10px; border:1px solid var(--line); border-radius:12px; background:var(--card); color:var(--ink); }
+.faithModule .adventureCard p { overflow-wrap:anywhere; }

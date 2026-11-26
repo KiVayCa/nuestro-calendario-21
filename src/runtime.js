@@ -149,6 +149,7 @@ const validAdvancedTabs = new Set([
   "home",
   "vinculo",
   "aventuras",
+  "fe",
   "calendar",
   "story",
   "memories",
@@ -171,6 +172,7 @@ if (!validAdvancedTabs.has(advancedTab)) advancedTab = "home";
 let advCache = {
   connection: [],
   adventures: [],
+  faith: [],
   memories: [],
   letters: [],
   letterReactions: [],
@@ -193,6 +195,7 @@ let budgetSelectedMonth =
 const advTables = {
   connection: "couple_connection",
   adventures: "couple_adventures",
+  faith: "couple_faith",
   memories: "memories",
   letters: "love_letters",
   letterReactions: "letter_reactions",
@@ -414,6 +417,7 @@ setInterval(() => {
   checkLocalReminders();
   if (!user || !couple || document.visibilityState !== "visible") return;
   if (advancedTab === "home") renderAdvanced({ preserveInputs: true });
+  if (advancedTab === "fe" && $("faithToday")?.dataset.date !== countdownToday()) renderAdvanced();
   if (advancedTab === "question" && !window.__nc21SelectedQuestionDate) {
     const shownDate = $("dailyQuestionDate")?.dataset.date;
     if (shownDate && shownDate !== todayQuestion().date) renderAdvanced();

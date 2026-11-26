@@ -18,6 +18,24 @@ function context(file, extra = {}) {
   vm.runInContext(fs.readFileSync(file, "utf8"), sandbox);
   return sandbox;
 }
+test("faith devotional is deterministic by date, supports both partners, and escapes journal text", () => {
+  const c=context("src/faith.js",{
+    countdownToday:()=>"2026-11-26", user:{id:"a"},
+    advCache:{faith:[
+      {id:"p",kind:"prayer",created_by:"b",title:"Prayer <example>",body:"Private",entry_date:"2026-11-26",answered:false},
+      {id:"s",kind:"support",created_by:"a",parent_id:"p",entry_date:"2026-11-26"},
+      {id:"d",kind:"devotional",created_by:"a",entry_date:"2026-11-26"},
+    ]},
+    dateES:x=>x,esc:x=>String(x).replaceAll("<","&lt;").replaceAll(">","&gt;")
+  });
+  assert.notEqual(c.faithReading("2026-11-26")[0],c.faithReading("2026-11-27")[0]);
+  assert.equal(c.faithReading("2026-11-26")[0],c.faithReading("2026-11-26")[0]);
+  const html=c.renderAdvFaith();
+  assert.match(html,/Prayer &lt;example&gt;/);
+  assert.match(html,/Ya oraste hoy/);
+  assert.match(html,/Devocional realizado/);
+  assert.doesNotMatch(html,/Marcar respondida/);
+});
 test("adventures show locked surprises, recipient-only coupons and completed stamps", () => {
   const c = context("src/adventures.js", {
     user:{id:"recipient"}, plans:[],

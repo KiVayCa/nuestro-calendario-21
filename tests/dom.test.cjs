@@ -68,6 +68,7 @@ const wait = () => new Promise((r) => setTimeout(r, 400));
     "question",
     "vinculo",
     "aventuras",
+    "fe",
     "places",
     "analysis",
     "achievements",
@@ -201,9 +202,19 @@ const wait = () => new Promise((r) => setTimeout(r, 400));
   w.showAdvancedTab("aventuras");
   assert.match(w.document.querySelector('[data-advanced-id="adventure-memory"]').textContent,/Ver recuerdo/);
   assert.ok(w.document.querySelector('[data-advanced-id="adventure-memory"] img[data-memory-path]'));
+  w.showAdvancedTab("fe");
+  w.openFaithForm("prayer");
+  w.document.getElementById("adv_faith_title").value="Petición de prueba";
+  w.document.getElementById("adv_faith_body").value="Una nota compartida";
+  await w.saveFaithEntry("prayer","");
+  assert.ok(w.__db.couple_faith.some(x=>x.kind==="prayer"&&x.title==="Petición de prueba"));
+  w.scheduleFaith();
+  assert.equal(w.document.getElementById("cat").value,"iglesia");
+  assert.equal(w.document.getElementById("title").value,"Orar y leer la Biblia juntos");
+  w.closeModal();
   assert.deepEqual(errors, []);
   console.log(
-    "PASS DOM: 19 tabs, legacy photo hydration, filters, idea-to-plan with place, save plan, goal RPC, memory edit.",
+    "PASS DOM: 20 tabs, legacy photo hydration, filters, idea-to-plan with place, save plan, goal RPC, memory edit.",
   );
 })()
   .catch((e) => {

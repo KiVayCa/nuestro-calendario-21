@@ -309,3 +309,18 @@ Las sorpresas privadas conservan sus restricciones. Prueba SQL en TEST de
 vínculos, permisos, estado y lugares aprobada con reversión. Sin nuevo APK.
 Migración aplicada en TEST y producción. 27 pruebas web superadas, incluido
 el recorrido de creación con foto y lugar y navegación en ambos sentidos.
+
+## Nuestra fe · fase 3
+
+Nuevo módulo compartido con 21 lecturas bíblicas rotativas por fecha de Bogotá,
+meditaciones originales y preguntas para conversar. Registro diario de lectura
+por cada miembro, historial, peticiones de oración con acompañamiento diario
+y estado respondida, diario de gratitud y reflexiones. Crea un plan de oración
+en el calendario desde el devocional usando el editor existente.
+La tabla couple_faith tiene RLS por membresía y edición/borrado solo del autor;
+las lecturas y acompañamientos tienen unicidad diaria. Avisos genéricos sin
+contenido de las peticiones o del diario. Prueba transaccional de aislamiento,
+unicidad y permisos aprobada en TEST. No requiere nuevo APK.
+Migración y avisos desplegados en TEST y producción. 28 pruebas web
+aprobadas, incluidas las 20 pestañas y creación de una petición.
+Pendiente validación visual y de push en los teléfonos.
