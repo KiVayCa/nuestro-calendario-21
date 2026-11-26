@@ -281,3 +281,18 @@ campos de escritura al abrir planes, presupuesto y diálogos de texto.
 Pasaron 25 pruebas web, incluidas reapertura durante cierre y foco sin teclado.
 CSS y JS verificados en producción. Pendiente comprobar visualmente en Android físico.
 Se mantiene APK v14.
+
+## Nuestras aventuras · fase 2
+
+Pestaña compartida con ruleta de citas (ideas incorporadas y de la pareja),
+experiencias por vivir, sorpresas con detalles privados hasta que su autor
+los revele, cupones con canje único por la otra persona y pasaporte con sellos
+por experiencia vivida. Las experiencias pueden agendarse o vincularse a un
+plan existente y guardar o vincular un recuerdo después de completarse.
+Se reutilizan los formularios, temas, Realtime y avisos de la aplicación.
+Los detalles privados se almacenan en una tabla separada con RLS; no se
+incluyen en los avisos ni en el contenido público de una cita sorpresa.
+Se verificó en TEST mediante transacción revertida el aislamiento, revelado,
+canje único, estados y vínculos. No necesita APK nuevo: Android v15.
+Migración y función de avisos desplegadas en TEST y producción; 27 pruebas
+web aprobadas. Pendiente comprobación de entrega push y visual en teléfonos.

@@ -23,7 +23,7 @@ function scheduleRealtimeRefresh(includePlans = false, keys = null) {
       realtimeKeys.clear();
       if (withPlans) await loadPlans();
       await advLoadAll(keys);
-      if (withPlans && ["home", "analysis"].includes(advancedTab))
+      if (withPlans && ["home", "analysis", "aventuras"].includes(advancedTab))
         renderAdvanced();
     } catch (err) {
       console.warn("No se pudo actualizar el calendario en tiempo real:", err);
@@ -122,6 +122,7 @@ async function setupAdvancedRealtime(force = false) {
   advancedRealtimeStatus = "CLOSED";
   const tables = [
     "couple_connection",
+    "couple_adventures",
     "memories",
     "love_letters",
     "letter_reactions",

@@ -466,6 +466,7 @@ function showPlanModal() {
 }
 
 function openModal(d) {
+  delete $("modal").dataset.adventureId;
   $("modalTitle").textContent = "Agregar un plan ♡";
 
   $("date").value = d || iso(view);
@@ -492,6 +493,7 @@ function openModal(d) {
 }
 
 function openEditModal(plan) {
+  delete $("modal").dataset.adventureId;
   $("modalTitle").textContent = "Editar plan ✏️";
 
   $("date").value = plan.plan_date || "";
@@ -593,6 +595,7 @@ async function savePlan() {
   }
 
   const editingId = $("modal").dataset.editingId;
+  const adventureId = $("modal").dataset.adventureId;
 
   const planData = {
     title: title,
@@ -666,6 +669,9 @@ async function savePlan() {
 
   closeModal();
   await loadPlans();
+  if (!editingId && createdPlanId && adventureId) {
+    await updateAdventure(adventureId, {plan_id:createdPlanId}, "Plan vinculado a su aventura. ❤️");
+  }
   const planOwnerName =
     myProfile?.display_name ||
     coupleProfiles.find((p) => p.user_id === user.id)?.display_name ||

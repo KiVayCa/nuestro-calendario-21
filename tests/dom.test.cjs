@@ -67,6 +67,7 @@ const wait = () => new Promise((r) => setTimeout(r, 400));
     "notifications",
     "question",
     "vinculo",
+    "aventuras",
     "places",
     "analysis",
     "achievements",
@@ -186,7 +187,7 @@ const wait = () => new Promise((r) => setTimeout(r, 400));
   assert.ok(w.__db.memories.some((m) => m.title === "Recuerdo editado"));
   assert.deepEqual(errors, []);
   console.log(
-    "PASS DOM: 18 tabs, legacy photo hydration, filters, idea-to-plan with place, save plan, goal RPC, memory edit.",
+    "PASS DOM: 19 tabs, legacy photo hydration, filters, idea-to-plan with place, save plan, goal RPC, memory edit.",
   );
 })()
   .catch((e) => {

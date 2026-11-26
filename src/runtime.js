@@ -148,6 +148,7 @@ let animateNextModuleRender = false;
 const validAdvancedTabs = new Set([
   "home",
   "vinculo",
+  "aventuras",
   "calendar",
   "story",
   "memories",
@@ -169,6 +170,7 @@ const validAdvancedTabs = new Set([
 if (!validAdvancedTabs.has(advancedTab)) advancedTab = "home";
 let advCache = {
   connection: [],
+  adventures: [],
   memories: [],
   letters: [],
   letterReactions: [],
@@ -190,6 +192,7 @@ let budgetSelectedMonth =
   String(new Date().getMonth() + 1).padStart(2, "0");
 const advTables = {
   connection: "couple_connection",
+  adventures: "couple_adventures",
   memories: "memories",
   letters: "love_letters",
   letterReactions: "letter_reactions",

@@ -18,6 +18,27 @@ function context(file, extra = {}) {
   vm.runInContext(fs.readFileSync(file, "utf8"), sandbox);
   return sandbox;
 }
+test("adventures show locked surprises, recipient-only coupons and completed stamps", () => {
+  const c = context("src/adventures.js", {
+    user:{id:"recipient"}, plans:[],
+    advCache:{ideas:[],memories:[],adventures:[
+      {id:"s",created_by:"creator",kind:"surprise",title:"Cita sorpresa",status:"pending",details:"",adventure_secrets:null},
+      {id:"c",created_by:"creator",kind:"coupon",title:"Desayuno",status:"pending",details:""},
+      {id:"e",created_by:"creator",kind:"experience",title:"Picnic <3",status:"done",category:"naturaleza",completed_at:"2026-11-26T12:00:00Z"},
+    ]},
+    dateES: value=>value,
+    esc: value=>String(value).replaceAll("<","&lt;").replaceAll(">","&gt;"),
+  });
+  const view=c.renderAdvAdventures();
+  assert.match(view,/Los detalles se revelarán/);
+  assert.doesNotMatch(view,/Revelar sorpresa/);
+  assert.match(view,/Canjear 💗/);
+  assert.match(view,/Picnic &lt;3/);
+  assert.match(view,/adventureStamp/);
+  c.user={id:"creator"};
+  assert.match(c.renderAdvAdventures(),/Revelar sorpresa/);
+  assert.doesNotMatch(c.renderAdvAdventures(),/Canjear 💗/);
+});
 test("connection sends once, uses the authenticated sender and keeps private text off notifications", async () => {
   const inserted = [], notifications = [];
   const input = {value: "Eres increíble <3"};

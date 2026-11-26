@@ -12,6 +12,7 @@ const sources = [
   "letters",
   "questions",
   "vinculo",
+  "adventures",
   "navigation",
   "auth",
   "calendar",

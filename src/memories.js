@@ -110,6 +110,7 @@ async function saveMemory() {
   if (advancedEditState.key === "memories" && advancedEditState.id)
     return saveAdvancedEdit();
   const origin = document.getElementById("memoryOrigin");
+  const adventureId = $("adventureMemoryOrigin")?.value;
   const title = $("adv_title").value.trim();
   if (!title) return appAlert("Escribe un título ❤️");
   let photo_url = null;
@@ -144,6 +145,9 @@ async function saveMemory() {
   if (error) {
     if (photo_url) await sb.storage.from("couple-media").remove([photo_url]);
     return appAlert(error.message);
+  }
+  if (created?.id && adventureId) {
+    await updateAdventure(adventureId, {memory_id:created.id}, "Recuerdo vinculado a su aventura. 📸");
   }
   await createPartnerNotification({
     event_type: "memory_created",

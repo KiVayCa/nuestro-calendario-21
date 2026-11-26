@@ -158,6 +158,8 @@ async function init() {
         advCache = Object.fromEntries(
           Object.keys(advTables).map((key) => [key, []]),
         );
+        adventureChoice = null;
+        adventureFilter = "all";
         coupleProfiles = [];
         myProfile = null;
         if (window.advancedRealtime) {

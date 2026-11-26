@@ -100,6 +100,7 @@ Deno.serve(async (req: Request) => {
     const allowedTabs = new Set([
       "home",
       "vinculo",
+      "aventuras",
       "calendar",
       "story",
       "memories",

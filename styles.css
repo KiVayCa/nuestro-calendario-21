@@ -1840,3 +1840,27 @@ body:has(#appDialog.show) .ncTransactionIndicator {
 @keyframes bond-pop { 0% { opacity:0; transform:scale(.55); } 65% { opacity:1; transform:scale(1.18); } 100% { transform:scale(1); } }
 @media (max-width:380px) { .bondGesture { padding:10px 4px; font-size:12px; } .bondGesture small { font-size:10px; } }
 @media (prefers-reduced-motion:reduce) { .bondSent,.bondArrival .bondEventIcon { animation:none; } .bondGesture,.bondMood { transition:none; } }
+.adventureStats,.adventureCreate { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
+.adventureStats>div { padding:14px 8px; text-align:center; border:1px solid var(--line); background:var(--card); color:var(--ink); border-radius:16px; min-width:0; }
+.adventureStats strong,.adventureStats span { display:block; }
+.adventureStats strong { font-size:clamp(21px,5vw,32px); color:var(--rose); }
+.adventureStats span { font-size:12px; }
+.adventureRoulette { text-align:center; }
+.adventureWheel { width:132px; height:132px; border:5px solid var(--line); border-radius:50%; margin:18px auto; display:grid; place-items:center; background:conic-gradient(var(--rose) 0deg 45deg,var(--soft) 45deg 90deg,var(--rose) 90deg 135deg,var(--soft) 135deg 180deg,var(--rose) 180deg 225deg,var(--soft) 225deg 270deg,var(--rose) 270deg 315deg,var(--soft) 315deg 360deg); box-shadow:0 7px 20px #0002; }
+.adventureWheel span { display:grid; place-items:center; height:48px; width:48px; border-radius:50%; background:var(--card); color:var(--ink); font-size:30px; }
+.adventureSpin { animation:adventure-spin .65s cubic-bezier(.2,.7,.2,1) both; }
+@keyframes adventure-spin { to { transform:rotate(1080deg); } }
+#adventureChoice { min-height:44px; font-weight:750; font-size:18px; color:var(--ink); }
+.adventureActions,.adventureFilters { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.adventureRoulette .adventureActions { justify-content:center; }
+.adventureStamps { display:grid; grid-template-columns:repeat(auto-fit,minmax(110px,1fr)); gap:10px; }
+.adventureStamp { display:grid; place-items:center; text-align:center; min-width:0; padding:14px 8px; border:2px dashed var(--rose); border-radius:18px; background:var(--soft); color:var(--ink); overflow-wrap:anywhere; }
+.adventureStamp span { font-size:27px; }.adventureStamp small { color:var(--muted); }
+.adventureList { display:grid; gap:12px; margin-top:14px; }
+.adventureCard { padding:14px; border:1px solid var(--line); border-radius:16px; background:var(--card); color:var(--ink); overflow-wrap:anywhere; }
+.adventureCardTop { display:flex; gap:10px; align-items:center; }
+.adventureCardTop>div { flex:1; min-width:0; }.adventureCardTop strong,.adventureCardTop small { display:block; }.adventureCardTop small,.adventureCard>small { font-size:12px; color:var(--muted); }
+.adventureIcon { font-size:28px; }.adventureBadge { align-self:flex-start; padding:5px 9px; border-radius:999px; font-size:11px; background:var(--soft); color:var(--ink); }
+.adventureCard p { white-space:pre-wrap; }.adventureActions { margin-top:10px; }.adventureMemory { display:flex; align-items:center; gap:9px; margin:8px 0; }.adventureMemory img { width:56px; height:56px; object-fit:cover; border-radius:10px; }
+@media(max-width:380px) { .adventureCreate .bondGesture { font-size:12px; padding:10px 4px; }.adventureStats { gap:5px; }.adventureActions .btn { padding:8px 10px; } }
+@media(prefers-reduced-motion:reduce) { .adventureSpin { animation:none; } }
