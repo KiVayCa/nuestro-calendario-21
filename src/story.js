@@ -27,7 +27,7 @@ function collectStoryEntries(cache=advCache,planRows=plans,today=countdownToday(
     if(m.source_plan_id)linkedPlans.add(m.source_plan_id+"|"+(m.source_occurrence_date||date));
     for(const a of adventures)if(a.plan_id)linkedPlans.add(a.plan_id+"|"+date);
     const place=(cache.places||[]).find(p=>p.id===m.place_id);
-    add("memory",m,date,{photo:m.photo_url||"",favorite:!!m.favorite,place:place?.name||m.location||"",badge:adventures.length?"Aventura vivida":""});
+    add("memory",m,date,{photo:m.photo_url||"",photo_x:m.photo_x,photo_y:m.photo_y,photo_zoom:m.photo_zoom,favorite:!!m.favorite,place:place?.name||m.location||"",badge:adventures.length?"Aventura vivida":""});
   }
   for(const a of cache.adventures||[]){
     if(a.status!=="done"||a.kind==="coupon"||linkedAdventures.has(a.id)||memoryIds.has(a.memory_id))continue;
@@ -71,7 +71,7 @@ function storyOpen(btn){
 function storyCard(e,compact=false){
   const [icon,label]=storyTypes[e.kind], displayIcon=e.icon||icon;
   return `<button type="button" class="storyEntry ${compact?"storyEntryCompact":""}" data-kind="${esc(e.kind)}" data-id="${esc(e.id)}" data-date="${esc(e.date)}" onclick="storyOpen(this)">
-    <div class="storyThumbWrap">${e.photo?`<img class="storyThumb" data-memory-path="${esc(e.photo)}" alt="Foto de ${esc(e.title)}" loading="lazy">`:`<span class="storyThumb storyNoPhoto">${esc(displayIcon)}</span>`}</div>
+    <div class="storyThumbWrap">${e.photo?`<img class="storyThumb" data-memory-path="${esc(e.photo)}" alt="Foto de ${esc(e.title)}" loading="lazy" style="${photoFrameStyle(e)}">`:`<span class="storyThumb storyNoPhoto">${esc(displayIcon)}</span>`}</div>
     <div class="storyEntryContent"><small>${esc(label)} · ${esc(dateES(e.date))}</small><strong>${e.favorite?"❤️ ":""}${esc(e.title)}</strong>${e.badge?`<span class="adventureBadge">${esc(e.badge)}</span>`:""}${e.place?`<small>📍 ${esc(e.place)}</small>`:""}${e.description&&!compact?`<p>${esc(e.description)}</p>`:""}<span class="storyOpenHint">Abrir ${e.kind==="memory"?"recuerdo":"momento"} ↗</span></div></button>`;
 }
 function storyThrowbacks(entries,today){

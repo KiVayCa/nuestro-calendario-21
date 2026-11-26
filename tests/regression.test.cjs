@@ -23,11 +23,18 @@ test("personalization normalizes lists and preserves required modules", () => {
   const c=context("src/personalization.js");
   const p=c.normalizePersonalPreferences({module_order:["fe","fe","unknown"],hidden_modules:["home","calendar","settings","letters","unknown"],shortcuts:["fe","calendar","story","goals","budget","places","letters"],home_sections:[],density:"compact",text_size:"large",motion:"reduced"});
   assert.equal(p.module_order[0],"fe");
-  assert.equal(new Set(p.module_order).size,21);
+  assert.equal(new Set(p.module_order).size,19);
+  assert.ok(p.shortcuts.includes("dreams"));
   assert.deepEqual(Array.from(p.hidden_modules),["letters"]);
   assert.equal(p.shortcuts.length,6);
   assert.equal(p.home_sections.length,0);
   assert.equal(p.density,"compact");
+});
+test("photo framing clamps metadata and keeps the default centered composition",()=>{
+  const c=context("src/photo-frame.js");
+  assert.equal(c.photoFrameStyle({}),"object-position:50% 50%;transform-origin:50% 50%;transform:scale(1);");
+  assert.equal(c.photoFrameStyle({photo_x:-20,photo_y:125,photo_zoom:12}),"object-position:0% 100%;transform-origin:0% 100%;transform:scale(3);");
+  assert.equal(c.photoFrameStyle({home_photo_x:25,home_photo_y:75,home_photo_zoom:2},true),"object-position:25% 75%;transform-origin:25% 75%;transform:scale(2);");
 });
 test("story combines history without repeating linked memories or revealing locked letters", () => {
   const c=context("src/story.js",{categoryIcon:()=>"🗓️"});
@@ -84,7 +91,7 @@ test("faith devotional is deterministic by date, supports both partners, and esc
   assert.equal(c.faithReading("2026-11-26")[0],readings[Math.floor(Date.UTC(2026,10,26)/86400000)%21][0]);
 });
 test("adventures show locked surprises, recipient-only coupons and completed stamps", () => {
-  const c = context("src/adventures.js", {
+  const c = context(["src/adventures.js","src/integrated.js"], {
     user:{id:"recipient"}, plans:[],
     advCache:{ideas:[],memories:[],adventures:[
       {id:"s",created_by:"creator",kind:"surprise",title:"Cita sorpresa",status:"pending",details:"",adventure_secrets:null},

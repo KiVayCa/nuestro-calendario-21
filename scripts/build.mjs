@@ -25,6 +25,8 @@ const sources = [
   "budget",
   "settings",
   "personalization",
+  "integrated",
+  "photo-frame",
   "profile",
   "notifications",
   "realtime",

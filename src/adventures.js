@@ -30,7 +30,7 @@ function renderAdvAdventures() {
   const completed = all.filter(a => a.status === "done");
   const pending = all.filter(a => a.status === "pending" && a.kind !== "coupon");
   const coupons = all.filter(a => a.kind === "coupon" && a.status === "pending");
-  const shown = all.filter(a => adventureFilter === "all" || a.kind === adventureFilter);
+  const shown = all.filter(a => adventureFilter==="all" || (adventureFilter==="experience"&&a.kind==="experience"&&a.status==="pending") || (adventureFilter==="passport"&&a.status==="done") || (["surprise","coupon"].includes(adventureFilter)&&a.kind===adventureFilter));
   const card = a => {
     const own = a.created_by === user?.id;
     const secret = a.kind === "surprise" && adventureSecret(a);
@@ -55,26 +55,27 @@ function renderAdvAdventures() {
     return `<article class="adventureCard" data-advanced-id="${esc(a.id)}">
       <div class="adventureCardTop"><span class="adventureIcon">${icon}</span><div><strong>${esc(adventureTitle(a))}</strong><small>${own?"Creado por ti":"Creado por tu pareja"}${(memory?.memory_date||a.target_date) ? " · "+esc(dateES(memory?.memory_date||a.target_date)) : ""}</small></div><span class="adventureBadge">${esc(adventureStatus[a.status]||a.status)}</span></div>
       ${hidden ? '<p>Tu pareja está preparando algo especial para ti. Los detalles se revelarán cuando decida compartirlos.</p>' : `<p>${esc(secret || adventureDetails(a) || (a.kind==="coupon" ? "Un detalle para disfrutar juntos." : ""))}</p>`}
-      ${plan ? `<small>🗓️ ${esc(plan.title)}</small>` : ""}${memory ? `<div class="adventureMemory">${memory.photo_url ? `<img alt="Foto de la experiencia" data-memory-path="${esc(memory.photo_url)}" onclick="openMemoryPhoto(this)" style="cursor:zoom-in">` : "📸"}<div><span>${esc(memory.title)}</span>${memory.place_id && advCache.places?.some(p=>p.id===memory.place_id) ? "<br>📍 "+placeLinkHtml(memory.place_id,advCache.places.find(p=>p.id===memory.place_id).name) : memory.location ? "<br>📍 "+esc(memory.location) : ""}</div></div>` : ""}
+      ${plan ? `<small>🗓️ ${esc(plan.title)}</small>` : ""}${memory ? `<div class="adventureMemory">${memory.photo_url ? `<div class="adventurePhotoFrame"><img alt="Foto de la experiencia" data-memory-path="${esc(memory.photo_url)}" onclick="openMemoryPhoto(this)" style="cursor:zoom-in;${photoFrameStyle(memory)}"></div>` : "📸"}<div><span>${esc(memory.title)}</span>${memory.photo_url?`<br><button class="btn" data-memory="${esc(memory.id)}" onclick="openMemoryFrame(this.dataset.memory)">Ajustar foto</button>`:""}${memory.place_id && advCache.places?.some(p=>p.id===memory.place_id) ? "<br>📍 "+placeLinkHtml(memory.place_id,advCache.places.find(p=>p.id===memory.place_id).name) : memory.location ? "<br>📍 "+esc(memory.location) : ""}</div></div>` : ""}
       <div class="adventureActions">${actions}</div></article>`;
   };
   return `<section class="bond adventureModule">
     <div class="bondHero"><div class="bondHeroHeart">🧭</div><small>COLECCIONEMOS MOMENTOS</small><h2>Nuestras aventuras</h2><p>Un mundo de primeras veces, pequeñas locuras y recuerdos juntos.</p></div>
     <div class="adventureStats"><div><strong>${pending.length}</strong><span>por vivir</span></div><div><strong>${completed.length}</strong><span>sellos del pasaporte</span></div><div><strong>${coupons.length}</strong><span>cupones activos</span></div></div>
-    <div class="advCard adventureRoulette"><h3>🎡 Ruleta de citas</h3><p>¿No saben qué hacer? Dejen que el azar elija su próxima aventura.</p><div class="adventureWheel" aria-hidden="true"><span>♡</span></div><div id="adventureChoice" aria-live="polite">${adventureChoice ? esc(adventureChoice.title) : "¡Giren para descubrir una cita!"}</div><div class="adventureActions"><button class="btn primary" onclick="spinAdventure()">Girar ruleta 🎡</button><button class="btn" id="adventureSaveChoice" onclick="saveAdventureChoice()" ${adventureChoice&&!adventureChoice.id?"":"disabled"}>Guardar experiencia</button><button class="btn" id="adventureScheduleChoice" onclick="scheduleAdventureChoice()" ${adventureChoice?"":"disabled"}>Agendar cita</button></div></div>
+    <div class="advCard"><div class="adventureFilters">${[["all","Todo"],["discover","🎡 Descubrir"],["experience","🗺️ Por vivir"],["surprise","🎁 Sorpresas"],["coupon","🎟️ Cupones"],["passport","🏆 Pasaporte"]].map(([k,v])=>`<button class="btn ${adventureFilter===k?"primary":""}" aria-pressed="${adventureFilter===k}" onclick="setAdventureFilter('${k}')">${v}</button>`).join("")}</div></div>
+    ${["all","discover"].includes(adventureFilter)?`<div class="advCard adventureRoulette"><h3>🎡 Ruleta de citas</h3><p>¿No saben qué hacer? Dejen que el azar elija su próxima aventura.</p><div class="adventureWheel" aria-hidden="true"><span>♡</span></div><div id="adventureChoice" aria-live="polite">${adventureChoice ? esc(adventureChoice.title) : "¡Giren para descubrir una cita!"}</div><div class="adventureActions"><button class="btn primary" onclick="spinAdventure()">Girar ruleta 🎡</button><button class="btn" id="adventureSaveChoice" onclick="saveAdventureChoice()" ${adventureChoice&&!adventureChoice.id?"":"disabled"}>Guardar experiencia</button><button class="btn" id="adventureScheduleChoice" onclick="scheduleAdventureChoice()" ${adventureChoice?"":"disabled"}>Agendar cita</button></div></div>${renderAdventureIdeas()}`:""}
     <div class="adventureCreate"><button class="bondGesture" onclick="openAdventureForm('experience')"><span>🗺️</span><strong>Nueva experiencia</strong><small>Una lista para los dos</small></button><button class="bondGesture" onclick="openAdventureForm('surprise')"><span>🎁</span><strong>Plan sorpresa</strong><small>Detalles secretos</small></button><button class="bondGesture" onclick="openAdventureForm('coupon')"><span>🎟️</span><strong>Cupón de amor</strong><small>Regala un detalle</small></button></div>
-    <div class="advCard"><h3>🏆 Pasaporte de pareja</h3><p>Cada aventura vivida deja un sello en su historia.</p><div class="adventureStamps">${completed.map(a=>`<div class="adventureStamp"><span>${adventureCategories[a.category]?.[0] || "✨"}</span><strong>${esc(adventureTitle(a))}</strong><small>${adventureMemory(a)?.memory_date ? esc(dateES(adventureMemory(a).memory_date)) : a.completed_at ? esc(new Date(a.completed_at).toLocaleDateString("es-CO",{timeZone:"America/Bogota"})) : ""}</small></div>`).join("") || '<div class="advEmpty">Su primer sello está esperando. ¡Vivan una aventura!</div>'}</div></div>
-    <div class="advCard"><h3>Nuestros planes y detalles</h3><div class="adventureFilters">${[["all","Todos"],["experience","Experiencias"],["surprise","Sorpresas"],["coupon","Cupones"]].map(([k,v])=>`<button class="btn ${adventureFilter===k?"primary":""}" aria-pressed="${adventureFilter===k}" onclick="setAdventureFilter('${k}')">${v}</button>`).join("")}</div><div class="adventureList">${shown.map(card).join("")||'<div class="advEmpty">Aún no hay aventuras en esta lista.</div>'}</div></div>
+    ${["all","passport"].includes(adventureFilter)?`<div class="advCard"><h3>🏆 Pasaporte de pareja</h3><p>Cada aventura vivida deja un sello en su historia.</p><div class="adventureStamps">${completed.map(a=>`<div class="adventureStamp"><span>${adventureCategories[a.category]?.[0] || "✨"}</span><strong>${esc(adventureTitle(a))}</strong><small>${adventureMemory(a)?.memory_date ? esc(dateES(adventureMemory(a).memory_date)) : a.completed_at ? esc(new Date(a.completed_at).toLocaleDateString("es-CO",{timeZone:"America/Bogota"})) : ""}</small></div>`).join("") || '<div class="advEmpty">Su primer sello está esperando. ¡Vivan una aventura!</div>'}</div></div>`:""}
+    ${adventureFilter!=="discover"?`<div class="advCard"><h3>Nuestros planes y detalles</h3><div class="adventureList">${shown.map(card).join("")||'<div class="advEmpty">Aún no hay aventuras en esta lista.</div>'}</div></div>`:""}
   </section>`;
 }
 function setAdventureFilter(value) {
-  if (!["all","experience","surprise","coupon"].includes(value)) return;
+  if (!["all","discover","experience","surprise","coupon","passport"].includes(value)) return;
   adventureFilter=value; renderAdvanced();
 }
 function spinAdventure() {
   const pool = [
     ...adventureDefaults.map(([title,category])=>({title,category,details:""})),
-    ...advCache.ideas.map(a=>({title:a.title,category:"especial",details:a.description||""})),
+    ...advCache.ideas.map(a=>({title:a.title,category:"especial",details:a.description||"",ideaId:a.id,place_id:a.place_id})),
     ...advCache.adventures.filter(a=>a.kind==="experience"&&a.status==="pending").map(a=>({...a,title:adventureTitle(a),details:adventureDetails(a)})),
   ];
   const candidates = pool.filter(a=>a.title!==adventureChoice?.title);
@@ -87,10 +88,12 @@ function spinAdventure() {
   $("adventureScheduleChoice").disabled=false;
 }
 function saveAdventureChoice() {
+  if (adventureChoice?.ideaId) return openIdeaAsAdventure(adventureChoice.ideaId);
   if (adventureChoice && !adventureChoice.id) openAdventureForm("experience",adventureChoice);
 }
 function scheduleAdventureChoice() {
   if (!adventureChoice) return;
+  if(adventureChoice.ideaId)return scheduleIdea(adventureChoice.ideaId);
   if(adventureChoice.id) return scheduleAdventure(adventureChoice.id);
   showAdvancedTab("calendar"); openModal(localISODate());
   $("title").value=adventureChoice.title; $("noteInput").value=adventureChoice.details||"";
@@ -136,6 +139,7 @@ async function saveAdventure(kind) {
     const {data,error}=await sb.rpc("create_adventure",{p_couple_id:space,p_kind:kind,p_title:title,p_details:details,p_category:$("adv_adventure_category")?.value||"especial",p_date:$("adv_adventure_date")?.value||null});
     if(error) throw error;
     if(user?.id!==account||couple?.id!==space) return;
+    adventureFilter=kind==="surprise"?"surprise":kind==="coupon"?"coupon":"all";
     closeAdvModal(); await advLoadAll();
     showAppToast("¡Guardado con amor! ❤️");
     await createPartnerNotification({event_type:"adventure_created",title:kind==="surprise"?"🎁 Tu pareja prepara una sorpresa":kind==="coupon"?"🎟️ Tienes un cupón de amor":"🧭 Una nueva aventura los espera",body:"Descúbrela en Nuestras aventuras.",target_tab:"aventuras",target_id:data});

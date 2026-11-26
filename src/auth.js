@@ -160,9 +160,11 @@ async function init() {
         );
         adventureChoice = null;
         adventureFilter = "all";
+        dreamsGoalsView = "dreams";
         futureFilter = "all";
         storyFilters = {month:"",kind:"all",query:"",favorites:false,view:"timeline",order:"newest"};
         personalDraft = null;
+        photoFrameDraft = null;
         coupleSettings.home_title = null;
         coupleSettings.home_subtitle = null;
         applyPersonalPreferences();

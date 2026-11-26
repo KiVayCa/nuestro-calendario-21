@@ -99,7 +99,7 @@ function renderAdvHome() {
     0,
     Math.floor((Date.now() - new Date("2026-04-21T00:00:00")) / 86400000),
   );
-  return `<div class="homeIntro"><div class="homeWelcome" style="position:relative;overflow:hidden"><img data-home-photo src="${esc(cachedHomePhotoUrl() || "pareja.jpeg")}" alt="Nuestra foto" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:1;z-index:0"><div style="position:relative;z-index:1"><div class="homeWelcomeContent"><div class="homePill">❤️ Nuestro Calendario #21 · Ana María & Nicolás</div><h2>${homeCoverTitle()}</h2><p>${homeCoverSubtitle()}</p><div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:18px"><button class="btn primary" onclick="showAdvancedTab('calendar')">🗓️ Entrar al calendario</button><button class="btn homeQuickCreateBtn" onclick="openQuickCreate()">✨ Crear algo especial</button></div></div></div></div></div>${personalHomeShortcuts()}<div class="homeStats" ${personalSectionAttr("stats")}><div class="homeStat"><strong>${together}</strong><span>días juntos ❤️</span></div><div class="homeStat"><strong>${dating}</strong><span>días de novios 💍</span></div><div class="homeStat"><strong>${p}</strong><span>planes guardados 🗓️</span></div><div class="homeStat"><strong>${m}</strong><span>recuerdos 📸</span></div></div><div class="homeNext" ${personalSectionAttr("next")}><div class="homeNextIcon">${next ? categoryIcon(next.category) : "♡"}</div><div style="flex:1"><div style="font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:#a16a7d;font-weight:900">Próximo capítulo</div><div class="homeNextTitle">${next ? esc(next.title) : "Todavía no hay un próximo plan"}</div><div class="homeNextMeta">${next ? dateES(next._occurrenceDate) + (next.plan_time ? " · " + formatTime(next.plan_time) : "") : "Creen uno y hagan que aparezca aquí ❤️"}</div>${next && next.recurrence_enabled ? '<span class="seriesBadge">🔁 Plan recurrente</span>' : ""}</div>${next ? '<button class="btn" data-next-id="' + next.id + '" data-date="' + next._occurrenceDate + '" onclick="openPlanDetail(this.dataset.nextId,this.dataset.date)">Abrir</button>' : ""}</div>${personalHomeBlock("recap",monthlyRecapCard())}${personalHomeBlock("countdown",homeCountdownCard())}<section class="homeNext" ${personalSectionAttr("week")}><div><h3>Próximos siete días</h3><p class="advMeta">Planes, fechas especiales y tareas asignadas.</p></div><button class="btn" type="button" onclick="openWeeklySummary()">Ver semana</button></section>${personalHomeBlock("question",dailyQuestionHomeCard())}<div class="advGrid" ${personalSectionAttr("summary")}><div class="advCard"><h3>✨ Sueños cumplidos</h3><div class="advMetric">${d}</div><p>De ideas bonitas a cosas que realmente vivieron.</p></div><div class="advCard"><h3>💌 Cartas</h3><div class="advMetric">${advCache.letters.length}</div><p>Palabras para leer hoy o guardar para el futuro.</p></div><div class="advCard"><h3>🎯 Retos</h3><div class="advMetric">${ch}</div><p>Pequeños desafíos para hacer juntos.</p></div><div class="advCard"><h3>💰 Metas</h3><div class="advMetric">${g}</div><p>Lo que están construyendo paso a paso.</p></div></div>`;
+  return `<div class="homeIntro"><div class="homeWelcome" style="position:relative;overflow:hidden"><img data-home-photo src="${esc(cachedHomePhotoUrl() || "pareja.jpeg")}" alt="Nuestra foto" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:1;z-index:0;${photoFrameStyle(coupleSettings,true)}"><div style="position:relative;z-index:1"><div class="homeWelcomeContent"><div class="homePill">❤️ Nuestro Calendario #21 · Ana María & Nicolás</div><h2>${homeCoverTitle()}</h2><p>${homeCoverSubtitle()}</p><div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:18px"><button class="btn primary" onclick="showAdvancedTab('calendar')">🗓️ Entrar al calendario</button><button class="btn homeQuickCreateBtn" onclick="openQuickCreate()">✨ Crear algo especial</button></div></div></div></div></div>${personalHomeShortcuts()}<div class="homeStats" ${personalSectionAttr("stats")}><div class="homeStat"><strong>${together}</strong><span>días juntos ❤️</span></div><div class="homeStat"><strong>${dating}</strong><span>días de novios 💍</span></div><div class="homeStat"><strong>${p}</strong><span>planes guardados 🗓️</span></div><div class="homeStat"><strong>${m}</strong><span>recuerdos 📸</span></div></div><div class="homeNext" ${personalSectionAttr("next")}><div class="homeNextIcon">${next ? categoryIcon(next.category) : "♡"}</div><div style="flex:1"><div style="font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:#a16a7d;font-weight:900">Próximo capítulo</div><div class="homeNextTitle">${next ? esc(next.title) : "Todavía no hay un próximo plan"}</div><div class="homeNextMeta">${next ? dateES(next._occurrenceDate) + (next.plan_time ? " · " + formatTime(next.plan_time) : "") : "Creen uno y hagan que aparezca aquí ❤️"}</div>${next && next.recurrence_enabled ? '<span class="seriesBadge">🔁 Plan recurrente</span>' : ""}</div>${next ? '<button class="btn" data-next-id="' + next.id + '" data-date="' + next._occurrenceDate + '" onclick="openPlanDetail(this.dataset.nextId,this.dataset.date)">Abrir</button>' : ""}</div>${personalHomeBlock("recap",monthlyRecapCard())}${personalHomeBlock("countdown",homeCountdownCard())}<section class="homeNext" ${personalSectionAttr("week")}><div><h3>Próximos siete días</h3><p class="advMeta">Planes, fechas especiales y tareas asignadas.</p></div><button class="btn" type="button" onclick="openWeeklySummary()">Ver semana</button></section>${personalHomeBlock("question",dailyQuestionHomeCard())}<div class="advGrid" ${personalSectionAttr("summary")}><div class="advCard"><h3>✨ Sueños cumplidos</h3><div class="advMetric">${d}</div><p>De ideas bonitas a cosas que realmente vivieron.</p></div><div class="advCard"><h3>💌 Cartas</h3><div class="advMetric">${advCache.letters.length}</div><p>Palabras para leer hoy o guardar para el futuro.</p></div><div class="advCard"><h3>🎯 Retos</h3><div class="advMetric">${ch}</div><p>Pequeños desafíos para hacer juntos.</p></div><div class="advCard"><h3>💰 Metas</h3><div class="advMetric">${g}</div><p>Lo que están construyendo paso a paso.</p></div></div>`;
 }
 
 function renderAdvDreams() {
@@ -110,7 +110,7 @@ function renderAdvDreams() {
       "✨ Nuevo sueño",
       "openDreamForm()",
     ) +
-    `<div class="advList">${advCache.dreams.length ? advCache.dreams.map((x) => `<div class="advItem" data-advanced-id="${x.id}"><div style="flex:1"><div class="advItemTitle">${x.status === "cumplido" ? "✅ " : x.status === "planeando" ? "🟡 " : "✨ "}${esc(x.title)}</div><div class="advMeta">${esc(x.category)}${x.target_date ? " · " + dateES(x.target_date) : ""}${x.budget ? " · " + money(x.budget) : ""}</div><p>${esc(x.description || "")}</p>${x.place_id && advCache.places.find((p) => p.id === x.place_id) ? `<div class="advMeta">📍 Lugar: ${placeLinkHtml(x.place_id, advCache.places.find((p) => p.id === x.place_id).name)}</div>` : ""}</div><div class="advActions"><select class="btn" onchange="setDreamStatus('${x.id}',this.value)"><option value="pendiente" ${x.status === "pendiente" ? "selected" : ""}>Pendiente</option><option value="planeando" ${x.status === "planeando" ? "selected" : ""}>Planeando</option><option value="cumplido" ${x.status === "cumplido" ? "selected" : ""}>Cumplido</option></select><button class="btn" onclick="openAdvancedEdit('dreams','${x.id}')">✏️ Editar</button><button class="btn danger" onclick="deleteAdvanced('dreams','${x.id}')">🗑️</button></div></div>`).join("") : `<div class="advEmpty">✨ ¿Qué quieren hacer algún día? Empiecen su lista.</div>`}</div>`
+    `<div class="advList">${advCache.dreams.length ? advCache.dreams.map((x) => `<div class="advItem" data-advanced-id="${x.id}"><div style="flex:1"><div class="advItemTitle">${x.status === "cumplido" ? "✅ " : x.status === "planeando" ? "🟡 " : "✨ "}${esc(x.title)}</div><div class="advMeta">${esc(x.category)}${x.target_date ? " · " + dateES(x.target_date) : ""}${x.budget ? " · " + money(x.budget) : ""}</div><p>${esc(x.description || "")}</p>${x.place_id && advCache.places.find((p) => p.id === x.place_id) ? `<div class="advMeta">📍 Lugar: ${placeLinkHtml(x.place_id, advCache.places.find((p) => p.id === x.place_id).name)}</div>` : ""}${dreamSavingsCard(x)}</div><div class="advActions"><select class="btn" onchange="setDreamStatus('${x.id}',this.value)"><option value="pendiente" ${x.status === "pendiente" ? "selected" : ""}>Pendiente</option><option value="planeando" ${x.status === "planeando" ? "selected" : ""}>Planeando</option><option value="cumplido" ${x.status === "cumplido" ? "selected" : ""}>Cumplido</option></select><button class="btn" onclick="openAdvancedEdit('dreams','${x.id}')">✏️ Editar</button><button class="btn danger" onclick="deleteAdvanced('dreams','${x.id}')">🗑️</button></div></div>`).join("") : `<div class="advEmpty">✨ ¿Qué quieren hacer algún día? Empiecen su lista.</div>`}</div>`
   );
 }
 
@@ -335,7 +335,7 @@ function openDreamForm(isEdit = false) {
           ["pareja", "Pareja"],
         ]) +
         textarea("description", "Descripción") +
-        `<div class="advFormGrid">${input("target_date", "Fecha objetivo", "date")}${input("budget", "Presupuesto", "number", 'min="0"')}</div>`,
+        `<div class="advFormGrid">${input("target_date", "Fecha objetivo", "date")}${input("budget", "Presupuesto", "number", 'min="0"')}</div>`+dreamSavingsSelector(),
       `saveDream()`,
     ),
   );
@@ -357,6 +357,7 @@ async function saveDream() {
       place_id: $("adv_place_id")?.value || null,
       target_date: $("adv_target_date").value || null,
       budget: $("adv_budget").value || null,
+      goal_id: $("adv_dream_goal")?.value || null,
     })
     .select("id")
     .single();
@@ -652,6 +653,7 @@ function openAdvancedEdit(key, id) {
     setAdvField("adv_category", x.category || "viaje");
     setAdvField("adv_target_date", x.target_date || "");
     setAdvField("adv_budget", x.budget ?? "");
+    setAdvField("adv_dream_goal",x.goal_id||"");
   } else if (key === "challenges") {
     setAdvField("adv_start_date", x.start_date || "");
     setAdvField("adv_end_date", x.end_date || "");
@@ -708,6 +710,7 @@ async function saveAdvancedEdit() {
       if (up.error)
         return appAlert("No se pudo subir la nueva foto: " + up.error.message);
       patch.photo_url = path;
+      patch.photo_x=50;patch.photo_y=50;patch.photo_zoom=1;
     }
   } else if (key === "letters") {
     const title = $("adv_title").value.trim();
@@ -743,6 +746,7 @@ async function saveAdvancedEdit() {
       place_id: $("adv_place_id")?.value || null,
       target_date: $("adv_target_date").value || null,
       budget: $("adv_budget").value || null,
+      goal_id: $("adv_dream_goal")?.value || null,
     };
   } else if (key === "challenges") {
     patch = {

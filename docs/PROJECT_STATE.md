@@ -385,3 +385,16 @@ se guarda en couple_settings. Migración en TEST y producción, prueba SQL de
 aislamiento y guardado aprobada. 30 pruebas web superadas, incluida la edición
 de la portada, navegación, accesos y preferencias. Pendiente prueba visual
 en teléfonos.
+
+## Integración y encuadre · fase 7
+
+Nuestras aventuras integra ¿Qué hacemos?, ruleta, ideas, experiencias, sorpresas,
+cupones y pasaporte. Sueños y metas integra sueños y metas de ahorro, con vínculo
+opcional y progreso compartido; Nuestro futuro conserva sus proyectos.
+Se mantienen los registros y las rutas antiguas para notificaciones y accesos.
+El encuadre reversible de recuerdos, experiencias y portada permite arrastrar,
+ampliar y restablecer sin reemplazar la imagen almacenada. Las fotos nuevas de
+portada conservan su original. La galería y la historia respetan el encuadre.
+Migración aditiva aplicada en TEST y producción; pruebas SQL de aislamiento,
+vínculos y conservación aprobadas en TEST. 31 pruebas web aprobadas. Sin nueva
+APK; pendiente validación visual en teléfonos.

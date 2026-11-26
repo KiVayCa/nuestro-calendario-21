@@ -114,6 +114,7 @@ async function saveGoal() {
   if (advancedEditState.key === "goals" && advancedEditState.id)
     return saveAdvancedEdit();
   const title = $("adv_title").value.trim();
+  const dreamOrigin=$("dreamGoalOrigin")?.value,account=user?.id,space=couple?.id;
   if (!title) return moneyFormError("Escribe el nombre de la meta.");
   const target = $("adv_target_amount").value;
   if (target !== "" && (!Number.isFinite(Number(target)) || Number(target) < 0))
@@ -135,6 +136,8 @@ async function saveGoal() {
     .single();
   if (error)
     return moneyFormError("No se pudo guardar la meta: " + error.message);
+  if(user?.id!==account||couple?.id!==space)return;
+  if(dreamOrigin&&created?.id)await linkDreamSavings(dreamOrigin,created.id);
   await createPartnerNotification({
     event_type: "goal_created",
     title: "Nueva meta compartida 💰",

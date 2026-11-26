@@ -203,6 +203,28 @@ const wait = () => new Promise((r) => setTimeout(r, 400));
   w.document.getElementById("adv_title").value = "Recuerdo editado";
   await w.saveAdvancedEdit();
   assert.ok(w.__db.memories.some((m) => m.title === "Recuerdo editado"));
+  await w.openPhotoFrame("memory",w.__db.memories.find(m=>m.id==="memory-one"));
+  w.changePhotoFrame("x",20);
+  w.changePhotoFrame("zoom",1.5);
+  const frameImage=w.document.getElementById("photoFrameImage");
+  assert.equal(frameImage.style.objectPosition,"20% 50%");
+  frameImage.dispatchEvent(new w.Event("load"));
+  await w.savePhotoFrame();
+  const framed=w.__db.memories.find(m=>m.id==="memory-one");
+  assert.equal(framed.photo_url,"pair/photo.png");
+  assert.equal(framed.photo_x,20);
+  assert.equal(framed.photo_zoom,1.5);
+  w.showAdvancedTab("dreams");
+  w.openDreamForm();
+  w.document.getElementById("adv_title").value="Viaje soñado";
+  w.document.getElementById("adv_dream_goal").value="goal-one";
+  await w.saveDream();
+  assert.equal(w.__db.dreams.find(d=>d.title==="Viaje soñado").goal_id,"goal-one");
+  w.showAdvancedTab("goals");
+  assert.equal(w.document.querySelector(".advTab.active").getAttribute("onclick"),"showAdvancedTab('dreams')");
+  w.navigateToItem("ideas","idea-one");
+  assert.equal(w.document.querySelector(".advTab.active").getAttribute("onclick"),"showAdvancedTab('aventuras')");
+  assert.ok(w.document.querySelector('[data-advanced-id="idea-one"]'));
   w.showAdvancedTab("aventuras");
   w.openAdventureForm("experience");
   assert.equal(w.document.getElementById("adv_photo").type,"file");
@@ -281,7 +303,7 @@ const wait = () => new Promise((r) => setTimeout(r, 400));
   assert.match(w.document.querySelector(".homeWelcome p").textContent,/Nuestro futuro juntos/);
   assert.deepEqual(errors, []);
   console.log(
-    "PASS DOM: 21 tabs, legacy photo hydration, filters, idea-to-plan with place, save plan, goal RPC, memory edit.",
+    "PASS DOM: integrated tabs and legacy routes, photo framing, dream savings, memory edit, plan and goal operations.",
   );
 })()
   .catch((e) => {

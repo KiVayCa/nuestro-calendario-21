@@ -1,8 +1,8 @@
 const personalModules={
   home:"🏠 Inicio",vinculo:"💞 Nuestro vínculo",aventuras:"🧭 Nuestras aventuras",fe:"🙏 Nuestra fe",
   futuro:"🌱 Nuestro futuro",calendar:"🗓️ Calendario",story:"📖 Historia",memories:"📸 Recuerdos",
-  letters:"💌 Cartas",dreams:"✨ Sueños",challenges:"🎯 Retos",ideas:"🎲 ¿Qué hacemos?",dates:"📅 Fechas",
-  goals:"💰 Metas",budget:"🧾 Presupuesto",question:"💭 Pregunta",places:"📍 Lugares",
+  letters:"💌 Cartas",dreams:"✨ Sueños y metas",challenges:"🎯 Retos",dates:"📅 Fechas",
+  budget:"🧾 Presupuesto",question:"💭 Pregunta",places:"📍 Lugares",
   analysis:"📊 Análisis",achievements:"🏆 Logros",private:"🔐 Privado",settings:"⚙️ Configuración"
 };
 const personalRequired=new Set(["home","calendar","settings"]);
@@ -12,11 +12,12 @@ function cleanPersonalList(list,choices){
   return Array.isArray(list)?[...new Set(list.filter(x=>typeof x==="string"&&choices.includes(x)))]:[];
 }
 function normalizePersonalPreferences(value={}){
-  const all=Object.keys(personalModules), order=cleanPersonalList(value.module_order,all);
+  const aliases=list=>Array.isArray(list)?list.map(k=>k==="ideas"?"aventuras":k==="goals"?"dreams":k):[];
+  const all=Object.keys(personalModules), order=cleanPersonalList(aliases(value.module_order),all);
   return {
     module_order:[...order,...all.filter(x=>!order.includes(x))],
     hidden_modules:cleanPersonalList(value.hidden_modules,all).filter(x=>!personalRequired.has(x)),
-    shortcuts:cleanPersonalList(value.shortcuts,all).filter(x=>x!=="home"&&x!=="settings").slice(0,6),
+    shortcuts:cleanPersonalList(aliases(value.shortcuts),all).filter(x=>x!=="home"&&x!=="settings").slice(0,6),
     home_sections:Array.isArray(value.home_sections)?cleanPersonalList(value.home_sections,Object.keys(personalSections)):Object.keys(personalSections),
     density:value.density==="compact"?"compact":"comfortable",
     text_size:value.text_size==="large"?"large":"normal",

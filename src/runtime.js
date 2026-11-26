@@ -170,6 +170,8 @@ const validAdvancedTabs = new Set([
   "settings",
 ]);
 if (!validAdvancedTabs.has(advancedTab)) advancedTab = "home";
+if(advancedTab==="ideas"){advancedTab="aventuras";adventureFilter="discover";}
+if(advancedTab==="goals"){advancedTab="dreams";dreamsGoalsView="savings";}
 let advCache = {
   connection: [],
   adventures: [],

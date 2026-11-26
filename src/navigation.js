@@ -1,5 +1,8 @@
 function showAdvancedTab(tab, options = {}) {
   if (!validAdvancedTabs.has(tab)) tab = "home";
+  if(tab==="ideas"){adventureFilter="discover";tab="aventuras";}
+  if(tab==="goals"){dreamsGoalsView="savings";tab="dreams";}
+  else if(tab==="dreams"&&!options.keepSection)dreamsGoalsView="dreams";
   const area = $("advancedArea"),
     content = $("advancedContent"),
     workspace = document.querySelector(".workspace"),
@@ -95,7 +98,7 @@ function renderAdvanced({ preserveInputs = false } = {}) {
     story: renderAdvStory,
     memories: renderAdvMemories,
     letters: renderAdvLetters,
-    dreams: renderAdvDreams,
+    dreams: renderDreamsAndGoals,
     challenges: renderAdvChallenges,
     ideas: renderAdvIdeas,
     dates: renderAdvDates,
@@ -142,6 +145,7 @@ function renderAdvanced({ preserveInputs = false } = {}) {
 }
 
 function openAdvModal(title, body) {
+  if(title!=="Ajustar portada ❤️"&&title!=="Ajustar foto 📸")photoFrameDraft=null;
   const modal = $("advModal");
   document.activeElement?.blur();
   modal.classList.remove("is-closing");
@@ -154,6 +158,7 @@ function openAdvModal(title, body) {
 }
 
 function closeAdvModal() {
+  photoFrameDraft=null;
   const modal = $("advModal");
   if (!modal || !modal.classList.contains("show")) return;
   if (homePhotoCropState?.objectUrl) {

@@ -16,7 +16,7 @@ function renderAdvMemories() {
         ? filteredMemories()
             .map(
               (x) =>
-                `<div class="advItem" data-advanced-id="${x.id}"><div>${x.photo_url ? `<img class="advPhoto" data-memory-path="${esc(x.photo_url)}" loading="lazy" alt="Foto de ${esc(x.title)}" role="button" tabindex="0" title="Pulsa para ampliar" onclick="openMemoryPhoto(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openMemoryPhoto(this)}" style="cursor:zoom-in">` : ""}<div class="advItemTitle">${x.favorite ? "❤️ " : ""}${esc(x.title)}</div><div class="advMeta">${dateES(x.memory_date)} · ${esc(x.category)}${x.place_id && advCache.places.find((p) => p.id === x.place_id) ? " · 📍 " + placeLinkHtml(x.place_id, advCache.places.find((p) => p.id === x.place_id).name) : x.location ? " · 📍 " + esc(x.location) : ""}</div><p>${esc(x.description || "")}</p></div><div class="advActions">${memoryPlanLink(x)}${memoryAdventureLinks(x)}<button class="btn" onclick="toggleFavorite('memories','${x.id}',${!x.favorite})">${x.favorite ? "💔 Quitar favorito" : "❤️ Favorito"}</button><button class="btn" onclick="openAdvancedEdit('memories','${x.id}')">✏️ Editar</button><button class="btn danger" onclick="deleteAdvanced('memories','${x.id}')">🗑️</button></div></div>`,
+                `<div class="advItem" data-advanced-id="${x.id}"><div>${x.photo_url ? `<div class="framedMemoryPhoto"><img class="advPhoto" data-memory-path="${esc(x.photo_url)}" loading="lazy" alt="Foto de ${esc(x.title)}" role="button" tabindex="0" title="Pulsa para ampliar" onclick="openMemoryPhoto(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openMemoryPhoto(this)}" style="cursor:zoom-in;${photoFrameStyle(x)}"></div>` : ""}<div class="advItemTitle">${x.favorite ? "❤️ " : ""}${esc(x.title)}</div><div class="advMeta">${dateES(x.memory_date)} · ${esc(x.category)}${x.place_id && advCache.places.find((p) => p.id === x.place_id) ? " · 📍 " + placeLinkHtml(x.place_id, advCache.places.find((p) => p.id === x.place_id).name) : x.location ? " · 📍 " + esc(x.location) : ""}</div><p>${esc(x.description || "")}</p></div><div class="advActions">${memoryPlanLink(x)}${memoryAdventureLinks(x)}${x.photo_url?`<button class="btn" data-memory="${esc(x.id)}" onclick="openMemoryFrame(this.dataset.memory)">🖼️ Ajustar foto</button>`:""}<button class="btn" onclick="toggleFavorite('memories','${x.id}',${!x.favorite})">${x.favorite ? "💔 Quitar favorito" : "❤️ Favorito"}</button><button class="btn" onclick="openAdvancedEdit('memories','${x.id}')">✏️ Editar</button><button class="btn danger" onclick="deleteAdvanced('memories','${x.id}')">🗑️</button></div></div>`,
             )
             .join("")
         : `<div class="advEmpty">${advCache.memories.length ? "No hay recuerdos que coincidan con los filtros." : "📸 Todavía no hay recuerdos. El primero puede ser uno muy especial."}</div>`
@@ -136,6 +136,7 @@ async function saveMemory() {
       return appAlert(error.message);
     }
     if(user?.id!==draft.created_by||couple?.id!==draft.couple_id) return;
+    adventureFilter="all";
     closeAdvModal();
     await advLoadAll();
     showAppToast("Experiencia y recuerdo vinculados. ❤️");

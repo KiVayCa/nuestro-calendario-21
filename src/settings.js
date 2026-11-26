@@ -28,7 +28,10 @@ async function loadCoupleSettings() {
     (data.countdown_date !== coupleSettings.countdown_date ||
       data.countdown_title !== coupleSettings.countdown_title ||
       data.home_title !== coupleSettings.home_title ||
-      data.home_subtitle !== coupleSettings.home_subtitle);
+      data.home_subtitle !== coupleSettings.home_subtitle ||
+      data.home_photo_x !== coupleSettings.home_photo_x ||
+      data.home_photo_y !== coupleSettings.home_photo_y ||
+      data.home_photo_zoom !== coupleSettings.home_photo_zoom);
   if (data) coupleSettings = { ...coupleSettings, ...data };
   applyCoupleSettings();
   return countdownChanged;
@@ -93,7 +96,7 @@ async function applyHomePhoto() {
   });
   if (token !== homePhotoApplyToken) return;
   document.querySelectorAll("[data-home-photo]").forEach((img) => {
-    img.style.objectPosition = "center center";
+    applyPhotoFrame(img,coupleSettings,true);
     if (img.src !== finalUrl) img.src = finalUrl;
     const syncHeroFrame = () => {
       const hero = img.closest(".homeWelcome");
@@ -155,10 +158,6 @@ async function uploadCouplePhoto(inputId, field) {
     appAlert("La imagen debe pesar menos de 8 MB.");
     return;
   }
-  if (field === "home_photo_path") {
-    openHomePhotoCropEditor(f);
-    return;
-  }
   const old = coupleSettings[field];
   const path = `${couple.id}/settings/${field}-${crypto.randomUUID()}-${f.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
   const up = await sb.storage
@@ -168,13 +167,14 @@ async function uploadCouplePhoto(inputId, field) {
     appAlert("No se pudo subir la foto: " + up.error.message);
     return;
   }
-  const ok = await saveCoupleSettings({ [field]: path });
+  const ok = await saveCoupleSettings({ [field]: path,...(field==="home_photo_path"?{home_photo_x:50,home_photo_y:50,home_photo_zoom:1}:{}) });
   if (!ok) {
     await sb.storage.from("couple-media").remove([path]);
     return;
   }
   if (old && old !== path) await sb.storage.from("couple-media").remove([old]);
   await renderSettingsPhotoPreviews();
+  if(field==="home_photo_path")openHomeFrame();
 }
 
 async function signedPhoto(path) {
@@ -402,7 +402,7 @@ function renderAdvSettings() {
  <div class="settingsCard"><h3>🎨 Tema de la aplicación</h3><p>Elige el estilo general. Se guarda para los dos.</p><div class="themeChoices">${themes.map((t) => `<button type="button" class="themeChoice ${active === t[0] ? "active" : ""}" onclick="selectTheme('${t[0]}')"><div class="themeSwatch" style="background:linear-gradient(135deg,${t[2]},${t[3]})"></div><b>${t[1]}</b><div class="advMeta">${{ romance: "Romántico y cálido", night: "Elegante y nocturno", lavender: "Suave y delicado", sunset: "Atardecer cálido", ocean: "Fresco y sereno", cherry: "Intenso y romántico", emerald: "Natural y equilibrado", coffee: "Tonos tierra acogedores", sakura: "Rosa suave y delicado", royal: "Violeta elegante", forest: "Verde natural", wine: "Clásico y profundo", sky: "Azul claro y limpio", mint: "Fresco y relajante", peach: "Cálido y luminoso", gold: "Dorado suave", plum: "Ciruela sofisticada", midnight: "Oscuro con acentos azules", charcoal: "Minimalista y oscuro", blush: "Rosa empolvado", ice: "Azul hielo", rosewood: "Rosa madera", aurora: "Verde agua sereno", sage: "Verde salvia natural", blueberry: "Azul violeta delicado", terracotta: "Arcilla cálida", butter: "Amarillo crema suave", lagoon: "Turquesa tranquilo", rosegold: "Rosa dorado elegante", porcelain: "Minimalista, limpio y sofisticado", citrus: "Verde cítrico fresco y luminoso", denim: "Azul clásico, sereno y moderno", cinnamon: "Tonos canela cálidos y acogedores", orchid: "Orquídea suave y romántica" }[t[0]] || "Una combinación equilibrada"}</div></button>`).join("")}</div>
  <div class="colorRow"><input id="settingsAccent" type="color" value="${esc(settingsDraft.accent_color || coupleSettings.accent_color || "#e64d78")}" onchange="previewAccent(this.value)"><div><b>Color principal</b><div class="advMeta">Personaliza botones, detalles y acentos.</div></div></div></div>
  <div class="settingsCard"><h3>📸 Fotos de la aplicación</h3><p>Pueden reemplazar la foto principal sin modificar el código.</p>
- <div class="photoSetting"><img id="settingsHomePreview" class="photoPreview" src="pareja.jpeg" alt="Portada"><div><b>Foto de portada</b><div class="advMeta">Es la imagen grande de Inicio.</div><input id="settingsHomePhoto" type="file" accept="image/*" style="margin-top:10px" onchange="uploadCouplePhoto('settingsHomePhoto','home_photo_path')"></div></div>
+ <div class="photoSetting"><img id="settingsHomePreview" class="photoPreview" src="pareja.jpeg" alt="Portada"><div><b>Foto de portada</b><div class="advMeta">Es la imagen grande de Inicio.</div><input id="settingsHomePhoto" type="file" accept="image/*" style="margin-top:10px" onchange="uploadCouplePhoto('settingsHomePhoto','home_photo_path')"><button class="btn" type="button" onclick="openHomeFrame()">🖼️ Ajustar encuadre</button></div></div>
  <div class="photoSetting"><img id="settingsLogoPreview" class="photoPreview" src="pareja.jpeg" alt="Foto secundaria"><div><b>Foto secundaria</b><div class="advMeta">Podremos usarla en tarjetas, perfil y futuras pantallas.</div><input id="settingsLogoPhoto" type="file" accept="image/*" style="margin-top:10px" onchange="uploadCouplePhoto('settingsLogoPhoto','logo_photo_path')"></div></div>
  <div class="settingsNote">🔒 Las fotos se guardan en el almacenamiento privado de su pareja. No se hacen públicas.</div></div>
  <div class="settingsCard"><h3>✨ Vista de Inicio</h3><p>La portada puede usar su foto actual o la que carguen arriba.</p><div class="settingsActions"><button class="btn primary" onclick="useDefaultCouplePhoto()">↩️ Volver a la foto original</button><button class="btn" onclick="showAdvancedTab('home')">🏠 Ver Inicio</button></div></div>
@@ -503,7 +503,7 @@ async function saveSettingsFromUI() {
 
 async function useDefaultCouplePhoto() {
   const old = coupleSettings.home_photo_path;
-  const ok = await saveCoupleSettings({ home_photo_path: null });
+  const ok = await saveCoupleSettings({ home_photo_path: null,home_photo_x:50,home_photo_y:50,home_photo_zoom:1 });
   if (!ok) return;
   if (old) await sb.storage.from("couple-media").remove([old]);
   await renderSettingsPhotoPreviews();
