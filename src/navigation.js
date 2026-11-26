@@ -7,6 +7,7 @@ function showAdvancedTab(tab, options = {}) {
     cards = document.querySelector(".cards");
   const previousTab = advancedTab;
   advancedTab = tab;
+  applyPersonalNav();
   animateNextModuleRender =
     previousTab !== tab &&
     !suppressTabAnimation &&

@@ -11,6 +11,7 @@ async function loadAdvancedData(keys = Object.keys(advTables)) {
             ? sb.rpc("list_couple_letters", { p_couple_id: couple.id })
             : sb.from(advTables[key]).select(key === "adventures" ? "*,adventure_secrets(details)" : "*").eq("couple_id", couple.id);
         if (key === "privateNotes") query = query.eq("user_id", user.id);
+        if (key === "personalPrefs") query = query.eq("user_id", user.id);
         if (key === "notifications")
           query = query.eq("recipient_user_id", user.id);
         // Page through the API limit so older memories and movements stay available.
@@ -41,6 +42,7 @@ async function loadAdvancedData(keys = Object.keys(advTables)) {
       changed = true;
     }
   }
+  if (requested.includes("personalPrefs")) applyPersonalPreferences();
   setConnectionStatus(
     results.some((result) => result.error)
       ? "No pudimos actualizar todo. Conservamos la última información disponible."

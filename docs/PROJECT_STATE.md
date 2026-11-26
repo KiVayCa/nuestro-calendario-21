@@ -368,3 +368,20 @@ con recuerdo vinculado ni se muestran cartas bloqueadas o su contenido.
 Cada tarjeta abre su módulo y registro original. Realtime y temas conservados.
 29 pruebas web aprobadas, incluida deduplicación, privacidad y galería.
 No hay nueva tabla ni APK. Pendiente aceptación visual en teléfonos.
+
+## Personalización avanzada · fase 6
+
+Configuración incorpora preferencias individuales sincronizadas por cuenta:
+reordenar módulos, ocultar módulos no obligatorios (sin borrar datos), hasta
+seis accesos rápidos en Inicio, mostrar u ocultar las siete secciones de Inicio,
+espaciado cómodo/compacto, texto normal/grande y reducción de animaciones.
+Inicio, Calendario y Configuración permanecen accesibles; el botón ☰ abre todos
+los módulos, incluso los ocultos. Los avisos y enlaces siguen abriendo el módulo
+destino. Por separado, título y frase de portada compartidos y editables.
+Se conservan los 34 temas, las fotos, el efecto normal de la barra y la
+sincronización de los widgets; no se cambia la APK v15. RLS restringe la tabla
+couple_personalization a la cuenta actual y su pareja autorizada; la portada
+se guarda en couple_settings. Migración en TEST y producción, prueba SQL de
+aislamiento y guardado aprobada. 30 pruebas web superadas, incluida la edición
+de la portada, navegación, accesos y preferencias. Pendiente prueba visual
+en teléfonos.

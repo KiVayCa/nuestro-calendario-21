@@ -126,6 +126,7 @@ async function setupAdvancedRealtime(force = false) {
     "couple_faith",
     "couple_future_projects",
     "couple_future_steps",
+    "couple_personalization",
     "memories",
     "love_letters",
     "letter_reactions",

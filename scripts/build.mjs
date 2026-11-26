@@ -24,6 +24,7 @@ const sources = [
   "story",
   "budget",
   "settings",
+  "personalization",
   "profile",
   "notifications",
   "realtime",

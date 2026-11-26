@@ -19,6 +19,16 @@ function context(file, extra = {}) {
     vm.runInContext(fs.readFileSync(name, "utf8"), sandbox);
   return sandbox;
 }
+test("personalization normalizes lists and preserves required modules", () => {
+  const c=context("src/personalization.js");
+  const p=c.normalizePersonalPreferences({module_order:["fe","fe","unknown"],hidden_modules:["home","calendar","settings","letters","unknown"],shortcuts:["fe","calendar","story","goals","budget","places","letters"],home_sections:[],density:"compact",text_size:"large",motion:"reduced"});
+  assert.equal(p.module_order[0],"fe");
+  assert.equal(new Set(p.module_order).size,21);
+  assert.deepEqual(Array.from(p.hidden_modules),["letters"]);
+  assert.equal(p.shortcuts.length,6);
+  assert.equal(p.home_sections.length,0);
+  assert.equal(p.density,"compact");
+});
 test("story combines history without repeating linked memories or revealing locked letters", () => {
   const c=context("src/story.js",{categoryIcon:()=>"🗓️"});
   const cache={
