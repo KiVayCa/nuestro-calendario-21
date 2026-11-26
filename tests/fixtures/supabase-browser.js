@@ -157,6 +157,12 @@
     from: (table) => new Query(table),
     rpc: (name, args) => {
       if (name === "list_couple_letters") return new Query("love_letters").eq("couple_id", args.p_couple_id);
+      if (name === "save_adventure_memory") {
+        const memory={id:"memory-adventure",couple_id:args.p_couple_id,title:args.p_title,description:args.p_description,memory_date:args.p_date,category:args.p_memory_category,place_id:args.p_place_id,location:db.places.find(p=>p.id===args.p_place_id)?.name,photo_url:args.p_photo_url};
+        db.memories.push(memory);
+        (db.couple_adventures ||= []).push({id:"adventure-memory",couple_id:args.p_couple_id,kind:"experience",title:args.p_title,status:args.p_done?"done":"pending",category:args.p_adventure_category,memory_id:memory.id});
+        return {data:{adventure_id:"adventure-memory",memory_id:memory.id},error:null};
+      }
       if (name === "record_goal_movement") {
         const goal = db.goals.find((x) => x.id === args.p_goal_id);
         goal.current_amount += args.p_amount;

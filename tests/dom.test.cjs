@@ -185,6 +185,22 @@ const wait = () => new Promise((r) => setTimeout(r, 400));
   w.document.getElementById("adv_title").value = "Recuerdo editado";
   await w.saveAdvancedEdit();
   assert.ok(w.__db.memories.some((m) => m.title === "Recuerdo editado"));
+  w.showAdvancedTab("aventuras");
+  w.openAdventureForm("experience");
+  assert.equal(w.document.getElementById("adv_photo").type,"file");
+  assert.ok(w.document.querySelector('#adv_place_id option[value="place-one"]'));
+  w.document.getElementById("adv_title").value="Experiencia con lugar";
+  w.document.getElementById("adv_place_id").value="place-one";
+  Object.defineProperty(w.document.getElementById("adv_photo"),"files",{value:[new w.File(["fixture"],"aventura.png",{type:"image/png"})]});
+  await w.saveMemory();
+  assert.equal(w.__db.couple_adventures[0].memory_id,"memory-adventure");
+  assert.equal(w.__db.memories.find(m=>m.id==="memory-adventure").place_id,"place-one");
+  assert.match(w.__db.memories.find(m=>m.id==="memory-adventure").photo_url,/aventura\.png$/);
+  w.showAdvancedTab("memories");
+  assert.ok(w.document.querySelector('[data-adventure="adventure-memory"]'));
+  w.showAdvancedTab("aventuras");
+  assert.match(w.document.querySelector('[data-advanced-id="adventure-memory"]').textContent,/Ver recuerdo/);
+  assert.ok(w.document.querySelector('[data-advanced-id="adventure-memory"] img[data-memory-path]'));
   assert.deepEqual(errors, []);
   console.log(
     "PASS DOM: 19 tabs, legacy photo hydration, filters, idea-to-plan with place, save plan, goal RPC, memory edit.",

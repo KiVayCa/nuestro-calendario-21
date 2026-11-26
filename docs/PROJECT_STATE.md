@@ -296,3 +296,16 @@ Se verificó en TEST mediante transacción revertida el aislamiento, revelado,
 canje único, estados y vínculos. No necesita APK nuevo: Android v15.
 Migración y función de avisos desplegadas en TEST y producción; 27 pruebas
 web aprobadas. Pendiente comprobación de entrega push y visual en teléfonos.
+
+## Experiencias y Recuerdos · formulario compartido
+
+Nueva experiencia reutiliza el formulario de Recuerdos con foto y lugar del
+mapa, tipo de experiencia y estado por vivir/vivida. Un RPC transaccional
+crea y vincula ambos registros; la foto se almacena una sola vez. Los datos
+visibles de la experiencia se leen del recuerdo vinculado, incluso al editar
+el recuerdo, y los dos módulos ofrecen navegación recíproca. Las experiencias
+anteriores pueden crear o vincular un recuerdo también mientras están pendientes.
+Las sorpresas privadas conservan sus restricciones. Prueba SQL en TEST de
+vínculos, permisos, estado y lugares aprobada con reversión. Sin nuevo APK.
+Migración aplicada en TEST y producción. 27 pruebas web superadas, incluido
+el recorrido de creación con foto y lugar y navegación en ambos sentidos.
