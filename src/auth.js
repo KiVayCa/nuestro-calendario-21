@@ -160,6 +160,7 @@ async function init() {
         );
         adventureChoice = null;
         adventureFilter = "all";
+        futureFilter = "all";
         coupleProfiles = [];
         myProfile = null;
         if (window.advancedRealtime) {

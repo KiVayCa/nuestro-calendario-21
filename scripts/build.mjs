@@ -15,6 +15,7 @@ const sources = [
   "adventures",
   "faith-readings",
   "faith",
+  "future",
   "navigation",
   "auth",
   "calendar",

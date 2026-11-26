@@ -157,6 +157,12 @@
     from: (table) => new Query(table),
     rpc: (name, args) => {
       if (name === "list_couple_letters") return new Query("love_letters").eq("couple_id", args.p_couple_id);
+      if (name === "create_future_project") {
+        const p={id:"future-one",couple_id:args.p_couple_id,title:args.p_title,description:args.p_description,category:args.p_category,status:args.p_status,target_date:args.p_target_date,goal_id:args.p_goal_id,dream_id:args.p_dream_id,created_at:now};
+        (db.couple_future_projects ||= []).push(p);
+        (db.couple_future_steps ||= []).push(...args.p_steps.map((title,i)=>({id:"future-step-"+i,couple_id:p.couple_id,project_id:p.id,title,done:false,created_at:now})));
+        return {data:p.id,error:null};
+      }
       if (name === "save_adventure_memory") {
         const memory={id:"memory-adventure",couple_id:args.p_couple_id,title:args.p_title,description:args.p_description,memory_date:args.p_date,category:args.p_memory_category,place_id:args.p_place_id,location:db.places.find(p=>p.id===args.p_place_id)?.name,photo_url:args.p_photo_url};
         db.memories.push(memory);

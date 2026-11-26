@@ -69,6 +69,7 @@ const wait = () => new Promise((r) => setTimeout(r, 400));
     "vinculo",
     "aventuras",
     "fe",
+    "futuro",
     "places",
     "analysis",
     "achievements",
@@ -108,6 +109,22 @@ const wait = () => new Promise((r) => setTimeout(r, 400));
   category.value = "comida";
   await w.savePlan();
   assert.equal(w.__db.plans.find((p) => p.id === newPlan.id).category, "comida");
+  w.closeModal();
+  w.showAdvancedTab("futuro");
+  w.openFutureProject("marriage");
+  assert.equal(w.document.getElementById("adv_future_title").value,"Nuestro matrimonio");
+  w.document.getElementById("adv_future_date").value="2028-04-21";
+  w.document.getElementById("adv_future_goal").value="goal-one";
+  await w.saveFutureProject("");
+  assert.equal(w.__db.couple_future_projects[0].goal_id,"goal-one");
+  assert.equal(w.__db.couple_future_steps.length,5);
+  await w.toggleFutureStep("future-step-0");
+  assert.equal(w.__db.couple_future_steps[0].done,true);
+  assert.match(w.document.querySelector('[data-advanced-id="future-one"]').textContent,/20%/);
+  w.scheduleFutureStep("future-step-1");
+  assert.equal(w.document.getElementById("date").value,"2028-04-21");
+  await w.savePlan();
+  assert.ok(w.__db.couple_future_steps[1].plan_id);
   w.closeModal();
   const filter = w.document.getElementById("planCategoryFilter");
   const calendarCard = w.document.querySelector(".calendarCard");
@@ -219,7 +236,7 @@ const wait = () => new Promise((r) => setTimeout(r, 400));
   w.closeModal();
   assert.deepEqual(errors, []);
   console.log(
-    "PASS DOM: 20 tabs, legacy photo hydration, filters, idea-to-plan with place, save plan, goal RPC, memory edit.",
+    "PASS DOM: 21 tabs, legacy photo hydration, filters, idea-to-plan with place, save plan, goal RPC, memory edit.",
   );
 })()
   .catch((e) => {

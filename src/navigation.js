@@ -89,6 +89,7 @@ function renderAdvanced({ preserveInputs = false } = {}) {
     vinculo: renderAdvVinculo,
     aventuras: renderAdvAdventures,
     fe: renderAdvFaith,
+    futuro: renderAdvFuture,
     home: renderAdvHome,
     story: renderAdvStory,
     memories: renderAdvMemories,

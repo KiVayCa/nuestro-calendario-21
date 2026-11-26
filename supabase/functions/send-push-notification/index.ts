@@ -102,6 +102,7 @@ Deno.serve(async (req: Request) => {
       "vinculo",
       "aventuras",
       "fe",
+      "futuro",
       "calendar",
       "story",
       "memories",

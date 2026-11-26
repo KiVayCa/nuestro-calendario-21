@@ -147,6 +147,7 @@ function navigateToItem(tab, id, date) {
   if (!validAdvancedTabs.has(tab)) tab = "notifications";
   if (tab === "memories" && id)
     memoryFilters = { query: "", year: "", favorites: false };
+  if (tab === "futuro" && id) futureFilter = "all";
   showAdvancedTab(tab);
   if (tab === "calendar" && !id && /^\d{4}-\d{2}-\d{2}$/.test(date || "")) {
     const selected = parseDateOnly(date);

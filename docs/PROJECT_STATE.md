@@ -338,3 +338,19 @@ Los registros de lectura no se reinician al abrir la biblioteca.
 Sin cambio en la base de datos ni nueva APK.
 28 pruebas web superadas, incluida la biblioteca, el ciclo completo sin
 duplicados y la conservación de las fechas registradas.
+
+## Nuestro futuro · fase 4
+
+Nuevo módulo con siete plantillas de proyectos (matrimonio, vivienda, viaje y
+luna de miel, familia, fe, crecimiento y otros), fecha objetivo, estado,
+checklist de pasos sugeridos o personalizados y porcentaje de avance.
+Línea de tiempo ordenada y filtros corto/mediano/largo plazo. Se vinculan
+metas de ahorro y sueños existentes, sin duplicar saldos ni movimientos.
+Cada paso puede vincularse a un plan existente o agendar uno nuevo con el
+formulario original; la fecha vinculada se lee del calendario. Ambos miembros
+pueden gestionar los proyectos; eliminar un proyecto no elimina planes,
+metas o sueños vinculados. Avisos y sincronización Realtime.
+Migración en TEST y producción. Prueba SQL de atomicidad, permisos, vínculos
+y conservación de datos aprobada en TEST; 28 pruebas web superadas (21
+pestañas, creación, checklist, aporte vinculado y agendamiento).
+Sin nuevo APK. Pendiente aceptación visual y recepción push en teléfonos.
