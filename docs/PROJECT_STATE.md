@@ -243,6 +243,17 @@ vertical en vez de forzar el mes a una pantalla de poca altura.
 Pasaron 25 pruebas web, incluida estructura de 42 celdas y reglas responsive.
 HTML y CSS verificados en producción. Pendiente comprobar visualmente la rotación en el Motorola.
 Se mantiene APK v14.
+
+## Nuestro vínculo · fase 1
+
+Nueva pestaña compartida: corazón, abrazo, pienso en ti, seis estados de ánimo
+y buzón de cumplidos con historial reciente. Realtime sincroniza el contenido
+sin recargar la página. Los avisos push contienen texto genérico, no el estado
+ni el cumplido privado, y abren el módulo. La tabla couple_connection aplica
+RLS de pertenencia y solo permite insertar como el usuario autenticado.
+El nuevo widget Android v15 abre el módulo autenticado para enviar un gesto
+con un toque adicional; no amplía las credenciales de lectura de widgets.
+Prueba SQL de aislamiento, identidad y validación superada en TEST.
 ## Calendario · información de festivos y fluidez del editor
 
 Nicolás confirmó que el calendario responsive se ve bien. Los números de

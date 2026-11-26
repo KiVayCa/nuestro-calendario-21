@@ -99,6 +99,7 @@ Deno.serve(async (req: Request) => {
     let tab = String(body.target_tab || "notifications");
     const allowedTabs = new Set([
       "home",
+      "vinculo",
       "calendar",
       "story",
       "memories",

@@ -11,6 +11,7 @@ const sources = [
   "goals",
   "letters",
   "questions",
+  "vinculo",
   "navigation",
   "auth",
   "calendar",

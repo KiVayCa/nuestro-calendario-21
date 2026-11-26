@@ -121,6 +121,7 @@ async function setupAdvancedRealtime(force = false) {
   advancedRealtimeCoupleId = couple.id;
   advancedRealtimeStatus = "CLOSED";
   const tables = [
+    "couple_connection",
     "memories",
     "love_letters",
     "letter_reactions",

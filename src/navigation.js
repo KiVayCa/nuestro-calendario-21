@@ -86,6 +86,7 @@ function renderAdvanced({ preserveInputs = false } = {}) {
   const shouldAnimate = animateNextModuleRender;
   animateNextModuleRender = false;
   const map = {
+    vinculo: renderAdvVinculo,
     home: renderAdvHome,
     story: renderAdvStory,
     memories: renderAdvMemories,

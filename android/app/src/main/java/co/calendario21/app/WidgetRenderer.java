@@ -21,6 +21,7 @@ final class WidgetRenderer {
     CountdownWidget.class,
     MonthWidget.class,
     RelationshipWidget.class,
+    BondWidget.class,
     WeekWidget.class,
     TodayWidget.class,
     ImportantDateWidget.class,
@@ -82,6 +83,15 @@ final class WidgetRenderer {
 
   private static RemoteViews build(
       Context c, int id, Class<?> kind, JSONObject snapshot, int width, int height) {
+    if (kind == BondWidget.class) {
+      RemoteViews bond = new RemoteViews(c.getPackageName(), R.layout.widget_bond);
+      WidgetPalette colors = palette(c, snapshot, c.getSharedPreferences("appearance", 0).getString("frame", "app"));
+      bond.setInt(R.id.widget_root, "setBackgroundResource", WidgetThemeResources.background(colors.name));
+      bond.setTextColor(R.id.bond_widget_label, colors.ink);
+      bond.setTextColor(R.id.bond_widget_title, colors.ink);
+      bond.setOnClickPendingIntent(R.id.widget_root, open(c, id, "https://nuestrocalendario21.vercel.app/?tab=vinculo"));
+      return bond;
+    }
     boolean month = kind == MonthWidget.class,
         relationship = kind == RelationshipWidget.class,
         week = kind == WeekWidget.class,

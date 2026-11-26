@@ -1811,3 +1811,32 @@ body:has(#appDialog.show) .ncTransactionIndicator {
   :is(#modal,#advModal,#profileModal,#plansModal,#detailModal,#appDialog):is(.show,.is-closing,[style*="display: grid"]) .modalBox,
   #advModal.show #advModalBody,#profileModal.show #profileModalBody{animation:none!important}
 }
+.bond { display:grid; gap:16px; max-width:880px; margin:auto; }
+.bondHero { text-align:center; padding:26px 16px; border:1px solid var(--line); border-radius:24px; background:linear-gradient(145deg,var(--soft),var(--card)); color:var(--ink); }
+.bondHeroHeart { font-size:48px; line-height:1.2; }
+.bondHero h2 { margin:8px 0; font-size:clamp(24px,5vw,34px); }
+.bondHero small { letter-spacing:.14em; color:var(--muted); }
+.bondHero p { margin-bottom:0; }
+.bondGestures,.bondMoods,.bondMoodPair { display:grid; gap:10px; grid-template-columns:repeat(3,minmax(0,1fr)); }
+.bondGesture,.bondMood,.bondMoodStatus { border:1px solid var(--line); border-radius:16px; background:var(--soft); color:var(--ink); padding:12px 8px; min-width:0; text-align:center; }
+.bondGesture,.bondMood { cursor:pointer; font:inherit; transition:transform .18s,border-color .18s; }
+.bondGesture:active,.bondMood:active { transform:scale(.96); }
+.bondGesture span { display:block; font-size:clamp(24px,5vw,38px); margin-bottom:6px; }
+.bondGesture strong,.bondGesture small,.bondMoodStatus small,.bondMoodStatus strong { display:block; overflow-wrap:anywhere; }
+.bondGesture small,.bondMoodStatus small,.bondEvent small { color:var(--muted); font-size:12px; }
+.bondMoodPair { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.bondMood { background:var(--card); font-size:13px; }
+.bondMood span { display:block; font-size:24px; }
+.bondMood.selected { border:2px solid var(--rose); background:var(--soft); }
+.bond textarea { width:100%; resize:vertical; margin-bottom:10px; }
+.bondHistory { display:grid; gap:8px; }
+.bondEvent { display:flex; align-items:flex-start; gap:12px; padding:12px; border:1px solid var(--line); border-radius:14px; background:var(--card); }
+.bondEventIcon { font-size:29px; flex-shrink:0; }
+.bondEvent p { white-space:pre-wrap; overflow-wrap:anywhere; margin:5px 0; }
+.bondEvent div { min-width:0; }
+#bondFeedback:empty { display:none; }
+.bondSent { text-align:center; margin-top:12px; font-weight:600; color:var(--rose); animation:bond-pop .4s ease-out both; }
+.bondArrival .bondEventIcon { animation:bond-pop .65s ease-out both; }
+@keyframes bond-pop { 0% { opacity:0; transform:scale(.55); } 65% { opacity:1; transform:scale(1.18); } 100% { transform:scale(1); } }
+@media (max-width:380px) { .bondGesture { padding:10px 4px; font-size:12px; } .bondGesture small { font-size:10px; } }
+@media (prefers-reduced-motion:reduce) { .bondSent,.bondArrival .bondEventIcon { animation:none; } .bondGesture,.bondMood { transition:none; } }
