@@ -15,11 +15,12 @@ function context(file, extra = {}) {
     ...extra,
   };
   vm.createContext(sandbox);
-  vm.runInContext(fs.readFileSync(file, "utf8"), sandbox);
+  for (const name of Array.isArray(file) ? file : [file])
+    vm.runInContext(fs.readFileSync(name, "utf8"), sandbox);
   return sandbox;
 }
 test("faith devotional is deterministic by date, supports both partners, and escapes journal text", () => {
-  const c=context("src/faith.js",{
+  const c=context(["src/faith-readings.js","src/faith.js"],{
     countdownToday:()=>"2026-11-26", user:{id:"a"},
     advCache:{faith:[
       {id:"p",kind:"prayer",created_by:"b",title:"Prayer <example>",body:"Private",entry_date:"2026-11-26",answered:false},
@@ -35,6 +36,23 @@ test("faith devotional is deterministic by date, supports both partners, and esc
   assert.match(html,/Ya oraste hoy/);
   assert.match(html,/Devocional realizado/);
   assert.doesNotMatch(html,/Marcar respondida/);
+  assert.match(html,/Pongámoslo en práctica/);
+  assert.match(html,/Oremos juntos/);
+  const readings=vm.runInContext("faithReadings",c);
+  assert.equal(readings.length,63);
+  assert.equal(new Set(readings.map(r=>r[0])).size,63);
+  for(const r of readings) {
+    assert.equal(r.length,6);
+    assert.ok(r[2].split("\n").length>=2);
+    assert.ok(r[2].split(/\s+/).length>=80);
+    assert.ok(r[3].length>40&&r[4].length>40&&r[5].length>40);
+  }
+  const cycle=Array.from({length:63},(_,i)=>{
+    const d=new Date(Date.UTC(2026,10,27+i)).toISOString().slice(0,10);
+    return c.faithReading(d)[0];
+  });
+  assert.equal(new Set(cycle).size,63);
+  assert.equal(c.faithReading("2026-11-26")[0],readings[Math.floor(Date.UTC(2026,10,26)/86400000)%21][0]);
 });
 test("adventures show locked surprises, recipient-only coupons and completed stamps", () => {
   const c = context("src/adventures.js", {

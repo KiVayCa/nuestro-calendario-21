@@ -1871,4 +1871,16 @@ body:has(#appDialog.show) .ncTransactionIndicator {
 .faithPrompt p { margin:6px 0 0; }
 .faithPair { display:flex; gap:10px; flex-wrap:wrap; }
 .faithPair span { flex:1; text-align:center; padding:10px; border:1px solid var(--line); border-radius:12px; background:var(--card); color:var(--ink); }
+.faithReadingTop { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; }
+.faithStudy { color:var(--ink); }
+.faithStudy h3 { margin:18px 0 8px; }
+.faithTeaching { margin:18px 0; line-height:1.75; }
+.faithTeaching h4 { margin:0 0 10px; color:var(--rose); }
+.faithTeaching p { margin:0 0 14px; }
+.faithPrayer { margin-bottom:20px; }
+.faithLibrary { display:grid; gap:18px; }
+.faithLibrary section { display:grid; gap:8px; }
+.faithLibrary h3 { color:var(--ink); margin:12px 0 4px; }
+.faithLibraryItem { display:grid; gap:5px; text-align:left; color:var(--ink); background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px; cursor:pointer; font:inherit; }
+.faithLibraryItem small { color:var(--muted); }
 .faithModule .adventureCard p { overflow-wrap:anywhere; }

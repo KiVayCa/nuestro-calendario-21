@@ -324,3 +324,17 @@ unicidad y permisos aprobada en TEST. No requiere nuevo APK.
 Migración y avisos desplegados en TEST y producción. 28 pruebas web
 aprobadas, incluidas las 20 pestañas y creación de una petición.
 Pendiente validación visual y de push en los teléfonos.
+
+## Devocionales ampliados
+
+63 estudios originales de pareja, cada uno con pasaje bíblico, enseñanza
+en dos párrafos, pregunta de diálogo, práctica concreta y oración escrita.
+Incluyen comunicación, perdón, confianza, noviazgo, fidelidad, preparación
+matrimonial, hogar, finanzas y vida espiritual. Biblioteca por tres grupos
+para consultar cualquier estudio y relectura desde el historial. Se conserva
+la asignación por fecha de las 21 lecturas anteriores hasta el 26/11/2026;
+desde el 27/11/2026 se recorre el catálogo de 63 sin repeticiones por ciclo.
+Los registros de lectura no se reinician al abrir la biblioteca.
+Sin cambio en la base de datos ni nueva APK.
+28 pruebas web superadas, incluida la biblioteca, el ciclo completo sin
+duplicados y la conservación de las fechas registradas.

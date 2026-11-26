@@ -13,6 +13,7 @@ const sources = [
   "questions",
   "vinculo",
   "adventures",
+  "faith-readings",
   "faith",
   "navigation",
   "auth",

@@ -1,39 +1,39 @@
-// Original meditations on Scripture; these are not quotations of a translation.
-const faithReadings = [
-  ["Eclesiastés 4:9-12","Un cordón de tres dobleces","Caminar juntos nos permite sostenernos cuando uno cae. Hagan de Dios el centro de su unión.","¿Cómo podemos sostenernos hoy?"],
-  ["1 Corintios 13:4-8","Amar con paciencia","El amor se expresa en bondad, humildad y perseverancia, incluso en los días difíciles.","¿Qué gesto paciente puedo ofrecerte?"],
-  ["Filipenses 4:6-7","Entregar nuestras preocupaciones","Lleven sus inquietudes a Dios con oración y gratitud; su paz puede guardar sus corazones.","¿Qué preocupación queremos entregar a Dios?"],
-  ["Colosenses 3:13-14","Perdonar y amar","Así como han recibido perdón, elijan perdonarse y revestirse de amor.","¿Hay algo que debamos conversar con ternura?"],
-  ["Proverbios 3:5-6","Confiar en su dirección","En lugar de depender solamente de sus propios planes, busquen la dirección del Señor.","¿Qué decisión podemos poner en oración?"],
-  ["Salmo 37:5","Nuestro camino en sus manos","Encomienden su camino al Señor y confíen en él mientras dan el siguiente paso.","¿Qué sueño queremos encomendarle?"],
-  ["Romanos 12:10","Honrarnos mutuamente","El cariño se fortalece cuando cada uno honra al otro con sinceridad.","¿Qué cualidad de tu pareja agradeces?"],
-  ["Santiago 1:19","Escuchar primero","Escuchen con atención y respondan con calma. No toda diferencia necesita convertirse en discusión.","¿Qué necesitas que escuche con más atención?"],
-  ["Gálatas 5:22-23","Fruto del Espíritu","Cultiven el amor, la alegría, la paz, la paciencia y el dominio propio en las pequeñas decisiones.","¿Qué fruto deseamos cultivar juntos?"],
-  ["Salmo 46:10","Un momento de quietud","Aparten unos minutos de las prisas para recordar quién es Dios.","¿Podemos dejar el teléfono y orar juntos?"],
-  ["1 Tesalonicenses 5:16-18","Vivir agradecidos","Busquen alegría, perseveren en la oración y den gracias incluso en las circunstancias difíciles.","¿Por qué podemos dar gracias hoy?"],
-  ["Efesios 4:2-3","Cuidar la unidad","La humildad, la paciencia y la mansedumbre ayudan a preservar la unidad en paz.","¿Cómo cuidamos nuestra unidad?"],
-  ["Josué 24:15","Una casa que sirve al Señor","Decidan juntos qué valores desean cultivar en su futuro hogar.","¿Qué hábito de fe queremos establecer?"],
-  ["Salmo 23:1-4","No caminamos solos","Dios es un pastor que guía y acompaña, también cuando el camino parece oscuro.","¿En qué necesitamos recordar su compañía?"],
-  ["Mateo 6:33","Buscar primero a Dios","Den prioridad al reino de Dios y a su justicia, incluso al organizar sus metas.","¿Qué prioridad necesita cambiar?"],
-  ["Hebreos 10:24-25","Animarnos al bien","Acompáñense con palabras y acciones que los impulsen al amor y a servir.","¿A quién podemos servir esta semana?"],
-  ["Romanos 15:13","Esperanza que sostiene","Pidan al Dios de esperanza que llene sus corazones de alegría y paz al confiar en él.","¿Qué esperanza queremos recordar?"],
-  ["Miqueas 6:8","Caminar humildemente","Vivan con justicia, misericordia y humildad delante de Dios.","¿Cómo practicamos la misericordia hoy?"],
-  ["Salmo 139:23-24","Un corazón dispuesto","Pidan a Dios que examine sus corazones y les enseñe el camino correcto.","¿Qué actitud necesitamos transformar?"],
-  ["Juan 15:12","Amar como Jesús","Jesús enseña a amar al prójimo con la misma entrega que él mostró.","¿Cómo puedo demostrarte amor sin pedir nada a cambio?"],
-  ["Cantar de los Cantares 8:7","Un amor perseverante","El poema celebra un amor que no se compra y que las dificultades no apagan fácilmente.","¿Qué compromiso queremos renovar con Dios?"],
-];
 const faithKinds={prayer:["🙏","Petición de oración"],gratitude:["🌿","Gratitud"],reflection:["📖","Reflexión"]};
 let faithBusy=false;
 function faithReading(day=countdownToday()) {
   const n=Math.floor(Date.parse(day+"T00:00:00Z")/86400000);
-  return faithReadings[((n%faithReadings.length)+faithReadings.length)%faithReadings.length];
+  // Preserve the passage associated with a previously registered daily reading.
+  const firstExpandedDay=Math.floor(Date.parse("2026-11-27T00:00:00Z")/86400000);
+  const index=n<firstExpandedDay?((n%21)+21)%21:(n-firstExpandedDay+21)%faithReadings.length;
+  return faithReadings[index];
+}
+function renderFaithStudy(reading) {
+  const [reference,title,meditation,prompt,practice,prayer]=reading;
+  return `<div class="faithStudy"><h3>${esc(reference)}</h3><strong class="faithTitle">${esc(title)}</strong>
+    <small class="advMeta">Lee primero el pasaje completo en tu Biblia. Esta es una meditación original inspirada en la lectura.</small>
+    <div class="faithTeaching"><h4>📖 Enseñanza para los dos</h4>${meditation.split("\n").map(p=>`<p>${esc(p)}</p>`).join("")}</div>
+    <div class="faithPrompt"><strong>💬 Conversemos juntos</strong><p>${esc(prompt)}</p></div>
+    <div class="faithPrompt"><strong>🤝 Pongámoslo en práctica</strong><p>${esc(practice)}</p></div>
+    <div class="faithPrompt faithPrayer"><strong>🙏 Oremos juntos</strong><p>${esc(prayer)}</p></div></div>`;
+}
+function openFaithLibrary() {
+  const groups=[["Fundamentos del amor y la fe",0,21],["Preparación y compromisos",21,42],["Vida en pareja y futuro hogar",42,63]];
+  openAdvModal("Biblioteca de devocionales 📖",`<p class="advMeta">${faithReadings.length} enseñanzas para leer a su ritmo. Explorar no cambia el registro del devocional del día.</p><div class="faithLibrary">${groups.map(([name,start,end])=>`<section><h3>${name}</h3>${faithReadings.slice(start,end).map((r,i)=>`<button type="button" class="faithLibraryItem" onclick="openFaithStudy(${start+i})"><strong>${esc(r[1])}</strong><small>${esc(r[0])} · Leer ↗</small></button>`).join("")}</section>`).join("")}</div>`);
+}
+function openFaithStudy(index) {
+  if(!Number.isInteger(index)||!faithReadings[index])return;
+  openAdvModal("Devocional en pareja 📖",`<button class="btn" onclick="openFaithLibrary()">← Volver a la biblioteca</button>${renderFaithStudy(faithReadings[index])}`);
+}
+function openFaithPast(day) {
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(day)||!faithReading(day))return;
+  openAdvModal("Devocional del "+dateES(day),renderFaithStudy(faithReading(day)));
 }
 function faithRow(id) { return advCache.faith.find(x=>x.id===id); }
 function faithAction(label,action,id,primary=false) {
   return `<button class="btn ${primary?"primary":""}" data-faith="${esc(id)}" onclick="${action}(this.dataset.faith)">${label}</button>`;
 }
 function renderAdvFaith() {
-  const day=countdownToday(), [reference,title,meditation,prompt]=faithReading(day);
+  const day=countdownToday(), reading=faithReading(day);
   const rows=advCache.faith||[], daily=rows.filter(x=>x.kind==="devotional"&&x.entry_date===day);
   const mine=daily.some(x=>x.created_by===user?.id), partner=daily.some(x=>x.created_by!==user?.id);
   const prayers=rows.filter(x=>x.kind==="prayer"), answered=prayers.filter(x=>x.answered).length;
@@ -51,12 +51,12 @@ function renderAdvFaith() {
   return `<section class="bond faithModule" id="faithToday" data-date="${esc(day)}">
     <div class="bondHero"><div class="bondHeroHeart">✝️</div><small>DIOS EN EL CENTRO</small><h2>Nuestra fe</h2><p>Crecer en amor, esperanza y propósito, tomados de la mano de Dios.</p></div>
     <div class="adventureStats"><div><strong>${prayers.length-answered}</strong><span>en oración</span></div><div><strong>${answered}</strong><span>oraciones respondidas</span></div><div><strong>${daily.length}/2</strong><span>devocional de hoy</span></div></div>
-    <div class="advCard faithReading"><div class="advMeta">📖 LECTURA DEL DÍA · ${esc(dateES(day))}</div><h3>${esc(reference)}</h3><strong class="faithTitle">${esc(title)}</strong><p>${esc(meditation)}</p><small class="advMeta">Meditación inspirada en el pasaje · lee el texto completo en tu Biblia.</small><div class="faithPrompt"><strong>Conversemos juntos</strong><p>${esc(prompt)}</p></div><div class="faithPair"><span>${mine?"✓":"○"} Tú</span><span>${partner?"✓":"○"} Tu pareja</span></div><div class="adventureActions"><button class="btn primary" onclick="markFaithDevotional()" ${mine?"disabled":""}>${mine?"Devocional realizado ✓":"Marcar lectura realizada"}</button><button class="btn" onclick="openFaithForm('reflection',null,true)">Escribir reflexión</button><button class="btn" onclick="scheduleFaith()">Agendar oración juntos</button></div></div>
+    <div class="advCard faithReading"><div class="faithReadingTop"><div class="advMeta">📖 LECTURA DEL DÍA · ${esc(dateES(day))}</div><button class="btn" onclick="openFaithLibrary()">📚 Biblioteca · ${faithReadings.length}</button></div>${renderFaithStudy(reading)}<div class="faithPair"><span>${mine?"✓":"○"} Tú</span><span>${partner?"✓":"○"} Tu pareja</span></div><div class="adventureActions"><button class="btn primary" onclick="markFaithDevotional()" ${mine?"disabled":""}>${mine?"Devocional realizado ✓":"Marcar lectura realizada"}</button><button class="btn" onclick="openFaithForm('reflection',null,true)">Escribir reflexión</button><button class="btn" onclick="scheduleFaith()">Agendar oración juntos</button></div></div>
     <div class="adventureCreate"><button class="bondGesture" onclick="openFaithForm('prayer')"><span>🙏</span><strong>Petición</strong><small>Oremos juntos</small></button><button class="bondGesture" onclick="openFaithForm('gratitude')"><span>🌿</span><strong>Dar gracias</strong><small>Recordemos sus bendiciones</small></button><button class="bondGesture" onclick="openFaithForm('reflection')"><span>📖</span><strong>Reflexión</strong><small>Diario compartido</small></button></div>
     <div class="advCard"><h3>🙏 Nuestro altar de oración</h3><p class="advMeta">Pidan, acompañen y recuerden las respuestas con gratitud.</p><div class="adventureList">${prayers.filter(x=>!x.answered).map(card).join("")||'<div class="advEmpty">Compartan una petición para comenzar.</div>'}</div></div>
     <div class="advCard"><h3>✨ Oraciones respondidas</h3><div class="adventureList">${prayers.filter(x=>x.answered).map(card).join("")||'<div class="advEmpty">Aquí quedarán los testimonios de su camino.</div>'}</div></div>
     <div class="advCard"><h3>🌿 Diario de gratitud y reflexiones</h3><div class="adventureList">${rows.filter(x=>["gratitude","reflection"].includes(x.kind)).map(card).join("")||'<div class="advEmpty">Guarden lo que Dios está enseñándoles.</div>'}</div></div>
-    <div class="advCard"><h3>🗓️ Nuestro camino devocional</h3><div class="adventureList">${[...new Set(rows.filter(x=>x.kind==="devotional").map(x=>x.entry_date))].sort().reverse().slice(0,30).map(d=>`<div class="adventureCard"><strong>${esc(dateES(d))}</strong> · ${esc(faithReading(d)[0])}<p>${rows.filter(x=>x.kind==="devotional"&&x.entry_date===d).length}/2 lecturas realizadas</p></div>`).join("")||'<div class="advEmpty">Cada día es una oportunidad para acercarse a Dios.</div>'}</div></div>
+    <div class="advCard"><h3>🗓️ Nuestro camino devocional</h3><div class="adventureList">${[...new Set(rows.filter(x=>x.kind==="devotional").map(x=>x.entry_date))].sort().reverse().slice(0,30).map(d=>`<div class="adventureCard"><strong>${esc(dateES(d))}</strong> · ${esc(faithReading(d)[0])}<p>${rows.filter(x=>x.kind==="devotional"&&x.entry_date===d).length}/2 lecturas realizadas</p><button class="btn" data-day="${esc(d)}" onclick="openFaithPast(this.dataset.day)">Releer devocional</button></div>`).join("")||'<div class="advEmpty">Cada día es una oportunidad para acercarse a Dios.</div>'}</div></div>
   </section>`;
 }
 function openFaithForm(kind,id=null,daily=false) {
