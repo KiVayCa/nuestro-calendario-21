@@ -149,6 +149,7 @@ const validAdvancedTabs = new Set([
   "home",
   "vinculo",
   "aventuras",
+  "juegos",
   "fe",
   "futuro",
   "calendar",

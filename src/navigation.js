@@ -92,6 +92,7 @@ function renderAdvanced({ preserveInputs = false } = {}) {
   const map = {
     vinculo: renderAdvVinculo,
     aventuras: renderAdvAdventures,
+    juegos: renderGamesModule,
     fe: renderAdvFaith,
     futuro: renderAdvFuture,
     home: renderAdvHome,

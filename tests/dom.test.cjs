@@ -68,6 +68,7 @@ const wait = () => new Promise((r) => setTimeout(r, 400));
     "question",
     "vinculo",
     "aventuras",
+    "juegos",
     "fe",
     "futuro",
     "places",
@@ -97,7 +98,8 @@ const wait = () => new Promise((r) => setTimeout(r, 400));
   w.showAdvancedTab("vinculo");
   assert.equal(w.document.getElementById("knowingSection"),null);
   w.showAdvancedTab("aventuras");
-  w.setAdventureFilter("games");
+  assert.equal(w.document.querySelector(".gameModule"),null);
+  w.showAdvancedTab("juegos");
   assert.equal(w.document.querySelectorAll(".gameMenu button").length,9);
   w.gamePickMode("trivia");w.startGameQuiz("trivia");
   assert.equal(w.document.querySelectorAll(".gameQuizOptions button").length,4);
@@ -112,7 +114,11 @@ const wait = () => new Promise((r) => setTimeout(r, 400));
   w.__db.couple_game_matches=[{id:"match-test",couple_id:"pair",kind:"tic",created_by:"user-one",opponent_id:"user-two",turn_user_id:"user-one",board:Array(9).fill(0),status:"active",move_count:0,created_at:"2026-11-27T12:00:00Z"}];
   await w.advLoadAll(["gameMatches"]);
   w.navigateToItem("aventuras","match-test");
+  assert.equal(w.document.querySelector(".advTab.active").getAttribute("onclick"),"showAdvancedTab('juegos')");
   assert.equal(w.document.querySelectorAll(".gameTic .gameCell").length,9);
+  w.navigateToItem("juegos","match-test");
+  assert.equal(w.document.querySelectorAll(".gameTic .gameCell").length,9);
+  w.showAdvancedTab("aventuras");
   w.setAdventureFilter("all");
   w.showTodayDailyQuestion();
   assert.equal(w.document.querySelectorAll("#knowingSection .knowingQuestion").length,1);

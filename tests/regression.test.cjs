@@ -23,7 +23,8 @@ test("personalization normalizes lists and preserves required modules", () => {
   const c=context("src/personalization.js");
   const p=c.normalizePersonalPreferences({module_order:["fe","fe","unknown"],hidden_modules:["home","calendar","settings","letters","unknown"],shortcuts:["fe","calendar","story","goals","budget","places","letters"],home_sections:[],density:"compact",text_size:"large",motion:"reduced"});
   assert.equal(p.module_order[0],"fe");
-  assert.equal(new Set(p.module_order).size,19);
+  assert.equal(new Set(p.module_order).size,20);
+  assert.ok(p.module_order.includes("juegos"));
   assert.ok(p.shortcuts.includes("dreams"));
   assert.deepEqual(Array.from(p.hidden_modules),["letters"]);
   assert.equal(p.shortcuts.length,6);

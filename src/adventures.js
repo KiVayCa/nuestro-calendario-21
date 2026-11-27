@@ -26,7 +26,6 @@ function adventureButton(label, action, id, primary = false) {
   return `<button type="button" class="btn ${primary ? "primary" : ""}" data-adventure="${esc(id)}" onclick="${action}(this.dataset.adventure)">${label}</button>`;
 }
 function renderAdvAdventures() {
-  if(adventureFilter==="games")return renderGamesModule();
   const all = advCache.adventures || [];
   const completed = all.filter(a => a.status === "done");
   const pending = all.filter(a => a.status === "pending" && a.kind !== "coupon");
@@ -62,7 +61,7 @@ function renderAdvAdventures() {
   return `<section class="bond adventureModule">
     <div class="bondHero"><div class="bondHeroHeart">🧭</div><small>COLECCIONEMOS MOMENTOS</small><h2>Nuestras aventuras</h2><p>Un mundo de primeras veces, pequeñas locuras y recuerdos juntos.</p></div>
     <div class="adventureStats"><div><strong>${pending.length}</strong><span>por vivir</span></div><div><strong>${completed.length}</strong><span>sellos del pasaporte</span></div><div><strong>${coupons.length}</strong><span>cupones activos</span></div></div>
-    <div class="advCard"><div class="adventureFilters">${[["all","Todo"],["discover","🎡 Descubrir"],["experience","🗺️ Por vivir"],["surprise","🎁 Sorpresas"],["coupon","🎟️ Cupones"],["passport","🏆 Pasaporte"],["games","🎮 Juegos"]].map(([k,v])=>`<button class="btn ${adventureFilter===k?"primary":""}" aria-pressed="${adventureFilter===k}" onclick="setAdventureFilter('${k}')">${v}</button>`).join("")}</div></div>
+    <div class="advCard"><div class="adventureFilters">${[["all","Todo"],["discover","🎡 Descubrir"],["experience","🗺️ Por vivir"],["surprise","🎁 Sorpresas"],["coupon","🎟️ Cupones"],["passport","🏆 Pasaporte"]].map(([k,v])=>`<button class="btn ${adventureFilter===k?"primary":""}" aria-pressed="${adventureFilter===k}" onclick="setAdventureFilter('${k}')">${v}</button>`).join("")}</div></div>
     ${["all","discover"].includes(adventureFilter)?`<div class="advCard adventureRoulette"><h3>🎡 Ruleta de citas</h3><p>¿No saben qué hacer? Dejen que el azar elija su próxima aventura.</p><div class="adventureWheel" aria-hidden="true"><span>♡</span></div><div id="adventureChoice" aria-live="polite">${adventureChoice ? esc(adventureChoice.title) : "¡Giren para descubrir una cita!"}</div><div class="adventureActions"><button class="btn primary" onclick="spinAdventure()">Girar ruleta 🎡</button><button class="btn" id="adventureSaveChoice" onclick="saveAdventureChoice()" ${adventureChoice&&!adventureChoice.id?"":"disabled"}>Guardar experiencia</button><button class="btn" id="adventureScheduleChoice" onclick="scheduleAdventureChoice()" ${adventureChoice?"":"disabled"}>Agendar cita</button></div></div>${renderAdventureIdeas()}`:""}
     <div class="adventureCreate"><button class="bondGesture" onclick="openAdventureForm('experience')"><span>🗺️</span><strong>Nueva experiencia</strong><small>Una lista para los dos</small></button><button class="bondGesture" onclick="openAdventureForm('surprise')"><span>🎁</span><strong>Plan sorpresa</strong><small>Detalles secretos</small></button><button class="bondGesture" onclick="openAdventureForm('coupon')"><span>🎟️</span><strong>Cupón de amor</strong><small>Regala un detalle</small></button></div>
     ${["all","passport"].includes(adventureFilter)?`<div class="advCard"><h3>🏆 Pasaporte de pareja</h3><p>Cada aventura vivida deja un sello en su historia.</p><div class="adventureStamps">${completed.map(a=>`<div class="adventureStamp"><span>${adventureCategories[a.category]?.[0] || "✨"}</span><strong>${esc(adventureTitle(a))}</strong><small>${adventureMemory(a)?.memory_date ? esc(dateES(adventureMemory(a).memory_date)) : a.completed_at ? esc(new Date(a.completed_at).toLocaleDateString("es-CO",{timeZone:"America/Bogota"})) : ""}</small></div>`).join("") || '<div class="advEmpty">Su primer sello está esperando. ¡Vivan una aventura!</div>'}</div></div>`:""}
@@ -70,7 +69,8 @@ function renderAdvAdventures() {
   </section>`;
 }
 function setAdventureFilter(value) {
-  if (!["all","discover","experience","surprise","coupon","passport","games"].includes(value)) return;
+  if(value==="games")return showAdvancedTab("juegos");
+  if (!["all","discover","experience","surprise","coupon","passport"].includes(value)) return;
   adventureFilter=value; renderAdvanced();
 }
 function spinAdventure() {

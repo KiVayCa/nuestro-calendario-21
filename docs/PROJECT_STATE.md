@@ -496,6 +496,15 @@ ganadora; Tres en raya también conserva su marca de victoria. Migración en
 TEST y producción, prueba SQL de cartones, turnos, sorteo, victoria y acceso
 aprobada, 39 pruebas web aprobadas. Sin nuevo APK.
 
+## Pestaña Juegos independiente
+
+Los nueve juegos ahora viven en una pestaña propia, Juegos, configurable
+en la navegación y accesos rápidos. Se elimina el filtro de juegos de
+Nuestras aventuras. Los avisos existentes y nuevos conservan el enlace
+compatible de transporte a aventuras con ID de partida; la web lo resuelve
+a Juegos y abre la partida original. Se conservan registros, logros y
+sincronización. 39 pruebas web aprobadas, sin cambio de esquema ni APK.
+
 ## Próximas fases
 
 9 Juegos de pareja; 10 Cápsulas del tiempo; 11 Nuestra banda sonora;

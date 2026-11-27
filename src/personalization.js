@@ -1,5 +1,5 @@
 const personalModules={
-  home:"🏠 Inicio",vinculo:"💞 Nuestro vínculo",aventuras:"🧭 Nuestras aventuras",fe:"🙏 Nuestra fe",
+  home:"🏠 Inicio",vinculo:"💞 Nuestro vínculo",aventuras:"🧭 Nuestras aventuras",juegos:"🎮 Juegos",fe:"🙏 Nuestra fe",
   futuro:"🌱 Nuestro futuro",calendar:"🗓️ Calendario",story:"📖 Historia",memories:"📸 Recuerdos",
   letters:"💌 Cartas",dreams:"✨ Sueños y metas",challenges:"🎯 Retos",dates:"📅 Fechas",
   budget:"🧾 Presupuesto",question:"💭 Pregunta",places:"📍 Lugares",
