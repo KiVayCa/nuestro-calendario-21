@@ -17,6 +17,7 @@ const sources = [
   "adventures",
   "games",
   "word-bingo",
+  "game-management",
   "faith-readings",
   "faith",
   "future",

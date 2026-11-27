@@ -11,8 +11,7 @@ do $$ declare m uuid; m2 uuid; g public.couple_game_matches; i integer; begin
  select * into g from public.couple_game_matches where id=m;
  if cardinality(g.board)<>50 or cardinality(g.called_numbers)<>0 or (select count(distinct x) from unnest(g.board[1:25]) x)<>25 or (select count(distinct x) from unnest(g.board[26:50]) x)<>25 then raise exception 'Bad cards';end if;
  update public.couple_game_matches set last_move=-1 where id=m;
- update public.couple_game_matches set last_move=-1 where id=m;
- if found then raise exception 'Double turn';end if;
+ begin update public.couple_game_matches set last_move=-1 where id=m; if found then raise exception 'Double turn';end if; exception when raise_exception then if sqlerrm='Double turn' then raise;end if;end;
  for i in 1..74 loop
    select * into g from public.couple_game_matches where id=m;
    exit when g.status<>'active';

@@ -20,8 +20,7 @@ do $$ declare m uuid; begin
  begin insert into public.couple_game_matches(couple_id,created_by,opponent_id,kind) values('21000000-0000-4000-8000-000000000091',auth.uid(),'11000000-0000-4000-8000-000000000093','tic');raise exception 'Expected bad opponent';exception when raise_exception then if sqlerrm='Expected bad opponent' then raise;end if;end;
  begin update public.couple_game_matches set board=array[1,1,1] where id=current_setting('test.tic')::uuid;raise exception 'Board writable';exception when insufficient_privilege then null;end;
  update public.couple_game_matches set last_move=0 where id=current_setting('test.tic')::uuid;
- update public.couple_game_matches set last_move=1 where id=current_setting('test.tic')::uuid;
- if found then raise exception 'Double turn allowed';end if;
+ begin update public.couple_game_matches set last_move=1 where id=current_setting('test.tic')::uuid; if found then raise exception 'Double turn allowed';end if; exception when raise_exception then if sqlerrm='Double turn allowed' then raise;end if;end;
  update public.couple_game_matches set last_move=0 where id=current_setting('test.connect')::uuid;
  if not exists(select 1 from public.couple_game_matches where id=current_setting('test.connect')::uuid and board[36]=1) then raise exception 'Gravity failed';end if;
  update public.couple_game_matches set last_move=0 where id=current_setting('test.bingo')::uuid;

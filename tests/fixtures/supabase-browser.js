@@ -82,6 +82,7 @@
       this.filters.push((x) => x[k] === v);
       return this;
     }
+    is(k,v){this.filters.push(x=>v===null?x[k]==null:x[k]===v);return this;}
     in(k, v) {
       this.filters.push((x) => v.includes(x[k]));
       return this;

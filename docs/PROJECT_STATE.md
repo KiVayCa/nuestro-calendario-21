@@ -505,6 +505,16 @@ compatible de transporte a aventuras con ID de partida; la web lo resuelve
 a Juegos y abre la partida original. Se conservan registros, logros y
 sincronización. 39 pruebas web aprobadas, sin cambio de esquema ni APK.
 
+## Gestión de partidas e instrucciones
+
+Bingo de actividades activo permite reiniciar las 25 marcas con confirmación,
+sin crear duplicados. Quien creó una partida compartida puede quitarla del
+historial de ambos; cada usuario puede quitar sus resultados individuales.
+Se archivan los registros (sin borrado físico) y Realtime sincroniza el cambio.
+Los nueve juegos tienen guía «Cómo jugar», incluida caída de fichas y líneas
+en Conecta cuatro. Migración TEST y producción; regresiones SQL de gestión,
+turnos y bingo aprobadas. 39 pruebas web aprobadas. Sin nuevo APK.
+
 ## Próximas fases
 
 9 Juegos de pareja; 10 Cápsulas del tiempo; 11 Nuestra banda sonora;
