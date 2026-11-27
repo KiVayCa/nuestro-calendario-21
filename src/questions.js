@@ -106,7 +106,7 @@ function renderAdvQuestion() {
       "Volver al inicio",
       "showAdvancedTab('home')",
     ) +
-    '<div class="advCard dailyQuestionCard" style="margin-top:18px">' +
+    '<div class="advCard"><h3>💞 Conociéndonos</h3><p>Exploren más conversaciones y sus lenguajes del amor, a su ritmo.</p><button class="btn" onclick="openKnowingFromQuestion()">Ir a Conociéndonos</button></div><div class="advCard dailyQuestionCard" style="margin-top:18px">' +
     `<div class="advMeta" id="dailyQuestionDate" data-date="${esc(q.date)}">` +
     dateES(q.date) +
     " · " +

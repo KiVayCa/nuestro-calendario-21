@@ -416,3 +416,24 @@ incorpora una variante compacta que conserva los controles, la cuadrícula y
 la orientación horizontal. Inicio conserva la portada fotográfica y la barra
 de navegación conserva el brillo. 31 pruebas web aprobadas, incluida la
 presencia de encabezados en todas las rutas. Sin cambios en datos ni APK v15.
+
+## Conociéndonos · fase 8
+
+Dentro de Nuestro vínculo, 30 conversaciones por relación, gustos, matrimonio
+y familia, gratitud y admiración. Cuestionario de ocho situaciones sobre cinco
+lenguajes del amor, con resultados orientativos individuales y comparables.
+Cada pregunta se responde una vez; solo se revela la respuesta ajena al guardar
+la propia. La tabla couple_knowing_answers usa RLS por pareja y respuesta propia,
+sin edición ni borrado desde el cliente. Avisos genéricos sin contenido personal;
+Realtime, acceso recíproco desde Pregunta diaria y sin cambios en los widgets.
+Prueba SQL en TEST de privacidad, revelado bilateral, identidad, unicidad y
+validación aprobada. Migración aplicada a TEST y producción. 32 pruebas web
+aprobadas. APK v15 intacto; pendiente aceptación visual y push en teléfonos.
+
+## Próximas fases
+
+9 Juegos de pareja; 10 Cápsulas del tiempo; 11 Nuestra banda sonora;
+12 Nuestro matrimonio; 13 Recuerdos inteligentes; 14 Libro de nuestra vida;
+15 Experiencia Android. **Antes de iniciar fase 15, recordar a Nicolás que
+quiere revisar y proponer mejoras adicionales de Android.** No iniciar esa
+fase sin conversar esos ajustes con él.

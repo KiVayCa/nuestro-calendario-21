@@ -11,6 +11,7 @@ const sources = [
   "goals",
   "letters",
   "questions",
+  "knowing",
   "vinculo",
   "adventures",
   "faith-readings",

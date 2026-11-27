@@ -121,6 +121,7 @@ async function setupAdvancedRealtime(force = false) {
   advancedRealtimeCoupleId = couple.id;
   advancedRealtimeStatus = "CLOSED";
   const tables = [
+    "couple_knowing_answers",
     "couple_connection",
     "couple_adventures",
     "couple_faith",
@@ -163,6 +164,8 @@ async function setupAdvancedRealtime(force = false) {
           // Future letter rows are hidden by RLS; their safe preview is refreshed via the notification.
           if (note.target_tab === "letters")
             scheduleRealtimeRefresh(false, ["letters"]);
+          if (note.event_type === "knowing_answered")
+            scheduleRealtimeRefresh(false, ["knowing"]);
           if (document.visibilityState === "visible")
             showAppToast(note.title || "Nueva notificación de tu pareja ❤️");
           if (

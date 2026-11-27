@@ -94,6 +94,20 @@ const wait = () => new Promise((r) => setTimeout(r, 400));
   }
   w.showAdvancedTab("memories");
   await wait();
+  w.showAdvancedTab("vinculo");
+  w.openKnowingQuestion("connection-01");
+  w.document.getElementById("knowingAnswer").value="Nuestro momento de prueba";
+  await w.saveKnowing("connection-01");
+  assert.equal(w.__db.couple_knowing_answers[0].answer,"Nuestro momento de prueba");
+  assert.match(w.document.getElementById("knowingSection").textContent,/Nuestro momento de prueba/);
+  w.setKnowingCategory("quiz");
+  w.openKnowingQuiz();
+  for(let i=0;i<8;i++)w.document.querySelector(`input[name="knowingScene${i}"][value="2"]`).checked=true;
+  await w.saveKnowing("love-v1");
+  assert.equal(w.__db.couple_knowing_answers[1].answer,"22222222");
+  assert.match(w.document.getElementById("knowingSection").textContent,/8\/8/);
+  w.showAdvancedTab("memories");
+  await wait();
   assert.equal(
     w.document.querySelector("[data-memory-path]").getAttribute("src"),
     "/icon-192.png",

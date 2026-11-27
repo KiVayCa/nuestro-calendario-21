@@ -114,7 +114,7 @@ test("adventures show locked surprises, recipient-only coupons and completed sta
 test("connection sends once, uses the authenticated sender and keeps private text off notifications", async () => {
   const inserted = [], notifications = [];
   const input = {value: "Eres increíble <3"};
-  const c = context("src/vinculo.js", {
+  const c = context(["src/knowing.js","src/vinculo.js"], {
     user:{id:"one"}, couple:{id:"pair"}, advCache:{connection:[]},
     advancedTab:"home",
     $: id => id === "bondCompliment" ? input : null,
@@ -138,6 +138,15 @@ test("connection sends once, uses the authenticated sender and keeps private tex
   assert.equal(notifications[0].target_tab,"vinculo");
   assert.ok(!JSON.stringify(notifications[0]).includes("increíble"));
   assert.ok(c.renderAdvVinculo().includes("Eres increíble &lt;3"));
+});
+test("knowing keeps partner answers hidden until own response and scores preferences",()=>{
+ const c=context("src/knowing.js",{user:{id:"one"},advCache:{knowing:[{question_key:"connection-01",user_id:"two",answer:"PRIVATE <secret>"}]},esc:v=>String(v).replaceAll("<","&lt;").replaceAll(">","&gt;")});
+ assert.doesNotMatch(c.renderKnowing(),/PRIVATE/);
+ c.advCache.knowing.push({question_key:"connection-01",user_id:"one",answer:"My response"});
+ assert.match(c.renderKnowing(),/PRIVATE &lt;secret&gt;/);
+ assert.equal(c.knowingScore("11223345")[0].score,2);
+ assert.equal(c.knowingScore("11111111")[0].score,8);
+ assert.equal(c.knowingScore("invalid").length,0);
 });
 test("calendar constrains all seven tracks and uses a full-width layout for rotated phones", () => {
   const css = fs.readFileSync("styles.css", "utf8");

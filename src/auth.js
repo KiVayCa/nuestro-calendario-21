@@ -159,6 +159,7 @@ async function init() {
           Object.keys(advTables).map((key) => [key, []]),
         );
         adventureChoice = null;
+        knowingCategory = "connection";
         adventureFilter = "all";
         dreamsGoalsView = "dreams";
         futureFilter = "all";
