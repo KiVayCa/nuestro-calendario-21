@@ -485,6 +485,17 @@ gravedad, ganador y fin de partida en el servidor. Migración aditiva en TEST y
 producción; prueba SQL de turnos, victoria, bingo y aislamiento aprobada. 38
 pruebas web aprobadas. Sin nuevo APK; pendiente aceptación en teléfonos.
 
+## Bingo clásico y Conecta cuatro
+
+Nuevo Bingo de nosotros: cartones individuales aleatorios de 25 números,
+75 palabras románticas, sorteo alternado sin repetición, marcas automáticas,
+historial de bolas y victoria automática por fila, columna o diagonal. Nuevo
+tablero siempre crea otra partida con progreso cero. El bingo de actividades
+se conserva separado. Conecta cuatro dibuja fichas sólidas y destaca la línea
+ganadora; Tres en raya también conserva su marca de victoria. Migración en
+TEST y producción, prueba SQL de cartones, turnos, sorteo, victoria y acceso
+aprobada, 39 pruebas web aprobadas. Sin nuevo APK.
+
 ## Próximas fases
 
 9 Juegos de pareja; 10 Cápsulas del tiempo; 11 Nuestra banda sonora;

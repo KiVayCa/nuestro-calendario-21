@@ -168,9 +168,15 @@ test("mood selector starts compact and expands all 24 choices",()=>{
  c.toggleBondMoreMoods();
  assert.equal((c.renderBondMoodChoices("grateful").match(/class="bondMood /g)||[]).length,6);
 });
-test("game bank offers eight games, one correct answer, unique photo cards and bingo lines",()=>{
+test("word bingo has 75 distinct words and connects four marked cells",()=>{
+ const c=context("src/word-bingo.js");
+ assert.equal(vm.runInContext("new Set(bingoWords).size",c),75);
+ const b=Array(42).fill(0);for(let i=35;i<39;i++)b[i]=1;
+ assert.deepEqual([...c.winningGameCells(b,7,6,4)],[35,36,37,38]);
+});
+test("game bank offers nine games, one correct answer, unique photo cards and bingo lines",()=>{
  const c=context("src/games.js",{advCache:{memories:[{id:"a",title:"A",photo_url:"one",memory_date:"2026-11-01"},{id:"b",title:"B",photo_url:"two",memory_date:"2026-11-02"},{id:"c",title:"C",photo_url:"two",memory_date:"2026-11-03"}]},plans:[],dateES:x=>x,renderAdvanced:()=>{},esc:String});
- assert.equal(vm.runInContext("Object.keys(gameCatalog).length",c),8);
+ assert.equal(vm.runInContext("Object.keys(gameCatalog).length",c),9);
  assert.equal(c.gamePhotos().length,2);
  for(const kind of ["trivia","guess"])for(const q of c.gameQuizQuestions(kind)){assert.equal(q.options.length,4);assert.equal(q.options.filter(x=>x===q.correct).length,1);}
  assert.equal(c.gameBingoLines(Array(25).fill(1)),12);

@@ -98,7 +98,7 @@ const wait = () => new Promise((r) => setTimeout(r, 400));
   assert.equal(w.document.getElementById("knowingSection"),null);
   w.showAdvancedTab("aventuras");
   w.setAdventureFilter("games");
-  assert.equal(w.document.querySelectorAll(".gameMenu button").length,8);
+  assert.equal(w.document.querySelectorAll(".gameMenu button").length,9);
   w.gamePickMode("trivia");w.startGameQuiz("trivia");
   assert.equal(w.document.querySelectorAll(".gameQuizOptions button").length,4);
   w.gameAnswer(0);assert.ok(w.document.querySelector(".gameQuizOptions .gameCorrect"));
