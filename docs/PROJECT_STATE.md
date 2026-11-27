@@ -471,6 +471,20 @@ Selector de ánimo compacto: seis opciones iniciales, botón «··· Más emoci
 para las 18 adicionales, cierre al compartir y estado seleccionado visible
 en el resumen. Historial independiente intacto. 37 pruebas web aprobadas.
 
+## Nuestro rincón de juegos · fase 9
+
+Dentro de Nuestras aventuras, ocho juegos: trivia de fechas, planes y recuerdos;
+bingo compartido de 25 actividades; memoria de parejas de fotos (mínimo dos);
+rompecabezas de intercambio 3×3 o 4×4; tres en raya y Conecta cuatro por turnos;
+ruleta de retos con formulario de experiencia; adivina el recuerdo por foto.
+Los cinco juegos individuales guardan resultados compartidos al terminarlos;
+los dos de tablero y bingo guardan progreso/partidas en Realtime. Las invitaciones
+y turnos abren la partida original. Se añaden tres insignias a Nuestros logros.
+RLS por pareja, identidad de quien crea/juega, validación de movimientos,
+gravedad, ganador y fin de partida en el servidor. Migración aditiva en TEST y
+producción; prueba SQL de turnos, victoria, bingo y aislamiento aprobada. 38
+pruebas web aprobadas. Sin nuevo APK; pendiente aceptación en teléfonos.
+
 ## Próximas fases
 
 9 Juegos de pareja; 10 Cápsulas del tiempo; 11 Nuestra banda sonora;

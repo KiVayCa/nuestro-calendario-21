@@ -175,6 +175,7 @@ function renderAdvAchievements() {
     goalsCount = advCache.goals.length,
     placesCount = advCache.places.length;
   const milestones = [
+    ...gameAchievementList(),
     ["❤️", "Empezó nuestra historia", true, "El comienzo de todo."],
     ["💍", "Nos hicimos novios", true, "El día que eligieron caminar juntos."],
     ["🌱", "Primer plan juntos", plansCount >= 1, "Su primera cita guardada."],

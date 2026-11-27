@@ -15,6 +15,7 @@ const sources = [
   "knowing",
   "vinculo",
   "adventures",
+  "games",
   "faith-readings",
   "faith",
   "future",

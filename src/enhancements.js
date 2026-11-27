@@ -149,7 +149,11 @@ function navigateToItem(tab, id, date) {
   if (tab === "memories" && id)
     memoryFilters = { query: "", year: "", favorites: false };
   if (tab === "futuro" && id) futureFilter = "all";
-  if (tab === "aventuras" && id) adventureFilter = "all";
+  if (tab === "aventuras" && id) {
+    const match=(advCache.gameMatches||[]).find(m=>m.id===id);
+    if(match){adventureFilter="games";gameMode=match.kind;gameActiveId=id;}
+    else adventureFilter="all";
+  }
   showAdvancedTab(tab);
   if (tab === "calendar" && !id && /^\d{4}-\d{2}-\d{2}$/.test(date || "")) {
     const selected = parseDateOnly(date);
