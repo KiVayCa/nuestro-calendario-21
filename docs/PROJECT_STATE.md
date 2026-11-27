@@ -467,6 +467,10 @@ Restricción ampliada en TEST y producción; prueba SQL de validación y
 aislamiento aprobada en TEST; 36 pruebas web aprobadas. Widget sin cambios,
 APK v15 intacto.
 
+Selector de ánimo compacto: seis opciones iniciales, botón «··· Más emociones»
+para las 18 adicionales, cierre al compartir y estado seleccionado visible
+en el resumen. Historial independiente intacto. 37 pruebas web aprobadas.
+
 ## Próximas fases
 
 9 Juegos de pareja; 10 Cápsulas del tiempo; 11 Nuestra banda sonora;

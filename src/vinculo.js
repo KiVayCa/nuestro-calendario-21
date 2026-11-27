@@ -32,7 +32,12 @@ const connectionMoods = {
 };
 let connectionSending = false;
 let connectionAnimatedId = null;
-let bondMoodHistoryOpen=false,bondMoodHistoryLimit=30;
+let bondMoodHistoryOpen=false,bondMoodHistoryLimit=30,bondMoreMoodsOpen=false;
+function toggleBondMoreMoods(){bondMoreMoodsOpen=!bondMoreMoodsOpen;renderAdvanced({preserveInputs:true});$("bondMoreMoodsButton")?.focus({preventScroll:true});}
+function renderBondMoodChoices(selected){
+  const entries=Object.entries(connectionMoods),button=([key,mood])=>`<button type="button" class="bondMood ${selected===key?"selected":""}" aria-pressed="${selected===key}" onclick="sendConnection('mood','${key}')"><span>${mood[0]}</span>${mood[1]}</button>`;
+  return `<div class="bondMoods">${entries.slice(0,6).map(button).join("")}</div><button type="button" id="bondMoreMoodsButton" class="btn bondMoreMoodsButton" aria-expanded="${bondMoreMoodsOpen}" aria-controls="bondMoreMoodsList" onclick="toggleBondMoreMoods()">${bondMoreMoodsOpen?"⌃ Ver menos emociones":"··· Más emociones ("+(entries.length-6)+")"}</button><div id="bondMoreMoodsList" ${bondMoreMoodsOpen?"":"hidden"}>${bondMoreMoodsOpen?`<div class="bondMoods">${entries.slice(6).map(button).join("")}</div>`:""}</div>`;
+}
 function bondTimestamp(when){const date=new Date(when);if(Number.isNaN(date.getTime()))return "";return date.toLocaleString("es-CO",{timeZone:"America/Bogota",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"});}
 function toggleBondMoodHistory(){bondMoodHistoryOpen=!bondMoodHistoryOpen;renderAdvanced({preserveInputs:true});}
 function moreBondMoodHistory(){bondMoodHistoryLimit+=30;renderAdvanced({preserveInputs:true});}
@@ -54,7 +59,7 @@ function renderAdvVinculo() {
   return `<section class="bond">
     <div class="bondHero"><div class="bondHeroHeart">💞</div><small>NUESTRO ESPACIO</small><h2>Nuestro vínculo</h2><p>Los pequeños detalles también hacen grande nuestro amor.</p></div>
     <div class="advCard"><h3>Envíale un poquito de amor</h3><p>Un gesto pequeño puede cambiarle el día.</p><div class="bondGestures">${Object.entries(connectionGestures).filter(([k]) => k !== "compliment").map(([k, g]) => `<button type="button" class="bondGesture" onclick="sendConnection('${k}')"><span>${g[0]}</span><strong>${g[1]}</strong><small>${g[2]}</small></button>`).join("")}</div><div id="bondFeedback" role="status" aria-live="polite"></div></div>
-    <div class="advCard"><h3>¿Cómo estamos hoy?</h3><div class="bondMoodPair">${moodCard("Tú", ownMood)}${moodCard("Tu pareja", partnerMood)}</div><p>Comparte cómo te sientes.</p><div class="bondMoods">${Object.entries(connectionMoods).map(([k, m]) => `<button type="button" class="bondMood ${ownMood?.body === k ? "selected" : ""}" aria-pressed="${ownMood?.body === k}" onclick="sendConnection('mood','${k}')"><span>${m[0]}</span>${m[1]}</button>`).join("")}</div>${renderBondMoodHistory(moods)}</div>
+    <div class="advCard"><h3>¿Cómo estamos hoy?</h3><div class="bondMoodPair">${moodCard("Tú", ownMood)}${moodCard("Tu pareja", partnerMood)}</div><p>Comparte cómo te sientes.</p>${renderBondMoodChoices(ownMood?.body)}${renderBondMoodHistory(moods)}</div>
     <div class="advCard"><h3>💌 Buzón de cumplidos</h3><p>¿Qué te encanta de tu pareja hoy?</p><textarea id="bondCompliment" maxlength="500" rows="3" placeholder="Hoy quiero decirte que…"></textarea><button type="button" class="btn primary" onclick="sendConnection('compliment')">Enviar cumplido 💌</button></div>
     <div class="advCard"><h3>Nuestros pequeños detalles</h3><div class="bondHistory">${gestures.slice(0, 60).map(x => {
       const g = connectionGestures[x.kind];
@@ -82,6 +87,7 @@ async function sendConnection(kind, mood) {
     if (error) throw error;
     if (user?.id !== account || couple?.id !== space) return;
     advCache.connection = [data, ...advCache.connection.filter(x => x.id !== data.id)];
+    if (kind === "mood") bondMoreMoodsOpen=false;
     if (kind === "compliment" && input) input.value = "";
     if (advancedTab === "vinculo") {
       renderAdvanced({ preserveInputs: true });

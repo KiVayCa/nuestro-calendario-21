@@ -160,7 +160,7 @@ async function init() {
         );
         adventureChoice = null;
         knowingCategory = "today";
-        bondMoodHistoryOpen=false;bondMoodHistoryLimit=30;
+        bondMoodHistoryOpen=false;bondMoodHistoryLimit=30;bondMoreMoodsOpen=false;
         adventureFilter = "all";
         dreamsGoalsView = "dreams";
         futureFilter = "all";

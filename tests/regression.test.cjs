@@ -158,6 +158,16 @@ test("bond moods have a distinct expandable history and dated gesture rows",()=>
  assert.match(c.renderAdvVinculo(),/Tú · Con gratitud/);
  assert.match(c.renderAdvVinculo(),/aria-expanded="true"/);
 });
+test("mood selector starts compact and expands all 24 choices",()=>{
+ const c=context("src/vinculo.js",{renderAdvanced:()=>{},$:()=>null});
+ assert.equal((c.renderBondMoodChoices("grateful").match(/class="bondMood /g)||[]).length,6);
+ assert.match(c.renderBondMoodChoices("grateful"),/Más emociones \(18\)/);
+ c.toggleBondMoreMoods();
+ assert.equal((c.renderBondMoodChoices("grateful").match(/class="bondMood /g)||[]).length,24);
+ assert.match(c.renderBondMoodChoices("grateful"),/class="bondMood selected"[^>]*sendConnection\('mood','grateful'\)/);
+ c.toggleBondMoreMoods();
+ assert.equal((c.renderBondMoodChoices("grateful").match(/class="bondMood /g)||[]).length,6);
+});
 test("knowing keeps partner answers hidden until own response and scores preferences",()=>{
  const c=context("src/knowing.js",{countdownToday:()=>"1970-01-01",user:{id:"one"},advCache:{knowing:[{question_key:"connection-01",user_id:"two",answer:"PRIVATE <secret>"}]},esc:v=>String(v).replaceAll("<","&lt;").replaceAll(">","&gt;")});
  assert.doesNotMatch(c.renderKnowing(),/PRIVATE/);

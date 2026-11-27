@@ -1838,6 +1838,7 @@ body:has(#appDialog.show) .ncTransactionIndicator {
 .bondMood { background:var(--card); font-size:13px; }
 .bondMood span { display:block; font-size:24px; }
 .bondMood.selected { border:2px solid var(--rose); background:var(--soft); }
+.bondMoreMoodsButton{display:block;width:100%;margin-top:10px}.bondMoreMoodsButton[aria-expanded="true"]{margin-bottom:10px}#bondMoreMoodsList[hidden]{display:none}
 .bond textarea { width:100%; resize:vertical; margin-bottom:10px; }
 .bondHistory { display:grid; gap:8px; }
 .bondEvent { display:flex; align-items:flex-start; gap:12px; padding:12px; border:1px solid var(--line); border-radius:14px; background:var(--card); }
