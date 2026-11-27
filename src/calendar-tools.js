@@ -288,6 +288,7 @@ function resolveCountdown() {
       return {
         date: plan.recurrence_enabled ? date : plan.plan_date,
         title: plan.title,
+        time: plan.plan_time || null,
       };
   }
   if (source === "date") {
@@ -305,20 +306,28 @@ function resolveCountdown() {
   return { date, title: coupleSettings.countdown_title };
 }
 
+function countdownTarget(date,time){
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(date||""))return null;
+  const clock=/^\d{2}:\d{2}(:\d{2})?$/.test(time||"")?time.slice(0,5)+":"+(time.length===8?time.slice(6):"00"):"00:00:00";
+  const target=Date.parse(date+"T"+clock+"-05:00");return Number.isFinite(target)?target:null;
+}
+function countdownParts(target,now=Date.now()){
+  const total=Math.max(0,Math.ceil((target-now)/1000));
+  return {days:Math.floor(total/86400),hours:Math.floor(total%86400/3600),minutes:Math.floor(total%3600/60),seconds:total%60,done:total===0};
+}
+function countdownNumber(key,value){return key==="days"?String(value):String(value).padStart(2,"0");}
+function refreshHomeCountdown(){
+  const card=document.querySelector("[data-countdown-target]");if(!card)return;
+  const parts=countdownParts(Number(card.dataset.countdownTarget));
+  for(const key of ["days","hours","minutes","seconds"]){const node=card.querySelector(`[data-countdown-part="${key}"]`);if(node)node.textContent=countdownNumber(key,parts[key]);}
+  const status=card.querySelector("[data-countdown-status]");if(status)status.textContent=parts.done?"¡Llegó el momento! ❤️":"Falta para nuestra fecha";
+}
 function homeCountdownCard() {
   const pinned = resolveCountdown();
-  const { date, title } = pinned;
-  const days = Math.round(
-    (Date.parse(date) - Date.parse(countdownToday())) / 86400000,
-  );
-  const label =
-    days > 0
-      ? `Faltan ${days} ${days === 1 ? "día" : "días"}`
-      : days === 0
-        ? "Es hoy"
-        : "Ya pasó";
-  return `<section class="homeNext"><div><h3>Cuenta regresiva</h3>
-    ${date && title ? `<strong>${esc(title)}</strong><p class="advMeta">${esc(label)} · ${esc(dateES(date))}</p>` : ""}
+  const { date, title,time } = pinned;
+  const target=countdownTarget(date,time),parts=target===null?null:countdownParts(target);
+  return `<section class="homeNext homeCountdown"><div><h3>Cuenta regresiva</h3>
+    ${parts && title ? `<strong>${esc(title)}</strong><p class="advMeta">${esc(dateES(date))}${time?" · "+esc(formatTime(time)):" · 12:00 a. m."}</p><div data-countdown-target="${target}"><div class="countdownUnits">${[["days","Días"],["hours","Horas"],["minutes","Minutos"],["seconds","Segundos"]].map(([key,label])=>`<div class="countdownUnit"><strong data-countdown-part="${key}">${countdownNumber(key,parts[key])}</strong><small>${label}</small></div>`).join("")}</div><p class="advMeta" data-countdown-status>${parts.done?"¡Llegó el momento! ❤️":"Falta para nuestra fecha"}</p></div>` : ""}
     </div><button class="btn" type="button" onclick="openCountdownSettings()">${date ? "Cambiar fecha" : "Fijar fecha"}</button></section>`;
 }
 

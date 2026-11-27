@@ -425,6 +425,8 @@ window.addEventListener("error", (e) => {
 
 window.addEventListener("load", init);
 window.addEventListener("focus", checkLocalReminders);
+setInterval(()=>{if(document.visibilityState==="visible"&&advancedTab==="home")refreshHomeCountdown();},1000);
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&advancedTab==="home")refreshHomeCountdown();});
 setInterval(() => {
   checkLocalReminders();
   if (!user || !couple || document.visibilityState !== "visible") return;

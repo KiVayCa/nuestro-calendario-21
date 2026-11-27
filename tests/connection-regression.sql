@@ -14,13 +14,15 @@ insert into public.couple_connection(couple_id,sender_user_id,kind,body) values
  ('21000000-0000-4000-8000-000000000011','11000000-0000-4000-8000-000000000011','heart',null),
  ('21000000-0000-4000-8000-000000000011','11000000-0000-4000-8000-000000000011','mood','happy'),
  ('21000000-0000-4000-8000-000000000011','11000000-0000-4000-8000-000000000011','compliment','Prueba');
+insert into public.couple_connection(couple_id,sender_user_id,kind,body)
+ select '21000000-0000-4000-8000-000000000011',auth.uid(),'mood',mood from unnest(array['excited','grateful','hopeful','proud','peaceful','playful','motivated','surprised','anxious','worried','overwhelmed','frustrated','angry','lonely','nostalgic','sick','confused','sleepy']) as mood;
 do $$ begin
  begin insert into public.couple_connection(couple_id,sender_user_id,kind) values ('21000000-0000-4000-8000-000000000011','11000000-0000-4000-8000-000000000012','heart'); raise exception 'Sender spoofing'; exception when insufficient_privilege then null; end;
  begin insert into public.couple_connection(couple_id,sender_user_id,kind,body) values ('21000000-0000-4000-8000-000000000011','11000000-0000-4000-8000-000000000011','mood','invalid'); raise exception 'Invalid mood'; exception when check_violation then null; end;
 end $$;
 select set_config('request.jwt.claim.sub','11000000-0000-4000-8000-000000000012',true);
 do $$ begin
- if (select count(*) from public.couple_connection) <> 3 then raise exception 'Partner cannot read'; end if;
+ if (select count(*) from public.couple_connection) <> 21 then raise exception 'Partner cannot read'; end if;
 end $$;
 select set_config('request.jwt.claim.sub','11000000-0000-4000-8000-000000000013',true);
 do $$ begin

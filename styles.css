@@ -1844,6 +1844,8 @@ body:has(#appDialog.show) .ncTransactionIndicator {
 .bondEventIcon { font-size:29px; flex-shrink:0; }
 .bondEvent p { white-space:pre-wrap; overflow-wrap:anywhere; margin:5px 0; }
 .bondEvent div { min-width:0; }
+.bondEvent strong,.bondEventDate{display:block}.bondEventDate{margin-top:5px;line-height:1.4}.bondMoodHistory{margin-top:14px}.bondMoodHistory #bondMoodHistoryList:not([hidden]){display:grid;gap:10px;margin-top:10px}.bondMoodHistory #bondMoodHistoryList[hidden]{display:none}
+.homeCountdown{flex-wrap:wrap;align-items:flex-start}.homeCountdown>div{flex:1;min-width:0}.countdownUnits{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;max-width:440px;margin:10px 0}.countdownUnit{min-width:0;background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:8px 3px;text-align:center;color:var(--ink)}.countdownUnit strong{display:block;font-size:clamp(20px,4vw,32px);font-variant-numeric:tabular-nums;line-height:1.2}.countdownUnit small{display:block;font-size:11px;color:var(--muted)}@media(max-width:600px){.homeCountdown>div{flex-basis:100%}.countdownUnits{max-width:none}.countdownUnit small{font-size:10px}}
 #bondFeedback:empty { display:none; }
 .bondSent { text-align:center; margin-top:12px; font-weight:600; color:var(--rose); animation:bond-pop .4s ease-out both; }
 .bondArrival .bondEventIcon { animation:bond-pop .65s ease-out both; }

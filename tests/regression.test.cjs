@@ -139,6 +139,25 @@ test("connection sends once, uses the authenticated sender and keeps private tex
   assert.ok(!JSON.stringify(notifications[0]).includes("increíble"));
   assert.ok(c.renderAdvVinculo().includes("Eres increíble &lt;3"));
 });
+test("countdown uses Bogotá midnight or linked plan time, clamps elapsed targets",()=>{
+ const c=context("src/calendar-tools.js");
+ const target=c.countdownTarget("2026-11-28","12:34:56");
+ assert.equal(target,Date.parse("2026-11-28T17:34:56Z"));
+ assert.equal(c.countdownTarget("2026-11-28",null),Date.parse("2026-11-28T05:00:00Z"));
+ const p=c.countdownParts(target,target-((2*86400+3*3600+4*60+5)*1000));
+ assert.equal(p.days,2);assert.equal(p.hours,3);assert.equal(p.minutes,4);assert.equal(p.seconds,5);assert.equal(p.done,false);
+ assert.equal(c.countdownParts(target,target+1000).done,true);
+ assert.equal(c.countdownParts(target,target+1000).seconds,0);
+});
+test("bond moods have a distinct expandable history and dated gesture rows",()=>{
+ const c=context("src/vinculo.js",{user:{id:"one"},advCache:{connection:[{id:"g",sender_user_id:"two",kind:"heart",created_at:"2026-11-26T18:00:00Z"},{id:"m",sender_user_id:"one",kind:"mood",body:"grateful",created_at:"2026-11-26T19:00:00Z"}]},esc:String,renderAdvanced:()=>{}});
+ assert.equal(vm.runInContext("Object.keys(connectionMoods).length",c),24);
+ assert.match(c.renderAdvVinculo(),/Recibiste · Un corazón<\/strong><small class="bondEventDate">/);
+ assert.match(c.renderAdvVinculo(),/id="bondMoodHistoryList" hidden/);
+ c.toggleBondMoodHistory();
+ assert.match(c.renderAdvVinculo(),/Tú · Con gratitud/);
+ assert.match(c.renderAdvVinculo(),/aria-expanded="true"/);
+});
 test("knowing keeps partner answers hidden until own response and scores preferences",()=>{
  const c=context("src/knowing.js",{countdownToday:()=>"1970-01-01",user:{id:"one"},advCache:{knowing:[{question_key:"connection-01",user_id:"two",answer:"PRIVATE <secret>"}]},esc:v=>String(v).replaceAll("<","&lt;").replaceAll(">","&gt;")});
  assert.doesNotMatch(c.renderKnowing(),/PRIVATE/);

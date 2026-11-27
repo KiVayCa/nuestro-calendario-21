@@ -455,6 +455,18 @@ del amor sigue disponible por separado. Avisos nuevos y enlaces internos de
 avisos anteriores abren Pregunta diaria. 34 pruebas web aprobadas. Sin cambios
 de esquema ni APK v15.
 
+## Cuenta regresiva en vivo y estados de ánimo ampliados
+
+Inicio muestra días, horas, minutos y segundos, con actualización de los
+números cada segundo sin repintar la página. Fecha sin hora: medianoche de
+Bogotá; plan vinculado: hora del plan si existe. Al llegar al objetivo queda
+en cero. Historial de detalles separa título y fecha/hora, y Nuestro vínculo
+amplía de seis a 24 emociones y ofrece historial plegable de ambos miembros,
+por lotes de 30 registros. Se preservan estados y notificaciones existentes.
+Restricción ampliada en TEST y producción; prueba SQL de validación y
+aislamiento aprobada en TEST; 36 pruebas web aprobadas. Widget sin cambios,
+APK v15 intacto.
+
 ## Próximas fases
 
 9 Juegos de pareja; 10 Cápsulas del tiempo; 11 Nuestra banda sonora;
