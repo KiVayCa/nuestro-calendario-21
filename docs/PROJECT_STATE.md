@@ -515,6 +515,15 @@ Los nueve juegos tienen guía «Cómo jugar», incluida caída de fichas y líne
 en Conecta cuatro. Migración TEST y producción; regresiones SQL de gestión,
 turnos y bingo aprobadas. 39 pruebas web aprobadas. Sin nuevo APK.
 
+Los nueve juegos incorporan Reiniciar con confirmación. Los cinco juegos
+individuales conservan resultados terminados y confirman también los botones
+de nueva ronda/nivel; los cuatro compartidos reinician la partida activa para
+ambos mediante validación del servidor. Las partidas terminadas se conservan
+y se crea una nueva. La versión de reinicio impide aplicar movimientos antiguos
+al nuevo tablero. Eliminación del historial sigue requiriendo confirmación.
+Migración TEST y producción; prueba SQL de los cuatro juegos y aislamiento,
+39 pruebas web aprobadas, incluida cancelación y confirmación. Sin nuevo APK.
+
 ## Próximas fases
 
 9 Juegos de pareja; 10 Cápsulas del tiempo; 11 Nuestra banda sonora;
