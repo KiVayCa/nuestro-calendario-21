@@ -282,7 +282,28 @@ function dateES(v) {
 }
 
 function advHeader(title, sub, button, action) {
-  return `<div class="advHero"><div style="display:flex;justify-content:space-between;gap:18px;align-items:center;flex-wrap:wrap"><div><div style="font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:#a16a7d;font-weight:800">Nuestro espacio</div><h2 style="font:700 32px Georgia,serif;color:#653449;margin:5px 0">${title}</h2><p style="margin:0;color:#806572">${sub}</p></div>${button ? `<button class="btn primary" onclick="${action}">${button}</button>` : ""}</div></div>`;
+  const styles={
+    "Nuestros recuerdos":["📸","MOMENTOS QUE PERDURAN"],
+    "Cartas para nosotros":["💌","PALABRAS DEL CORAZÓN"],
+    "Nuestra lista de sueños":["✨","SOÑAR JUNTOS"],
+    "Nuestras metas":["💰","CADA APORTE CUENTA"],
+    "Retos de pareja":["🎯","CRECER JUNTOS"],
+    "¿Qué hacemos hoy?":["🎲","DESCUBRAMOS ALGO NUEVO"],
+    "Fechas importantes":["📅","DÍAS PARA RECORDAR"],
+    "Nuestros lugares":["📍","HUELLAS EN EL MAPA"],
+    "Presupuesto familiar":["💰","CONSTRUYENDO ESTABILIDAD"],
+    "Notificaciones":["🔔","AL DÍA CON NOSOTROS"],
+    "La pregunta de hoy":["💭","CONOCERNOS CADA DÍA"],
+    "Nuestros logros":["🏆","CELEBREMOS CADA PASO"],
+    "Mi rincón privado":["🔐","UN ESPACIO PARA TI"],
+    "Configuración":["⚙️","A NUESTRA MANERA"],
+    "Análisis":["📊","NUESTRO CAMINO EN NÚMEROS"],
+  };
+  const [icon,kicker]=styles[title]||["♡","NUESTRO ESPACIO"];
+  const actions=button?`<div class="moduleHeroActions"><button type="button" class="btn primary" onclick="${action}">${button}</button></div>`:"";
+  const subsection=title==="Nuestra lista de sueños"||title==="Nuestras metas";
+  if(subsection)return `<div class="moduleSubheading"><div><h3>${icon} ${title}</h3><p>${sub}</p></div>${actions}</div>`;
+  return `<div class="bondHero moduleHero"><div class="bondHeroHeart" aria-hidden="true">${icon}</div><small>${kicker}</small><h2>${title}</h2><p>${sub}</p>${actions}</div>`;
 }
 
 function pushBase64UrlToBytes(value) {

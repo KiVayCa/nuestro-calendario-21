@@ -405,3 +405,14 @@ El checkbox de creación de proyecto deja de heredar el ancho de los campos de
 texto. Se alinea a la izquierda del texto, con la lista sugerida debajo y
 colores del tema. Toda la etiqueta permite activarlo o desactivarlo.
 31 pruebas web aprobadas; sin cambios en datos, vínculos ni APK v15.
+
+## Identidad visual unificada · encabezados de módulos
+
+Los módulos anteriores adoptan el encabezado centrado de Nuestro vínculo y
+Nuestra fe: icono propio, frase breve, título, descripción, gradiente del tema
+y acciones originales. Análisis mantiene su filtro; Sueños y metas usa un
+único encabezado principal y subtítulos para sus dos secciones. Calendario
+incorpora una variante compacta que conserva los controles, la cuadrícula y
+la orientación horizontal. Inicio conserva la portada fotográfica y la barra
+de navegación conserva el brillo. 31 pruebas web aprobadas, incluida la
+presencia de encabezados en todas las rutas. Sin cambios en datos ni APK v15.

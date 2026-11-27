@@ -191,7 +191,7 @@ function renderAdvAnalysis() {
       ["Pendientes", rows.length - count],
     ];
   };
-  return `<div class="analysis-heading"><div><h2>Análisis</h2><p>Actividad, recuerdos y avances de su calendario.</p></div>
+  return advHeader("Análisis","Actividad, recuerdos y avances de su calendario.")+`<div class="analysis-heading">
     <label>Período <select onchange="analysisPeriod=this.value;renderAdvanced()">
     <option value="all">Todo el historial</option>
     ${months.map((month) => `<option value="${month}" ${analysisPeriod === month ? "selected" : ""}>${esc(monthLabel(month))}</option>`).join("")}

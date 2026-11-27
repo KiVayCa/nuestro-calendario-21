@@ -78,6 +78,14 @@ const wait = () => new Promise((r) => setTimeout(r, 400));
   ]) {
     w.showAdvancedTab(tab);
     await wait();
+    if(tab==="calendar")assert.ok(w.document.querySelector(".calendarCard .calendarModuleHero h2"));
+    else if(tab==="home")assert.ok(w.document.querySelector(".homeWelcome [data-home-photo]"));
+    else {
+      const content=w.document.getElementById("advancedContent");
+      assert.equal(content.querySelectorAll(".bondHero").length,1,tab);
+      assert.ok(content.querySelector(".bondHero .bondHeroHeart"),tab);
+      assert.ok(content.querySelector(".bondHero h2")?.textContent.trim(),tab);
+    }
     if (tab !== "calendar")
       assert.ok(
         w.document.getElementById("advancedContent").textContent.trim(),
