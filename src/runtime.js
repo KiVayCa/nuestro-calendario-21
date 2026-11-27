@@ -435,6 +435,7 @@ setInterval(() => {
     const shownDate = $("dailyQuestionDate")?.dataset.date;
     if (shownDate && shownDate !== todayQuestion().date) renderAdvanced();
   }
+  if (advancedTab === "question" && $("knowingSection")?.dataset.date !== countdownToday()) renderAdvanced({preserveInputs:true});
   if (advancedTab === "letters") {
     const justUnlocked = advCache.letters.some((letter) =>
       letter.unlock_at && letter.created_by !== user.id && letter.content == null &&

@@ -145,6 +145,7 @@ function reminderOccurrenceDate(note) {
 
 function navigateToItem(tab, id, date) {
   if (!validAdvancedTabs.has(tab)) tab = "notifications";
+  if (tab === "question") { window.__nc21SelectedQuestionDate=null;knowingCategory="today"; }
   if (tab === "memories" && id)
     memoryFilters = { query: "", year: "", favorites: false };
   if (tab === "futuro" && id) futureFilter = "all";

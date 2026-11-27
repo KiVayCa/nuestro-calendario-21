@@ -140,13 +140,27 @@ test("connection sends once, uses the authenticated sender and keeps private tex
   assert.ok(c.renderAdvVinculo().includes("Eres increíble &lt;3"));
 });
 test("knowing keeps partner answers hidden until own response and scores preferences",()=>{
- const c=context("src/knowing.js",{user:{id:"one"},advCache:{knowing:[{question_key:"connection-01",user_id:"two",answer:"PRIVATE <secret>"}]},esc:v=>String(v).replaceAll("<","&lt;").replaceAll(">","&gt;")});
+ const c=context("src/knowing.js",{countdownToday:()=>"1970-01-01",user:{id:"one"},advCache:{knowing:[{question_key:"connection-01",user_id:"two",answer:"PRIVATE <secret>"}]},esc:v=>String(v).replaceAll("<","&lt;").replaceAll(">","&gt;")});
  assert.doesNotMatch(c.renderKnowing(),/PRIVATE/);
  c.advCache.knowing.push({question_key:"connection-01",user_id:"one",answer:"My response"});
  assert.match(c.renderKnowing(),/PRIVATE &lt;secret&gt;/);
  assert.equal(c.knowingScore("11223345")[0].score,2);
  assert.equal(c.knowingScore("11111111")[0].score,8);
  assert.equal(c.knowingScore("invalid").length,0);
+});
+test("knowing daily selection is shared, stable for the day, and skips completed conversations",()=>{
+ const c=context("src/knowing.js");
+ const bank=[{key:"connection-01"},{key:"connection-02"}];
+ const date="2026-11-27";
+ const first=c.selectKnowingDaily(date,[],bank).key;
+ const a={question_key:first,user_id:"one",created_at:"2026-11-26T12:00:00Z"};
+ const b={question_key:first,user_id:"two",created_at:"2026-11-27T15:00:00Z"};
+ assert.equal(c.selectKnowingDaily(date,[a],bank).key,first);
+ assert.equal(c.selectKnowingDaily(date,[b],bank).key,first);
+ assert.equal(c.selectKnowingDaily(date,[a,b],bank).key,first);
+ assert.notEqual(c.selectKnowingDaily("2026-11-28",[a,b],bank).key,first);
+ const other=bank.find(q=>q.key!==first).key;
+ assert.equal(c.selectKnowingDaily("2026-11-29",[a,b,{...a,question_key:other},{...b,question_key:other}],bank),null);
 });
 test("expanded question banks keep original IDs, and retire only jointly completed prompts",()=>{
  const c=context(["src/questions.js","src/question-bank.js","src/knowing.js"]);

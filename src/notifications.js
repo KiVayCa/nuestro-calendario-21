@@ -142,6 +142,7 @@ async function markAllNotificationsRead() {
 async function openNotificationTarget(id, tab) {
   const notification = advCache.notifications.find((item) => item.id === id);
   await markNotificationRead(id);
+  if(notification?.event_type === "knowing_answered") return openKnowingFromQuestion();
   navigateToItem(
     tab,
     notification?.target_id,

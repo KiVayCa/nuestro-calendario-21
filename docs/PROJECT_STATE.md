@@ -443,6 +443,18 @@ Cuando se completa el banco se muestra el mensaje de finalización e historial.
 Se conservan textos y claves originales, historial de edición, vínculos y
 avisos. Sin cambios de esquema ni APK v15. 33 pruebas web aprobadas.
 
+## Conociéndonos en Pregunta diaria
+
+Se traslada desde Nuestro vínculo a Pregunta diaria, conservando las 150
+preguntas, sus claves y todas las respuestas. La sección muestra una pregunta
+compartida al día (Bogotá); rota categorías, omite las completadas antes de hoy
+y mantiene la selección aunque ambos respondan durante el día. Las respuestas
+de un solo miembro no cambian la selección ni revelan datos a la pareja.
+Historial muestra únicamente preguntas ya respondidas por la cuenta; Lenguajes
+del amor sigue disponible por separado. Avisos nuevos y enlaces internos de
+avisos anteriores abren Pregunta diaria. 34 pruebas web aprobadas. Sin cambios
+de esquema ni APK v15.
+
 ## Próximas fases
 
 9 Juegos de pareja; 10 Cápsulas del tiempo; 11 Nuestra banda sonora;

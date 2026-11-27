@@ -50,6 +50,7 @@ function openDailyQuestionHistory(date) {
 
 function showTodayDailyQuestion() {
   window.__nc21SelectedQuestionDate = null;
+  knowingCategory = "today";
   showAdvancedTab("question");
 }
 
@@ -129,7 +130,7 @@ function renderAdvQuestion() {
       "Volver al inicio",
       "showAdvancedTab('home')",
     ) +
-    '<div class="advCard"><h3>💞 Conociéndonos</h3><p>Exploren más conversaciones y sus lenguajes del amor, a su ritmo.</p><button class="btn" onclick="openKnowingFromQuestion()">Ir a Conociéndonos</button></div><div class="advCard dailyQuestionCard" style="margin-top:18px">' +
+    '<div class="advCard dailyQuestionCard" style="margin-top:18px">' +
     `<p class="advMeta">💗 ${dailyQuestionProgress(today.date)}/${dailyQuestionBank.length} preguntas respondidas por ambos. Solo regresan las que aún tienen respuestas pendientes.</p>`+
     `<div class="advMeta" id="dailyQuestionDate" data-date="${esc(q.date)}">` +
     dateES(q.date) +
@@ -145,6 +146,7 @@ function renderAdvQuestion() {
     '<div class="advList" style="margin-top:18px">' +
     answerHtml +
     "</div></div>" +
+    renderKnowing() +
     '<div class="advCard" style="margin-top:18px"><h3>📖 Historial de preguntas</h3><p>Vuelve a leer las preguntas anteriores y las respuestas que hayan guardado.</p><div class="advList">' +
     historyHtml +
     "</div></div>"
