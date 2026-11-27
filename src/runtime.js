@@ -268,6 +268,7 @@ const dailyQuestionBank = [
   "¿Qué te hace sentir que somos un equipo?",
   "¿Qué actividad nueva probarías conmigo?",
   "¿Qué quisieras que recordáramos de este año?",
+  ...extraDailyQuestions,
 ];
 
 const PUSH_VAPID_PUBLIC_KEY =

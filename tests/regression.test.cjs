@@ -148,6 +148,23 @@ test("knowing keeps partner answers hidden until own response and scores prefere
  assert.equal(c.knowingScore("11111111")[0].score,8);
  assert.equal(c.knowingScore("invalid").length,0);
 });
+test("expanded question banks keep original IDs, and retire only jointly completed prompts",()=>{
+ const c=context(["src/questions.js","src/question-bank.js","src/knowing.js"]);
+ const original=vm.runInNewContext(fs.readFileSync("src/runtime.js","utf8").match(/const dailyQuestionBank = (\[[\s\S]*?\]);/)[1],{extraDailyQuestions:vm.runInContext("extraDailyQuestions",c)});
+ assert.equal(original.length,365);assert.equal(new Set(original).size,365);
+ const knowing=vm.runInContext("Object.keys(knowingGroups).flatMap(knowingQuestions)",c);
+ assert.equal(knowing.length,150);assert.equal(new Set(knowing.map(q=>q.key)).size,150);assert.equal(new Set(knowing.map(q=>q.text)).size,150);
+ assert.equal(knowing.find(q=>q.key==="connection-01").text,"¿Qué momento nuestro te hizo sentir especialmente amado/a?");
+ const row=(key,who,date)=>({question_text:key,user_id:who,question_date:date,answer:"yes"});
+ const rows=[row("A","one","2026-11-20"),row("A","two","2026-11-21"),row("B","one","2026-11-22")];
+ assert.equal(c.selectDailyQuestion("2026-11-27",["A","B"],rows).text,"B");
+ assert.equal(c.dailyQuestionRows(rows,"B","2026-11-27").length,1);
+ rows.push(row("B","two","2026-11-27"));
+ assert.equal(c.selectDailyQuestion("2026-11-27",["A","B"],rows).text,"B");
+ assert.equal(c.selectDailyQuestion("2026-11-28",["A","B"],rows).text,null);
+ const missed=c.selectDailyQuestion("2026-11-30",["A","B","C"],[]).text;
+ assert.notEqual(missed,c.selectDailyQuestion("2026-12-01",["A","B","C"],[]).text);
+});
 test("calendar constrains all seven tracks and uses a full-width layout for rotated phones", () => {
   const css = fs.readFileSync("styles.css", "utf8");
   assert.match(css, /\.workspace \.week,\s*\.workspace \.grid\s*\{[^}]*grid-template-columns:repeat\(7,minmax\(0,1fr\)\)/);

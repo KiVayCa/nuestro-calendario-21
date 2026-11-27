@@ -430,6 +430,19 @@ Prueba SQL en TEST de privacidad, revelado bilateral, identidad, unicidad y
 validación aprobada. Migración aplicada a TEST y producción. 32 pruebas web
 aprobadas. APK v15 intacto; pendiente aceptación visual y push en teléfonos.
 
+## Bancos de preguntas ampliados
+
+365 preguntas diarias (30 originales + 335 nuevas) y 150 conversaciones de
+Conociéndonos (30 originales + 120 nuevas en seis categorías). El cuestionario
+de lenguajes del amor conserva sus ocho situaciones y resultados existentes.
+La pregunta diaria usa el día de Bogotá y el historial compartido: excluye
+preguntas respondidas por ambos incluso si se contestaron en fechas distintas,
+conserva la respuesta anterior de quien ya respondió y permite contestar solo
+a quien falta. Si ya hay una respuesta del día, se mantiene su enunciado.
+Cuando se completa el banco se muestra el mensaje de finalización e historial.
+Se conservan textos y claves originales, historial de edición, vínculos y
+avisos. Sin cambios de esquema ni APK v15. 33 pruebas web aprobadas.
+
 ## Próximas fases
 
 9 Juegos de pareja; 10 Cápsulas del tiempo; 11 Nuestra banda sonora;

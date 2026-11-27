@@ -1,21 +1,46 @@
+// Pick from the shared history rather than from each person's local progress.
+// A question answered by both is retired permanently. If one already answered,
+// their earlier response is reused and only the remaining person can answer.
+function dailyQuestionRows(rows, text, throughDate) {
+  const byUser = new Map();
+  for (const row of rows) {
+    if (!row.answer?.trim() || row.question_text !== text || row.question_date > throughDate) continue;
+    const old = byUser.get(row.user_id);
+    if (!old || old.question_date < row.question_date) byUser.set(row.user_id, row);
+  }
+  return [...byUser.values()];
+}
+
+function selectDailyQuestion(date, bank, rows) {
+  // Once anyone has answered today's question, leave it unchanged for the day.
+  const existing = rows.filter(r => r.question_date === date && r.question_text)
+    .sort((a,b) => String(a.created_at||"").localeCompare(String(b.created_at||"")) || String(a.id||"").localeCompare(String(b.id||"")))[0];
+  if (existing) return {date,text:existing.question_text};
+  if (!bank.length) return {date,text:null};
+  const day = Math.floor(Date.parse(date + "T00:00:00Z") / 86400000);
+  const start = ((day % bank.length) + bank.length) % bank.length;
+  for (let i=0;i<bank.length;i++) {
+    const text=bank[(start+i)%bank.length];
+    if (dailyQuestionRows(rows,text,date).length < 2) return {date,text};
+  }
+  return {date,text:null};
+}
+
 function todayQuestion() {
-  const today = countdownToday();
-  const seed = Number(today.replaceAll("-", ""));
-  return {
-    date: today,
-    text: dailyQuestionBank[seed % dailyQuestionBank.length],
-  };
+  return selectDailyQuestion(countdownToday(), dailyQuestionBank, advCache.dailyAnswers || []);
+}
+
+function dailyQuestionProgress(date) {
+  return dailyQuestionBank.filter(text => dailyQuestionRows(advCache.dailyAnswers,text,date).length >= 2).length;
 }
 
 function dailyQuestionHomeCard() {
   const q = todayQuestion();
-  const mine = advCache.dailyAnswers.find(
-    (a) => a.user_id === user?.id && a.question_date === q.date,
-  );
-  const count = advCache.dailyAnswers.filter(
-    (a) => a.question_date === q.date && a.answer?.trim(),
-  ).length;
-  return `<div class="advCard dailyQuestionCard"><div class="advMeta">💭 PREGUNTA DEL DÍA · ${dateES(q.date)}</div><h3>${esc(q.text)}</h3><p>${mine ? "Tu respuesta ya está guardada. ❤️" : "Tómense un minuto para responderse algo bonito."}</p><div class="advActions"><button class="btn primary" onclick="showAdvancedTab('question')">${mine ? "Ver respuestas" : "Responder juntos"} · ${count}/2</button></div></div>`;
+  if (!q.text) return `<div class="advCard dailyQuestionCard"><h3>💭 ¡Completaron todas las preguntas!</h3><p>Pueden volver a leer sus respuestas en el historial.</p><button class="btn" onclick="showTodayDailyQuestion()">Ver historial</button></div>`;
+  const rows=dailyQuestionRows(advCache.dailyAnswers,q.text,q.date);
+  const mine=rows.find(a=>a.user_id===user?.id);
+  const count=rows.length;
+  return `<div class="advCard dailyQuestionCard"><div class="advMeta">💭 PREGUNTA DEL DÍA · ${dateES(q.date)}</div><h3>${esc(q.text)}</h3><p>${mine ? "Tu respuesta ya está guardada. ❤️" : "Tómense un minuto para responderse algo bonito."}</p><div class="advActions"><button class="btn primary" onclick="showTodayDailyQuestion()">${mine ? "Ver respuestas" : "Responder juntos"} · ${count}/2</button></div></div>`;
 }
 
 function openDailyQuestionHistory(date) {
@@ -41,9 +66,7 @@ function renderAdvQuestion() {
           )?.question_text || "Pregunta anterior",
       }
     : today;
-  const answers = advCache.dailyAnswers.filter(
-    (a) => a.question_date === q.date,
-  );
+  const answers = isHistory ? advCache.dailyAnswers.filter(a=>a.question_date===q.date) : dailyQuestionRows(advCache.dailyAnswers,q.text,q.date);
   const mine = answers.find((a) => a.user_id === user?.id);
   const partner = answers.find((a) => a.user_id !== user?.id);
   const myName =
@@ -88,12 +111,12 @@ function renderAdvQuestion() {
         .join("")
     : '<div class="advEmpty">Aquí aparecerán las preguntas anteriores cuando alguno de los dos guarde una respuesta. ❤️</div>';
   const answerHtml =
-    (!isHistory && !mine
-      ? `<form onsubmit="event.preventDefault();saveDailyAnswer()"><div class="field"><label for="dailyAnswerInput">Tu respuesta · ${esc(myName)}</label><textarea id="dailyAnswerInput" data-date="${esc(q.date)}" rows="4" required placeholder="Escribe con sinceridad ❤️"></textarea></div><button class="btn primary" type="submit">Guardar mi respuesta ❤️</button></form>`
+    (!isHistory && !mine && q.text
+      ? `<form onsubmit="event.preventDefault();saveDailyAnswer()"><div class="field"><label for="dailyAnswerInput">Tu respuesta · ${esc(myName)}</label><textarea id="dailyAnswerInput" data-date="${esc(q.date)}" data-question="${esc(q.text)}" rows="4" required placeholder="Escribe con sinceridad ❤️"></textarea></div><button class="btn primary" type="submit">Guardar mi respuesta ❤️</button></form>`
       : "") +
     (mine ? dailyAnswerCard(mine, myName, true) : "") +
     (partner ? dailyAnswerCard(partner, partnerName, false) : "") +
-    (!isHistory && !partner
+    (!isHistory && q.text && !partner
       ? '<div class="advEmpty">La respuesta de tu pareja aparecerá aquí cuando la guarde. ❤️</div>'
       : "") +
     (isHistory && !mine && !partner
@@ -107,13 +130,14 @@ function renderAdvQuestion() {
       "showAdvancedTab('home')",
     ) +
     '<div class="advCard"><h3>💞 Conociéndonos</h3><p>Exploren más conversaciones y sus lenguajes del amor, a su ritmo.</p><button class="btn" onclick="openKnowingFromQuestion()">Ir a Conociéndonos</button></div><div class="advCard dailyQuestionCard" style="margin-top:18px">' +
+    `<p class="advMeta">💗 ${dailyQuestionProgress(today.date)}/${dailyQuestionBank.length} preguntas respondidas por ambos. Solo regresan las que aún tienen respuestas pendientes.</p>`+
     `<div class="advMeta" id="dailyQuestionDate" data-date="${esc(q.date)}">` +
     dateES(q.date) +
     " · " +
     (isHistory ? "PREGUNTA ANTERIOR" : "PREGUNTA COMPARTIDA") +
     "</div>" +
     '<h2 style="font:italic 30px Georgia,serif;color:#653449">' +
-    esc(q.text) +
+    esc(q.text || "¡Completaron todas las preguntas! ❤️") +
     "</h2>" +
     (isHistory
       ? '<div class="advActions"><button class="btn primary" onclick="showTodayDailyQuestion()">Volver a la pregunta de hoy ❤️</button></div>'
@@ -141,7 +165,7 @@ function dailyAnswerCard(answer, name, mine) {
         )
         .join("")}</details>`
     : "";
-  return `<div class="advItem"><div><div class="advItemTitle">${mine ? "💗 " : "💞 "}${esc(name)}${mine ? " · Tu respuesta" : ""}</div><p class="dailyAnswerText">${esc(answer.answer)}</p>${revisions}</div>${mine ? `<button class="btn" type="button" data-id="${esc(answer.id)}" onclick="openDailyAnswerEdit(this.dataset.id)">Editar respuesta</button>` : ""}</div>`;
+  return `<div class="advItem"><div><div class="advItemTitle">${mine ? "💗 " : "💞 "}${esc(name)}${mine ? " · Tu respuesta" : ""}</div><small class="advMeta">Respondida el ${esc(dateES(answer.question_date))}</small><p class="dailyAnswerText">${esc(answer.answer)}</p>${revisions}</div>${mine ? `<button class="btn" type="button" data-id="${esc(answer.id)}" onclick="openDailyAnswerEdit(this.dataset.id)">Editar respuesta</button>` : ""}</div>`;
 }
 
 function openDailyAnswerEdit(id) {
@@ -163,16 +187,20 @@ async function saveDailyAnswer(editId) {
   const input = $(editId ? "dailyAnswerEditInput" : "dailyAnswerInput");
   const answer = input?.value.trim();
   if (!answer) return appAlert("Escribe tu respuesta antes de guardarla ❤️");
+  const displayedDate=input?.dataset.date, displayedQuestion=input?.dataset.question;
+  if (!editId) {
+    await advLoadAll(["dailyAnswers"]);
+    if(user?.id!==account||couple?.id!==space)return;
+  }
   const q = todayQuestion();
   const existing = advCache.dailyAnswers.find(
     (row) =>
       row.user_id === account &&
-      (editId ? row.id === editId : row.question_date === q.date),
+      (editId ? row.id === editId : row.question_text === q.text || row.question_date === q.date),
   );
-  if (!editId && (input.dataset.date !== q.date || existing)) {
-    await advLoadAll(["dailyAnswers"]);
+  if (!editId && (!q.text || displayedDate !== q.date || displayedQuestion !== q.text || existing)) {
     renderAdvanced();
-    return;
+    return appAlert("La pregunta cambió o ya está respondida. Revisa la pregunta actual antes de continuar.");
   }
   if (editId && (!existing || existing.answer !== input.dataset.previous))
     return appAlert(
