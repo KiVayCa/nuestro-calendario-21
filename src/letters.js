@@ -89,6 +89,7 @@ function renderAdvLetters() {
       "💌 Nueva carta",
       "openLetterForm()",
     ) +
+    '<div class="advCard"><h3>⏳ Cápsulas del tiempo</h3><p>Guarden un mensaje para abrir juntos en una fecha especial.</p><button class="btn" onclick="showAdvancedTab(\'capsulas\')">Ver cápsulas</button></div>' +
     `<div class="advList">${
       advCache.letters.length
         ? advCache.letters

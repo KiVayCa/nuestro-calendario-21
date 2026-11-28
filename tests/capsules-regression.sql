@@ -1,0 +1,35 @@
+begin;
+insert into auth.users(id,email) values ('11000000-0000-4000-8000-000000000097','capsule-a@example.invalid'),('11000000-0000-4000-8000-000000000098','capsule-b@example.invalid'),('11000000-0000-4000-8000-000000000099','capsule-c@example.invalid');
+insert into public.couples(id,name,created_by) values ('21000000-0000-4000-8000-000000000097','Capsule test','11000000-0000-4000-8000-000000000097');
+insert into public.couple_members(couple_id,user_id) values ('21000000-0000-4000-8000-000000000097','11000000-0000-4000-8000-000000000097'),('21000000-0000-4000-8000-000000000097','11000000-0000-4000-8000-000000000098');
+insert into public.couple_capsules(id,couple_id,created_by,title,category,opens_on) values ('31000000-0000-4000-8000-000000000097','21000000-0000-4000-8000-000000000097','11000000-0000-4000-8000-000000000097','Ready','love',(now() at time zone 'America/Bogota')::date);
+insert into public.couple_capsule_messages(capsule_id,message) values ('31000000-0000-4000-8000-000000000097','Ready message');
+set local role authenticated;
+select set_config('request.jwt.claim.sub','11000000-0000-4000-8000-000000000097',true);
+do $$ declare c uuid; begin
+ c:=public.create_couple_capsule('21000000-0000-4000-8000-000000000097','Secret','love',(now() at time zone 'America/Bogota')::date+1,'Secret message');
+ perform set_config('test.capsule',c::text,true);
+ if not exists(select 1 from public.couple_capsules where id=c) then raise exception 'Missing metadata'; end if;
+ if exists(select 1 from public.couple_capsule_messages where capsule_id=c) then raise exception 'Author read early'; end if;
+ begin perform public.create_couple_capsule('21000000-0000-4000-8000-000000000097','Invalid','love',(now() at time zone 'America/Bogota')::date,'Secret'); raise exception 'Past date accepted'; exception when insufficient_privilege then null; end;
+ begin update public.couple_capsules set opens_on=current_date where id=c; raise exception 'Date mutable'; exception when insufficient_privilege then null; end;
+ if not exists(select 1 from public.couple_capsule_messages where capsule_id='31000000-0000-4000-8000-000000000097' and message='Ready message') then raise exception 'Author cannot read ready'; end if;
+end $$;
+select set_config('request.jwt.claim.sub','11000000-0000-4000-8000-000000000098',true);
+do $$ begin
+ if not exists(select 1 from public.couple_capsules where id=current_setting('test.capsule')::uuid) then raise exception 'Partner metadata hidden'; end if;
+ if exists(select 1 from public.couple_capsule_messages where capsule_id=current_setting('test.capsule')::uuid) then raise exception 'Partner read early'; end if;
+ if not exists(select 1 from public.couple_capsule_messages where capsule_id='31000000-0000-4000-8000-000000000097') then raise exception 'Partner cannot read ready'; end if;
+ update public.couple_capsules set archived_at=now() where id=current_setting('test.capsule')::uuid; if found then raise exception 'Partner archive permitted';end if;
+end $$;
+select set_config('request.jwt.claim.sub','11000000-0000-4000-8000-000000000099',true);
+do $$ begin if exists(select 1 from public.couple_capsules where couple_id='21000000-0000-4000-8000-000000000097') or exists(select 1 from public.couple_capsule_messages where capsule_id='31000000-0000-4000-8000-000000000097') then raise exception 'Outside access';end if;end $$;
+reset role;
+do $$ declare job_sql text;begin select command into job_sql from cron.job where jobname='couple-capsule-unlock';execute job_sql;execute job_sql;if (select count(*) from public.notifications where target_id='31000000-0000-4000-8000-000000000097' and event_type='capsule_unlocked')<>2 then raise exception 'Unlock notification dedup failed';end if;if exists(select 1 from public.notifications where target_id=current_setting('test.capsule')::uuid) then raise exception 'Premature notification';end if;end $$;
+set local role authenticated;
+select set_config('request.jwt.claim.sub','11000000-0000-4000-8000-000000000097',true);
+update public.couple_capsules set archived_at=now() where id='31000000-0000-4000-8000-000000000097';
+do $$ begin if exists(select 1 from public.couple_capsule_messages where capsule_id='31000000-0000-4000-8000-000000000097') then raise exception 'Archived body accessible';end if;end $$;
+reset role;
+rollback;
+select 'Capsule seal, unlock, membership, archive and scheduled notification passed' as result;

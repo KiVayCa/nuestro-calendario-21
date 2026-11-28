@@ -551,6 +551,21 @@ prueba SQL de resultados, límites, visibilidad y aislamiento aprobada.
 43 pruebas web aprobadas, incluida lógica de los cuatro juegos. Sin nuevo
 APK. Pendiente aceptación táctil en teléfonos físicos.
 
+## Cápsulas del tiempo · fase 10
+
+Pestaña independiente y acceso desde Cartas, configurable en navegación y
+accesos rápidos. Permite sellar un mensaje de hasta 10.000 caracteres con
+título visible, categoría y fecha futura. Metadatos compartidos en Realtime;
+mensaje en tabla separada, sin exposición Realtime, protegido por RLS para
+ambos hasta medianoche de la fecha de apertura en Bogotá. Creación atómica,
+fecha y mensaje inmutables, retiro por autor con confirmación. Listado con
+filtros, cuenta regresiva y lectura bajo demanda. Aviso de creación con ruta
+compatible con Cartas que resuelve a la cápsula; cron cada cinco minutos
+genera un aviso interno de apertura para cada integrante sin duplicados.
+Migración TEST y producción, prueba SQL de sellado, fecha, aislamiento,
+archivo y avisos aprobada. 44 pruebas web aprobadas, incluido flujo DOM.
+Sin APK nuevo. Pendiente aceptación visual y recepción real de push de creación.
+
 ## Próximas fases
 
 9 Juegos de pareja; 10 Cápsulas del tiempo; 11 Nuestra banda sonora;

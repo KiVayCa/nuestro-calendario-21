@@ -23,13 +23,21 @@ test("personalization normalizes lists and preserves required modules", () => {
   const c=context("src/personalization.js");
   const p=c.normalizePersonalPreferences({module_order:["fe","fe","unknown"],hidden_modules:["home","calendar","settings","letters","unknown"],shortcuts:["fe","calendar","story","goals","budget","places","letters"],home_sections:[],density:"compact",text_size:"large",motion:"reduced"});
   assert.equal(p.module_order[0],"fe");
-  assert.equal(new Set(p.module_order).size,20);
+  assert.equal(new Set(p.module_order).size,21);
+  assert.ok(p.module_order.includes("capsulas"));
   assert.ok(p.module_order.includes("juegos"));
   assert.ok(p.shortcuts.includes("dreams"));
   assert.deepEqual(Array.from(p.hidden_modules),["letters"]);
   assert.equal(p.shortcuts.length,6);
   assert.equal(p.home_sections.length,0);
   assert.equal(p.density,"compact");
+});
+test("capsule countdown uses whole calendar days and sealed cards do not render messages",()=>{
+  const c=context("src/capsules.js",{countdownToday:()=>"2026-11-28",esc:s=>String(s).replaceAll('<','&lt;'),dateES:s=>s,user:{id:'one'}});
+  assert.equal(c.capsuleDays('2028-02-29','2028-02-28'),1);
+  assert.equal(c.capsuleDays('2026-11-27'),0);
+  const html=c.renderCapsuleCard({id:'test',created_by:'one',category:'love',title:'<secret>',opens_on:'2026-11-29',message:'private body'},'2026-11-28');
+  assert.match(html,/1<\/strong> día/);assert.match(html,/disabled/);assert.match(html,/&lt;secret>/);assert.doesNotMatch(html,/private body/);
 });
 test("photo framing clamps metadata and keeps the default centered composition",()=>{
   const c=context("src/photo-frame.js");

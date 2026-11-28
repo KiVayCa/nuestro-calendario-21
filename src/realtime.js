@@ -124,6 +124,7 @@ async function setupAdvancedRealtime(force = false) {
     "couple_game_matches",
     "couple_game_private",
     "couple_game_results",
+    "couple_capsules",
     "couple_knowing_answers",
     "couple_connection",
     "couple_adventures",
@@ -166,7 +167,7 @@ async function setupAdvancedRealtime(force = false) {
           const note = payload.new;
           // Future letter rows are hidden by RLS; their safe preview is refreshed via the notification.
           if (note.target_tab === "letters")
-            scheduleRealtimeRefresh(false, ["letters"]);
+            scheduleRealtimeRefresh(false, ["letters","capsules"]);
           if (note.event_type === "knowing_answered")
             scheduleRealtimeRefresh(false, ["knowing"]);
           if (document.visibilityState === "visible")

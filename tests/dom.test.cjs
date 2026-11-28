@@ -58,6 +58,7 @@ const wait = () => new Promise((r) => setTimeout(r, 400));
     "story",
     "memories",
     "letters",
+    "capsulas",
     "dreams",
     "challenges",
     "ideas",
@@ -95,6 +96,19 @@ const wait = () => new Promise((r) => setTimeout(r, 400));
   }
   w.showAdvancedTab("memories");
   await wait();
+  w.showAdvancedTab("capsulas");
+  w.openCapsuleForm();
+  w.document.getElementById("adv_capsule_title").value="Para nuestro aniversario";
+  w.document.getElementById("adv_capsule_message").value="Mensaje secreto <no HTML>";
+  const seal=w.saveCapsule();await new Promise(r=>setTimeout(r,40));w.appDialogClose(true);await seal;
+  const cap=w.__db.couple_capsules[0];
+  assert.equal(w.document.querySelectorAll('.capsuleCard').length,1);
+  assert.ok(w.document.querySelector('.capsuleCard button[onclick="openCapsule(this.dataset.id)"]').disabled);
+  assert.doesNotMatch(w.document.querySelector('.capsuleModule').textContent,/Mensaje secreto/);
+  cap.opens_on='2020-01-01';await w.advLoadAll(['capsules']);w.showAdvancedTab('capsulas');
+  await w.openCapsule(cap.id);assert.equal(w.document.getElementById('capsuleMessage').textContent,'Mensaje secreto <no HTML>');
+  w.closeAdvModal();await new Promise(r=>setTimeout(r,240));
+  w.navigateToItem('letters',cap.id);assert.ok(w.document.querySelector('.capsuleModule'));
   w.showAdvancedTab("vinculo");
   assert.equal(w.document.getElementById("knowingSection"),null);
   w.showAdvancedTab("aventuras");

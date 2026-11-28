@@ -158,6 +158,12 @@
     from: (table) => new Query(table),
     rpc: (name, args) => {
       if (name === "list_couple_letters") return new Query("love_letters").eq("couple_id", args.p_couple_id);
+      if (name === "create_couple_capsule") {
+        const id=crypto.randomUUID();
+        (db.couple_capsules ||= []).push({id,couple_id:args.p_couple_id,created_by:me.id,title:args.p_title,category:args.p_category,opens_on:args.p_opens_on,created_at:now});
+        (db.couple_capsule_messages ||= []).push({capsule_id:id,message:args.p_message});
+        return {data:id,error:null};
+      }
       if (name === "create_future_project") {
         const p={id:"future-one",couple_id:args.p_couple_id,title:args.p_title,description:args.p_description,category:args.p_category,status:args.p_status,target_date:args.p_target_date,goal_id:args.p_goal_id,dream_id:args.p_dream_id,created_at:now};
         (db.couple_future_projects ||= []).push(p);

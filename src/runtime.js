@@ -156,6 +156,7 @@ const validAdvancedTabs = new Set([
   "story",
   "memories",
   "letters",
+  "capsulas",
   "dreams",
   "challenges",
   "ideas",
@@ -186,6 +187,7 @@ let advCache = {
   personalPrefs: [],
   memories: [],
   letters: [],
+  capsules: [],
   letterReactions: [],
   dreams: [],
   challenges: [],
@@ -216,6 +218,7 @@ const advTables = {
   personalPrefs: "couple_personalization",
   memories: "memories",
   letters: "love_letters",
+  capsules: "couple_capsules",
   letterReactions: "letter_reactions",
   dreams: "dreams",
   challenges: "challenges",
@@ -440,6 +443,7 @@ setInterval(() => {
   if (advancedTab === "home") renderAdvanced({ preserveInputs: true });
   if (advancedTab === "fe" && $("faithToday")?.dataset.date !== countdownToday()) renderAdvanced();
   if (advancedTab === "story" && $("storyToday")?.dataset.date !== countdownToday()) renderAdvanced();
+  if (advancedTab === "capsulas" && $("capsuleToday")?.dataset.date !== countdownToday()) renderAdvanced();
   if (advancedTab === "question" && !window.__nc21SelectedQuestionDate) {
     const shownDate = $("dailyQuestionDate")?.dataset.date;
     if (shownDate && shownDate !== todayQuestion().date) renderAdvanced();

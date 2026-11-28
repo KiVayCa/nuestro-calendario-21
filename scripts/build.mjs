@@ -20,6 +20,7 @@ const sources = [
   "game-management",
   "extra-games",
   "solo-games",
+  "capsules",
   "faith-readings",
   "faith",
   "future",

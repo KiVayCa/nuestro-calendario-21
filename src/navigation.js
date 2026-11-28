@@ -99,6 +99,7 @@ function renderAdvanced({ preserveInputs = false } = {}) {
     story: renderAdvStory,
     memories: renderAdvMemories,
     letters: renderAdvLetters,
+    capsulas: renderCapsules,
     dreams: renderDreamsAndGoals,
     challenges: renderAdvChallenges,
     ideas: renderAdvIdeas,
@@ -168,7 +169,9 @@ function closeAdvModal() {
   }
   modal.classList.add("is-closing");
   window.setTimeout(() => {
-    if (modal.classList.contains("is-closing"))
+    if (modal.classList.contains("is-closing")) {
       modal.classList.remove("show", "is-closing");
+      if ($("capsuleDraft") || $("capsuleRead")) $("advModalBody").replaceChildren();
+    }
   }, 210);
 }
