@@ -100,7 +100,11 @@ const wait = () => new Promise((r) => setTimeout(r, 400));
   w.showAdvancedTab("aventuras");
   assert.equal(w.document.querySelector(".gameModule"),null);
   w.showAdvancedTab("juegos");
-  assert.equal(w.document.querySelectorAll(".gameMenu button").length,15);
+  assert.equal(w.document.querySelectorAll(".gameMenu button").length,19);
+  for(const [kind,selector,count] of [["simon",".simonPad",4],["sudoku",".sudokuCell",81],["tile2048",".tile2048",16],["darts",".dartBoard",1]]){w.gamePickMode(kind);w.startExtraSolo(kind);assert.equal(w.document.querySelectorAll(selector).length,count,kind);assert.ok(w.document.querySelector('.moduleHeroActions button[onclick="restartCurrentGame()"]'));}
+  for(let i=0;i<10;i++)w.throwDart();
+  await wait();
+  assert.ok(w.__db.couple_game_results.some(r=>r.kind==='darts'));
   for(const kind of ["ludo","naval","colors","checkers","snakes","hangman"]){w.gamePickMode(kind);assert.match(w.document.querySelector(".gameModule").textContent,/Invitar a jugar/);assert.ok(w.document.querySelector('.moduleHeroActions button[onclick="restartCurrentGame()"]'));}
   w.gamePickMode("trivia");w.startGameQuiz("trivia");
   assert.equal(w.document.querySelectorAll(".gameQuizOptions button").length,4);

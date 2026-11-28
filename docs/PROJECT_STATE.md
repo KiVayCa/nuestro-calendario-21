@@ -540,6 +540,17 @@ completas, reinicio, privacidad y regresiones previas aprobadas en TEST.
 Sin nuevo APK. Pendiente aceptación en dos dispositivos y siguiente bloque:
 Simón dice, Sudoku, 2048 y Dardos.
 
+## Ampliación de juegos · segundo bloque individual
+
+Simón dice (20 rondas), Sudoku con tres dificultades y solución única,
+2048 con controles táctiles y de teclado, y Dardos de precisión con diez
+lanzamientos. Total: 19 juegos. Récord personal y de la pareja en cada ficha,
+resultados compartidos al terminar y confirmación antes de reiniciar.
+Migración de tipos y límites de puntuación aplicada en TEST y producción;
+prueba SQL de resultados, límites, visibilidad y aislamiento aprobada.
+43 pruebas web aprobadas, incluida lógica de los cuatro juegos. Sin nuevo
+APK. Pendiente aceptación táctil en teléfonos físicos.
+
 ## Próximas fases
 
 9 Juegos de pareja; 10 Cápsulas del tiempo; 11 Nuestra banda sonora;
