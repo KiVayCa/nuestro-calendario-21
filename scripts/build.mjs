@@ -25,6 +25,7 @@ const sources = [
   "spotify-connect",
   "wedding",
   "smart-memories",
+  "life-book",
   "faith-readings",
   "faith",
   "future",

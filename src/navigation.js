@@ -98,6 +98,7 @@ function renderAdvanced({ preserveInputs = false } = {}) {
     matrimonio: renderWedding,
     home: renderAdvHome,
     story: renderAdvStory,
+    libro: renderLifeBook,
     memories: renderAdvMemories,
     letters: renderAdvLetters,
     capsulas: renderCapsules,

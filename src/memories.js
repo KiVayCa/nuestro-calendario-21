@@ -10,7 +10,7 @@ function renderAdvMemories() {
       "📸 Nuevo recuerdo",
       "openMemoryForm()",
     ) +
-    renderSmartMemories() + memoryFilterToolbar() + smartMemoryViewControls() + '<button type="button" class="btn" onclick="openAlbumExport()">Exportar álbum o collage</button>' +
+    renderSmartMemories() + memoryFilterToolbar() + smartMemoryViewControls() + '<button type="button" class="btn" onclick="openAlbumExport()">Exportar álbum o collage</button><button type="button" class="btn" onclick="showAdvancedTab(\'libro\')">📚 Libro de nuestra vida</button>' +
     (smartMemoryView==='gallery'?renderSmartGallery(filteredMemories()):`<div class="advList">${
       filteredMemories().length
         ? filteredMemories()

@@ -23,7 +23,8 @@ test("personalization normalizes lists and preserves required modules", () => {
   const c=context("src/personalization.js");
   const p=c.normalizePersonalPreferences({module_order:["fe","fe","unknown"],hidden_modules:["home","calendar","settings","letters","unknown"],shortcuts:["fe","calendar","story","goals","budget","places","letters"],home_sections:[],density:"compact",text_size:"large",motion:"reduced"});
   assert.equal(p.module_order[0],"fe");
-  assert.equal(new Set(p.module_order).size,23);
+  assert.equal(new Set(p.module_order).size,24);
+  assert.ok(p.module_order.includes('libro'));
   assert.ok(p.module_order.includes("matrimonio"));
   assert.ok(p.module_order.includes("musica"));
   assert.ok(p.module_order.includes("capsulas"));
@@ -33,6 +34,16 @@ test("personalization normalizes lists and preserves required modules", () => {
   assert.equal(p.shortcuts.length,6);
   assert.equal(p.home_sections.length,0);
   assert.equal(p.density,"compact");
+});
+test('life book groups chronological chapters and filters selected moments',()=>{
+ const c=context('src/life-book.js');const entries=[{kind:'plan',date:'2026-11-28',title:'Later'},{kind:'memory',date:'2026-01-21',title:'First',favorite:true},{kind:'memory',date:'2026-11-01',title:'Earlier'},{kind:'letter',date:'2026-02-01',title:'Letter'}];
+ const groups=c.lifeBookChapters(entries,{kinds:['plan','memory'],from:'',to:'',favorites:false});assert.deepEqual(Array.from(groups,g=>g[0]),['2026-01','2026-11']);assert.deepEqual(Array.from(groups[1][1],e=>e.title),['Earlier','Later']);assert.equal(c.lifeBookChapters(entries,{kinds:['memory'],from:'2026-02-01',to:'',favorites:false}).length,1);assert.equal(c.lifeBookChapters(entries,{kinds:['memory'],favorites:true}).length,1);
+});
+test('life book PDF renderer includes cover, chapter and original moment text',async()=>{
+ const painted=[];const canvas={width:900,height:1273,toBlob(cb){cb(new Blob(['mock jpeg']));}};const ctx={canvas,fillRect(){},strokeRect(){},fillText(s){painted.push(String(s));},measureText(s){return {width:s.length*13};}};canvas.getContext=()=>ctx;
+ const c=context('src/album-export.js',{document:{createElement:()=>canvas},Blob,TextEncoder,advCache:{places:[]},dateES:s=>s});
+ const result=await c.buildMemoryAlbum([['2026-11',[{title:'Un día juntos',memory_date:'2026-11-21',description:'Nuestro recuerdo'}]]],()=>{},()=>true,'Nuestro libro','Para siempre','Libro de nuestra vida');
+ assert.equal(result.blob.type,'application/pdf');assert.match(await result.blob.text(),/\/Count 3/);assert.ok(painted.includes('Nuestro libro'));assert.ok(painted.includes('Para siempre'));assert.ok(painted.includes('Nuestro recuerdo'));
 });
 test("capsule countdown uses whole calendar days and sealed cards do not render messages",()=>{
   const c=context("src/capsules.js",{countdownToday:()=>"2026-11-28",esc:s=>String(s).replaceAll('<','&lt;'),dateES:s=>s,user:{id:'one'}});

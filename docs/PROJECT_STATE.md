@@ -661,6 +661,20 @@ se resuelven por el mecanismo privado existente, sin análisis externo.
 56 pruebas web aprobadas, incluidos filtros, presentación, agrupación y
 deduplicación. Sin esquema nuevo ni APK; pendiente aceptación visual.
 
+## Libro de nuestra vida · fase 14
+
+Pestaña Nuestro libro con portada, índice y capítulos mensuales cronológicos
+generados desde Historia (recuerdos, aventuras, planes realizados, fechas,
+sueños y retos cumplidos, y referencia a cartas abiertas sin su contenido).
+No incluye notas privadas ni cápsulas. Enlaces al registro original,
+personalización de título, dedicatoria, periodo, tipos y favoritos por
+cuenta en el dispositivo. PDF generado bajo demanda con el motor local
+del álbum, sin enviar datos a un servicio externo. Sin duplicación de
+registros, nueva tabla ni APK. 58 pruebas web, incluido flujo DOM y
+estructura PDF con canvas simulado; pendiente validar descarga real en
+teléfonos. Al terminar esta fase, recordar conversar con Nicolás los
+ajustes adicionales antes de empezar la fase 15 Android.
+
 ## Próximas fases
 
 9 Juegos de pareja; 10 Cápsulas del tiempo; 11 Nuestra banda sonora;

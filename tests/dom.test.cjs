@@ -57,6 +57,7 @@ const wait = () => new Promise((r) => setTimeout(r, 400));
     "calendar",
     "story",
     "memories",
+    "libro",
     "letters",
     "capsulas",
     "musica",
@@ -98,6 +99,10 @@ const wait = () => new Promise((r) => setTimeout(r, 400));
   }
   w.showAdvancedTab("memories");
   await wait();
+  w.showAdvancedTab('libro');assert.ok(w.document.querySelector('.lifeBookCover'));
+  w.lifeBookTurn(1);assert.ok(w.document.querySelector('.lifeBookEntry'));
+  w.openLifeBookSettings();w.document.getElementById('adv_book_title').value='Nuestra historia de amor';w.saveLifeBookSettings();assert.match(w.document.querySelector('.lifeBookCover').textContent,/Nuestra historia de amor/);
+  w.showAdvancedTab('memories');
   assert.ok(w.document.querySelector('#smartMemoriesToday'));
   w.smartMemorySetView('gallery');assert.ok(w.document.querySelector('.smartGalleryTile'));
   w.openSmartSlideshow();assert.ok(w.document.querySelector('.smartSlideshow img'));w.closeAdvModal();

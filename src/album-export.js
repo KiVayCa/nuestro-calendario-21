@@ -335,6 +335,8 @@ async function buildMemoryAlbum(
   progress,
   stillSignedIn,
   title = "Todo lo que vivimos",
+  dedication = "A veces, lo más bonito de un día es recordarlo juntos.",
+  section = "Álbum de recuerdos",
 ) {
   const canvas = albumCanvas(900, 1273);
   const ctx = canvas.getContext("2d");
@@ -349,7 +351,7 @@ async function buildMemoryAlbum(
     });
   };
   const count = groups.reduce((sum, [, memories]) => sum + memories.length, 0);
-  albumPage(ctx, 1, "Álbum de recuerdos");
+  albumPage(ctx, 1, section);
   ctx.fillStyle = "#b56874";
   ctx.font = "96px Georgia, serif";
   ctx.fillText("♡", 70, 405);
@@ -358,17 +360,18 @@ async function buildMemoryAlbum(
   ctx.font = "30px Georgia, serif";
   albumText(
     ctx,
-    "A veces, lo más bonito de un día es recordarlo juntos.",
+    dedication,
     72,
-    630,
+    700,
     700,
     43,
+    8,
   );
   ctx.font = "bold 24px sans-serif";
   ctx.fillText(
-    `${groups.length} ${groups.length === 1 ? "mes" : "meses"} · ${count} ${count === 1 ? "recuerdo" : "recuerdos"}`,
+    `${groups.length} ${groups.length === 1 ? "mes" : "meses"} · ${count} ${section === 'Libro de nuestra vida' ? (count===1?'momento':'momentos') : (count===1?'recuerdo':'recuerdos')}`,
     72,
-    810,
+    1050,
   );
   ctx.font = "22px sans-serif";
   const first = albumMonthLabel(groups[0][0]);
@@ -377,7 +380,7 @@ async function buildMemoryAlbum(
     ctx,
     first === last ? first : `${first} — ${last}`,
     72,
-    854,
+    1094,
     756,
     34,
   );
@@ -390,7 +393,7 @@ async function buildMemoryAlbum(
     const y = albumHeading(ctx, label[0].toUpperCase() + label.slice(1), 390);
     ctx.font = "bold 26px sans-serif";
     ctx.fillText(
-      `${memories.length} ${memories.length === 1 ? "recuerdo" : "recuerdos"} · ${photos} ${photos === 1 ? "foto" : "fotos"}`,
+      `${memories.length} ${section === 'Libro de nuestra vida' ? (memories.length===1?'momento':'momentos') : (memories.length===1?'recuerdo':'recuerdos')} · ${photos} ${photos === 1 ? "foto" : "fotos"}`,
       72,
       y + 32,
     );

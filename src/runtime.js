@@ -155,6 +155,7 @@ const validAdvancedTabs = new Set([
   "matrimonio",
   "calendar",
   "story",
+  "libro",
   "memories",
   "letters",
   "capsulas",
@@ -454,6 +455,7 @@ setInterval(() => {
   if (advancedTab === "capsulas" && $("capsuleToday")?.dataset.date !== countdownToday()) renderAdvanced();
   if (advancedTab === "matrimonio" && $("weddingToday")?.dataset.date !== countdownToday()) renderAdvanced();
   if (advancedTab === "memories" && $("smartMemoriesToday")?.dataset.date !== countdownToday()) renderAdvanced();
+  if (advancedTab === "libro" && $("lifeBookToday")?.dataset.date !== countdownToday()) renderAdvanced();
   if (advancedTab === "question" && !window.__nc21SelectedQuestionDate) {
     const shownDate = $("dailyQuestionDate")?.dataset.date;
     if (shownDate && shownDate !== todayQuestion().date) renderAdvanced();

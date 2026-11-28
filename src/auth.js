@@ -169,6 +169,8 @@ async function init() {
         futureFilter = "all";
         weddingFilter = "overview";
         smartMemoryView='list';smartSlideshowIds=[];smartSlideshowIndex=0;memoryFilters={query:'',year:'',favorites:false};
+        lifeBookPage=0;lifeBookDraft=null;
+        if($('lifeBookDraft')){$('advModalBody').replaceChildren();$('advModal').classList.remove('show','is-closing');}
         if($('advModal')?.querySelector('.smartSlideshow,.smartSuggestionList')){$('advModalBody').replaceChildren();$('advModal').classList.remove('show','is-closing');}
         storyFilters = {month:"",kind:"all",query:"",favorites:false,view:"timeline",order:"newest"};
         personalDraft = null;
