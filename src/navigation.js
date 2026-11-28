@@ -100,7 +100,7 @@ function renderAdvanced({ preserveInputs = false } = {}) {
     memories: renderAdvMemories,
     letters: renderAdvLetters,
     capsulas: renderCapsules,
-    musica: renderSoundtrack,
+    musica: () => renderSoundtrack().replace('<div class="advCard musicPlaylist">', spotifyPanel()+'<div class="advCard musicPlaylist">'),
     dreams: renderDreamsAndGoals,
     challenges: renderAdvChallenges,
     ideas: renderAdvIdeas,

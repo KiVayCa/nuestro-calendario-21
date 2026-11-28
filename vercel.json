@@ -1,7 +1,9 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": "public",
+  "rewrites": [{"source":"/spotify-callback","destination":"/index.html"}],
   "headers": [
+    {"source":"/spotify-callback","headers":[{"key":"Cache-Control","value":"no-store"},{"key":"Referrer-Policy","value":"no-referrer"}]},
     {
       "source": "/android-release.json",
       "headers": [

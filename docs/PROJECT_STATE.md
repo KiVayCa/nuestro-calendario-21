@@ -583,6 +583,23 @@ de categorías, URLs, aislamiento y edición aprobada; 45 pruebas web
 aprobadas. Sin nuevo APK. Pendiente probar reproducción en sus teléfonos
 y valorar OAuth para gestión avanzada con autorización individual.
 
+## Spotify Premium · integración avanzada
+
+Client ID público proporcionado por Nicolás; OAuth oficial Authorization Code
+con PKCE (sin Client Secret), callback HTTPS `/spotify-callback`, estado aleatorio
+de un uso ligado a cuenta y pareja y vencimiento de diez minutos. Tokens de
+Spotify únicamente en sessionStorage de la pestaña, renovación serializada y
+desvinculación al cerrar sesión. No se escriben en Supabase, repositorio ni logs.
+Buscador de canciones/artistas (tracks), listado paginado de la playlist,
+añadir una canción mediante API oficial, dedicatoria con datos de búsqueda,
+Web Playback SDK con controles de reproducción y mini reproductor persistente
+entre módulos. Sin cambio de base de datos ni APK. 49 pruebas web aprobadas,
+incluido intercambio PKCE simulado, aislamiento de cuenta y renovación.
+Pendiente autorización real individual (Dashboard con usuarios habilitados),
+validar permisos colaborativos y reproducción completa en Android/PC. La
+reproducción depende de Premium, DRM, navegador y Spotify; queda el reproductor
+embebido y enlace externo como alternativa. No sincronización audiovisual.
+
 ## Próximas fases
 
 9 Juegos de pareja; 10 Cápsulas del tiempo; 11 Nuestra banda sonora;

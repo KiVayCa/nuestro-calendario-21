@@ -22,6 +22,7 @@ const sources = [
   "solo-games",
   "capsules",
   "soundtrack",
+  "spotify-connect",
   "faith-readings",
   "faith",
   "future",
