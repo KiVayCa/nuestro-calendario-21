@@ -239,7 +239,7 @@ async function initAdvanced() {
     history.replaceState(null, "", cleanUrl.href);
   }
   if (!maybeOfferAndroidPushLink()) maybeOfferWidgetLink();
-  await spotifyCompleteAuth();
+  if(spotifyCallback)await spotifyCompleteAuth();else void spotifyCompleteAuth();
   $("advModal")?.addEventListener("click", (e) => {
     if (e.target === $("advModal")) closeAdvModal();
   });

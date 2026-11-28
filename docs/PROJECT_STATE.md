@@ -600,6 +600,25 @@ validar permisos colaborativos y reproducción completa en Android/PC. La
 reproducción depende de Premium, DRM, navegador y Spotify; queda el reproductor
 embebido y enlace externo como alternativa. No sincronización audiovisual.
 
+## Spotify · vínculo persistente y catálogo ampliado
+
+La autorización PKCE pasa por `/api/spotify-link`, autenticada con Supabase
+y membresía. Guarda por usuario los tokens cifrados AES-256-GCM (AAD de
+identidad, clave sensible de Vercel solo producción), tabla con RLS sin
+políticas deliberadamente y permisos exclusivamente service_role. No hay
+Realtime ni credenciales en el cliente salvo el access token temporal en
+memoria. El servidor renueva con bloqueo de versión y conserva el refresh
+rotado; al iniciar sesión recupera el vínculo incluso en otro dispositivo.
+Migra el refresh previo si sigue abierto; desvinculación explícita desde
+Configuración o Música elimina el vínculo, cierre de sesión solo limpia
+el estado local. Spotify exige reautorización cada seis meses o si revoca
+el permiso. Búsqueda por canciones, álbumes, artistas y playlists con
+reproducción de contexto y enlaces oficiales. Se mantienen dedicatorias y
+añadir canciones a playlist. Migración TEST y producción; verificados
+permisos deny-by-default y 54 pruebas web/servidor (simuladas), incluido
+cifrado, separación y recuperación. Sin APK. Pendiente validar con ambas
+cuentas reales, cierre completo y segundo dispositivo.
+
 ## Próximas fases
 
 9 Juegos de pareja; 10 Cápsulas del tiempo; 11 Nuestra banda sonora;

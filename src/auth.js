@@ -152,7 +152,7 @@ async function init() {
         user = null;
 
         couple = null;
-        spotifyDisconnect();
+        spotifyLocalReset();
 
         plans = [];
         dataLoadRevision++;
