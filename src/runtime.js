@@ -175,6 +175,7 @@ if(advancedTab==="ideas"){advancedTab="aventuras";adventureFilter="discover";}
 if(advancedTab==="goals"){advancedTab="dreams";dreamsGoalsView="savings";}
 let advCache = {
   gameMatches: [],
+  gamePrivate: [],
   gameResults: [],
   knowing: [],
   connection: [],
@@ -204,6 +205,7 @@ let budgetSelectedMonth =
   String(new Date().getMonth() + 1).padStart(2, "0");
 const advTables = {
   gameMatches: "couple_game_matches",
+  gamePrivate: "couple_game_private",
   gameResults: "couple_game_results",
   knowing: "couple_knowing_answers",
   connection: "couple_connection",

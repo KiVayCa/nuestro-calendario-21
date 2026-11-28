@@ -163,6 +163,7 @@ async function init() {
         bondMoodHistoryOpen=false;bondMoodHistoryLimit=30;bondMoreMoodsOpen=false;
         adventureFilter = "all";
         gameMode="menu";gameActiveId=null;gameSolo=null;
+        extraSelected=null;
         dreamsGoalsView = "dreams";
         futureFilter = "all";
         storyFilters = {month:"",kind:"all",query:"",favorites:false,view:"timeline",order:"newest"};

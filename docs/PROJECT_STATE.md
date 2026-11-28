@@ -524,6 +524,22 @@ al nuevo tablero. Eliminación del historial sigue requiriendo confirmación.
 Migración TEST y producción; prueba SQL de los cuatro juegos y aislamiento,
 39 pruebas web aprobadas, incluida cancelación y confirmación. Sin nuevo APK.
 
+## Ampliación de juegos · primer bloque multijugador
+
+Se incorporan seis juegos de dos jugadores: Parchís (variante de ruta de
+40 pasos, cuatro fichas), Batalla naval (5×5, tres barcos de dos casillas),
+Cartas de colores (números 0–9, cuatro colores, sin cartas especiales), Damas
+8×8 con captura obligatoria y coronación, Escaleras y serpientes hasta 100,
+y Ahorcado romántico con puntuación compartida. Total: 15 juegos. Se mantienen
+invitaciones, turnos, historial, instrucciones, reinicio confirmado y archivo.
+Cartas y barcos se almacenan por usuario con RLS; palabra oculta en esquema
+privado, RLS sin políticas deliberadamente. El servidor valida turnos,
+movimientos, sorteos y resultados. Migración TEST y producción; partidas
+completas, reinicio, privacidad y regresiones previas aprobadas en TEST.
+39 pruebas web aprobadas, incluida visualización de los seis nuevos tableros.
+Sin nuevo APK. Pendiente aceptación en dos dispositivos y siguiente bloque:
+Simón dice, Sudoku, 2048 y Dardos.
+
 ## Próximas fases
 
 9 Juegos de pareja; 10 Cápsulas del tiempo; 11 Nuestra banda sonora;

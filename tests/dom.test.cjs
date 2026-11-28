@@ -100,7 +100,8 @@ const wait = () => new Promise((r) => setTimeout(r, 400));
   w.showAdvancedTab("aventuras");
   assert.equal(w.document.querySelector(".gameModule"),null);
   w.showAdvancedTab("juegos");
-  assert.equal(w.document.querySelectorAll(".gameMenu button").length,9);
+  assert.equal(w.document.querySelectorAll(".gameMenu button").length,15);
+  for(const kind of ["ludo","naval","colors","checkers","snakes","hangman"]){w.gamePickMode(kind);assert.match(w.document.querySelector(".gameModule").textContent,/Invitar a jugar/);assert.ok(w.document.querySelector('.moduleHeroActions button[onclick="restartCurrentGame()"]'));}
   w.gamePickMode("trivia");w.startGameQuiz("trivia");
   assert.equal(w.document.querySelectorAll(".gameQuizOptions button").length,4);
   w.gameAnswer(0);assert.ok(w.document.querySelector(".gameQuizOptions .gameCorrect"));
@@ -135,6 +136,11 @@ const wait = () => new Promise((r) => setTimeout(r, 400));
   await removeGame;
   assert.ok(w.__db.couple_game_matches[0].archived_at);
   assert.equal(w.document.querySelector(".gameTic"),null);
+  const extraBoards={ludo:[Array(8).fill(-1),{die:0,legal:[]}],naval:[Array(50).fill(0),{}],colors:[[],{top:13,counts:[7,7]}],checkers:[Array(64).fill(0),{legal:[64]}],snakes:[[0,0],{die:1}],hangman:[[],{mask:"____",misses:0,scores:[0,0]}]};
+  for(const [kind,[board,game_state]] of Object.entries(extraBoards))w.__db.couple_game_matches.push({id:"extra-"+kind,couple_id:"pair",kind,created_by:"user-one",opponent_id:"user-two",turn_user_id:"user-one",board,game_state,status:"active",move_count:0,created_at:"2026-11-28T12:00:00Z"});
+  w.__db.couple_game_private=[{id:"hand-one",match_id:"extra-colors",couple_id:"pair",user_id:"user-one",payload:[13,14,15,16,17,18,19],created_at:"2026-11-28T12:00:00Z"}];
+  await w.advLoadAll(["gameMatches","gamePrivate"]);
+  for(const [kind,selector,count] of [["ludo",".ludoTile",40],["naval",".navalCell",50],["colors",".colorHand button",7],["checkers",".checkerCell",64],["snakes",".snakeTile",100],["hangman",".hangmanLetters button",26]]){w.gamePickMode(kind);assert.equal(w.document.querySelectorAll(selector).length,count,kind);}
   w.showAdvancedTab("aventuras");
   w.setAdventureFilter("all");
   w.showTodayDailyQuestion();
