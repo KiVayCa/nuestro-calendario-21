@@ -619,6 +619,16 @@ permisos deny-by-default y 54 pruebas web/servidor (simuladas), incluido
 cifrado, separación y recuperación. Sin APK. Pendiente validar con ambas
 cuentas reales, cierre completo y segundo dispositivo.
 
+## Spotify · cerrar y reabrir reproductor
+
+Botón ✕ del minirreproductor pausa la reproducción y oculta sus controles
+sin desvincular Spotify. Nuestra música ofrece «Abrir reproductor» para
+retomar la canción; elegir otra canción vuelve a mostrarlo. El SDK y el
+minirreproductor quedan fuera del contenido que cambia al navegar. Prueba
+DOM de navegación a Calendario y Recuerdos sin pausa, cierre y reapertura
+con vínculo conservado; 54 pruebas aprobadas. Sin APK nuevo; pendiente
+aceptación de audio real en dispositivos.
+
 ## Próximas fases
 
 9 Juegos de pareja; 10 Cápsulas del tiempo; 11 Nuestra banda sonora;
