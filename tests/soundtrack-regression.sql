@@ -1,0 +1,22 @@
+begin;
+insert into auth.users(id,email) values ('11000000-0000-4000-8000-000000000101','music-a@example.invalid'),('11000000-0000-4000-8000-000000000102','music-b@example.invalid'),('11000000-0000-4000-8000-000000000103','music-c@example.invalid');
+insert into public.couples(id,name,created_by) values ('21000000-0000-4000-8000-000000000101','Music test','11000000-0000-4000-8000-000000000101'),('21000000-0000-4000-8000-000000000103','Other test','11000000-0000-4000-8000-000000000103');
+insert into public.couple_members(couple_id,user_id) values ('21000000-0000-4000-8000-000000000101','11000000-0000-4000-8000-000000000101'),('21000000-0000-4000-8000-000000000101','11000000-0000-4000-8000-000000000102'),('21000000-0000-4000-8000-000000000103','11000000-0000-4000-8000-000000000103');
+insert into public.memories(id,couple_id,created_by,title,memory_date) values ('31000000-0000-4000-8000-000000000101','21000000-0000-4000-8000-000000000101','11000000-0000-4000-8000-000000000101','Own memory',current_date),('31000000-0000-4000-8000-000000000103','21000000-0000-4000-8000-000000000103','11000000-0000-4000-8000-000000000103','Other memory',current_date);
+set local role authenticated;
+select set_config('request.jwt.claim.sub','11000000-0000-4000-8000-000000000101',true);
+insert into public.couple_music(couple_id,created_by,kind,title,spotify_id) select '21000000-0000-4000-8000-000000000101',auth.uid(),kind,kind,'1234567890123456789012' from unnest(array['playlist','our_song','dedication','favorite','wedding']) kind;
+insert into public.couple_music(couple_id,created_by,kind,title,spotify_id,memory_id) values ('21000000-0000-4000-8000-000000000101',auth.uid(),'memory','Song','1234567890123456789012','31000000-0000-4000-8000-000000000101');
+insert into public.couple_music(couple_id,created_by,kind,title,jam_url) values ('21000000-0000-4000-8000-000000000101',auth.uid(),'jam','Jam','https://spotify.link/abc123');
+do $$ begin
+ begin insert into public.couple_music(couple_id,created_by,kind,title,spotify_id,memory_id) values ('21000000-0000-4000-8000-000000000101',auth.uid(),'memory','Other','1234567890123456789012','31000000-0000-4000-8000-000000000103');raise exception 'Foreign memory allowed';exception when insufficient_privilege then null;end;
+ begin insert into public.couple_music(couple_id,created_by,kind,title,jam_url) values ('21000000-0000-4000-8000-000000000101',auth.uid(),'jam','Invalid','https://spotify.link.evil.invalid/abc');raise exception 'Invalid URL accepted';exception when check_violation then null;end;
+ begin insert into public.couple_music(couple_id,created_by,kind,title,spotify_id) values ('21000000-0000-4000-8000-000000000101',auth.uid(),'playlist','Duplicate','1234567890123456789012');raise exception 'Duplicate playlist allowed';exception when unique_violation then null;end;
+end $$;
+select set_config('request.jwt.claim.sub','11000000-0000-4000-8000-000000000102',true);
+do $$ begin if (select count(*) from public.couple_music where couple_id='21000000-0000-4000-8000-000000000101')<>7 then raise exception 'Partner visibility failed';end if; update public.couple_music set title='Updated playlist' where kind='playlist';if not found then raise exception 'Shared edit failed';end if;update public.couple_music set title='Other' where kind='dedication';if found then raise exception 'Partner dedication edit allowed';end if;delete from public.couple_music where kind='dedication';if found then raise exception 'Partner deletion allowed';end if;end $$;
+select set_config('request.jwt.claim.sub','11000000-0000-4000-8000-000000000103',true);
+do $$ begin if exists(select 1 from public.couple_music where couple_id='21000000-0000-4000-8000-000000000101') then raise exception 'Outside access';end if;end $$;
+reset role;
+rollback;
+select 'Soundtrack kinds, shared settings, safe URLs, memory links and isolation passed' as result;

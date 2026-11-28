@@ -23,7 +23,8 @@ test("personalization normalizes lists and preserves required modules", () => {
   const c=context("src/personalization.js");
   const p=c.normalizePersonalPreferences({module_order:["fe","fe","unknown"],hidden_modules:["home","calendar","settings","letters","unknown"],shortcuts:["fe","calendar","story","goals","budget","places","letters"],home_sections:[],density:"compact",text_size:"large",motion:"reduced"});
   assert.equal(p.module_order[0],"fe");
-  assert.equal(new Set(p.module_order).size,21);
+  assert.equal(new Set(p.module_order).size,22);
+  assert.ok(p.module_order.includes("musica"));
   assert.ok(p.module_order.includes("capsulas"));
   assert.ok(p.module_order.includes("juegos"));
   assert.ok(p.shortcuts.includes("dreams"));
@@ -38,6 +39,16 @@ test("capsule countdown uses whole calendar days and sealed cards do not render 
   assert.equal(c.capsuleDays('2026-11-27'),0);
   const html=c.renderCapsuleCard({id:'test',created_by:'one',category:'love',title:'<secret>',opens_on:'2026-11-29',message:'private body'},'2026-11-28');
   assert.match(html,/1<\/strong> día/);assert.match(html,/disabled/);assert.match(html,/&lt;secret>/);assert.doesNotMatch(html,/private body/);
+});
+test("Spotify links accept only the intended Spotify resource and Jam hosts",()=>{
+ const c=context('src/soundtrack.js');const id='1234567890123456789012';
+ assert.equal(c.musicSpotifyId('https://open.spotify.com/playlist/'+id+'?si=abc','playlist'),id);
+ assert.equal(c.musicSpotifyId('spotify:track:'+id),id);
+ assert.equal(c.musicSpotifyId('https://open.spotify.com.evil.invalid/track/'+id),null);
+ assert.equal(c.musicSpotifyId('https://open.spotify.com/playlist/'+id),null);
+ assert.equal(c.musicSpotifyId('http://open.spotify.com/track/'+id),null);
+ assert.equal(c.musicJamUrl('https://spotify.link/abc123'),'https://spotify.link/abc123');
+ assert.equal(c.musicJamUrl('https://spotify.link.evil.invalid/abc123'),null);
 });
 test("photo framing clamps metadata and keeps the default centered composition",()=>{
   const c=context("src/photo-frame.js");

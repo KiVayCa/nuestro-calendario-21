@@ -566,6 +566,23 @@ Migración TEST y producción, prueba SQL de sellado, fecha, aislamiento,
 archivo y avisos aprobada. 44 pruebas web aprobadas, incluido flujo DOM.
 Sin APK nuevo. Pendiente aceptación visual y recepción real de push de creación.
 
+## Nuestra banda sonora · fase 11, integración inicial
+
+Pestaña Nuestra música, configurable, con reproductor oficial de la playlist
+de Spotify y enlace externo. La playlist proporcionada por Nicolás se
+validó mediante oEmbed y quedó configurada en producción exclusivamente en
+su pareja, no en el bundle. Ambos pueden cambiar playlist y Nuestra canción.
+Dedicatorias con mensaje y avisos, favoritas, música de boda, canciones
+asociadas a recuerdos (enlaces bidireccionales) e invitaciones Jam copiadas
+desde Spotify, con historial y filtros. No se almacena audio, credenciales
+ni tokens Spotify; no hay sincronización de reproducción propia ni edición
+de playlists por API. Reproducción completa depende de Spotify y su sesión;
+en móvil siempre existe enlace para abrir Spotify. RLS por membresía,
+identidad y vínculo de recuerdo; migración TEST y producción. Prueba SQL
+de categorías, URLs, aislamiento y edición aprobada; 45 pruebas web
+aprobadas. Sin nuevo APK. Pendiente probar reproducción en sus teléfonos
+y valorar OAuth para gestión avanzada con autorización individual.
+
 ## Próximas fases
 
 9 Juegos de pareja; 10 Cápsulas del tiempo; 11 Nuestra banda sonora;

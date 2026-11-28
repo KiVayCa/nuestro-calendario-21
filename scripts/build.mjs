@@ -21,6 +21,7 @@ const sources = [
   "extra-games",
   "solo-games",
   "capsules",
+  "soundtrack",
   "faith-readings",
   "faith",
   "future",

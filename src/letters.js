@@ -90,6 +90,7 @@ function renderAdvLetters() {
       "openLetterForm()",
     ) +
     '<div class="advCard"><h3>⏳ Cápsulas del tiempo</h3><p>Guarden un mensaje para abrir juntos en una fecha especial.</p><button class="btn" onclick="showAdvancedTab(\'capsulas\')">Ver cápsulas</button></div>' +
+    '<div class="advCard"><h3>🎶 Nuestra banda sonora</h3><p>Dedica una canción con un mensaje.</p><button class="btn" onclick="showAdvancedTab(\'musica\')">Ir a nuestra música</button></div>' +
     `<div class="advList">${
       advCache.letters.length
         ? advCache.letters

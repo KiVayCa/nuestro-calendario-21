@@ -1,6 +1,6 @@
 function memoryAdventureLinks(memory) {
   return (advCache.adventures||[]).filter(a=>a.memory_id===memory.id)
-    .map(a=>`<button class="btn" data-adventure="${esc(a.id)}" onclick="navigateToItem('aventuras',this.dataset.adventure)">🧭 Ver experiencia</button>`).join("");
+    .map(a=>`<button class="btn" data-adventure="${esc(a.id)}" onclick="navigateToItem('aventuras',this.dataset.adventure)">🧭 Ver experiencia</button>`).join("") + (advCache.music||[]).filter(r=>r.kind==='memory'&&r.memory_id===memory.id).map(r=>`<button class="btn" data-id="${esc(r.id)}" onclick="navigateToItem('musica',this.dataset.id)">🎶 ${esc(r.title)}</button>`).join("") + `<button class="btn" data-id="${esc(memory.id)}" onclick="openMusicForm('memory','',this.dataset.id)">＋ Canción</button>`;
 }
 function renderAdvMemories() {
   return (

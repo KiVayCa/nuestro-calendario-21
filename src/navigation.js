@@ -100,6 +100,7 @@ function renderAdvanced({ preserveInputs = false } = {}) {
     memories: renderAdvMemories,
     letters: renderAdvLetters,
     capsulas: renderCapsules,
+    musica: renderSoundtrack,
     dreams: renderDreamsAndGoals,
     challenges: renderAdvChallenges,
     ideas: renderAdvIdeas,
@@ -171,7 +172,7 @@ function closeAdvModal() {
   window.setTimeout(() => {
     if (modal.classList.contains("is-closing")) {
       modal.classList.remove("show", "is-closing");
-      if ($("capsuleDraft") || $("capsuleRead")) $("advModalBody").replaceChildren();
+      if ($("capsuleDraft") || $("capsuleRead") || $("musicDraft") || modal.querySelector('.musicPlayer')) $("advModalBody").replaceChildren();
     }
   }, 210);
 }

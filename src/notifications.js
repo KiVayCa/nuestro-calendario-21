@@ -144,6 +144,7 @@ async function openNotificationTarget(id, tab) {
   await markNotificationRead(id);
   if(notification?.event_type === "knowing_answered") return openKnowingFromQuestion();
   if(notification?.event_type?.startsWith("capsule_")){await advLoadAll(["capsules"]);tab="capsulas";}
+  if(notification?.event_type?.startsWith("music_")){await advLoadAll(["music"]);tab="musica";}
   navigateToItem(
     tab,
     notification?.target_id,

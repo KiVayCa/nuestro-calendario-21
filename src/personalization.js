@@ -1,7 +1,7 @@
 const personalModules={
   home:"🏠 Inicio",vinculo:"💞 Nuestro vínculo",aventuras:"🧭 Nuestras aventuras",juegos:"🎮 Juegos",fe:"🙏 Nuestra fe",
   futuro:"🌱 Nuestro futuro",calendar:"🗓️ Calendario",story:"📖 Historia",memories:"📸 Recuerdos",
-  letters:"💌 Cartas",capsulas:"⏳ Cápsulas del tiempo",dreams:"✨ Sueños y metas",challenges:"🎯 Retos",dates:"📅 Fechas",
+  letters:"💌 Cartas",capsulas:"⏳ Cápsulas del tiempo",musica:"🎶 Nuestra música",dreams:"✨ Sueños y metas",challenges:"🎯 Retos",dates:"📅 Fechas",
   budget:"🧾 Presupuesto",question:"💭 Pregunta",places:"📍 Lugares",
   analysis:"📊 Análisis",achievements:"🏆 Logros",private:"🔐 Privado",settings:"⚙️ Configuración"
 };

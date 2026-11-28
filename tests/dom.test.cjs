@@ -59,6 +59,7 @@ const wait = () => new Promise((r) => setTimeout(r, 400));
     "memories",
     "letters",
     "capsulas",
+    "musica",
     "dreams",
     "challenges",
     "ideas",
@@ -109,6 +110,12 @@ const wait = () => new Promise((r) => setTimeout(r, 400));
   await w.openCapsule(cap.id);assert.equal(w.document.getElementById('capsuleMessage').textContent,'Mensaje secreto <no HTML>');
   w.closeAdvModal();await new Promise(r=>setTimeout(r,240));
   w.navigateToItem('letters',cap.id);assert.ok(w.document.querySelector('.capsuleModule'));
+  w.__db.couple_music=[{id:'playlist-one',couple_id:'pair',created_by:'user-one',kind:'playlist',title:'Ella y yo',spotify_id:'1234567890123456789012',created_at:'2026-11-28T12:00:00Z'}];
+  await w.advLoadAll(['music']);w.showAdvancedTab('musica');
+  assert.match(w.document.querySelector('.spotifyEmbed').src,/open\.spotify\.com\/embed\/playlist/);
+  w.openMusicForm('dedication');w.document.getElementById('adv_music_title').value='Canción de prueba';w.document.getElementById('adv_music_url').value='https://open.spotify.com/track/1234567890123456789012';w.document.getElementById('adv_music_note').value='Te quiero';await w.saveMusic('dedication','');
+  const song=w.__db.couple_music.find(x=>x.kind==='dedication');assert.ok(song);assert.match(w.document.querySelector('.musicList').textContent,/Te quiero/);
+  w.navigateToItem('letters',song.id);assert.ok(w.document.querySelector('.soundtrackModule'));
   w.showAdvancedTab("vinculo");
   assert.equal(w.document.getElementById("knowingSection"),null);
   w.showAdvancedTab("aventuras");

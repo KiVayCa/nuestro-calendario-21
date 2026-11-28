@@ -146,6 +146,8 @@ function reminderOccurrenceDate(note) {
 function navigateToItem(tab, id, date) {
   if (!validAdvancedTabs.has(tab)) tab = "notifications";
   if (tab === "letters" && id && (advCache.capsules||[]).some(c=>c.id===id)) tab="capsulas";
+  if (tab === "letters" && id && (advCache.music||[]).some(c=>c.id===id)) tab="musica";
+  if (tab === "musica" && id) musicFilter="all";
   if (tab === "capsulas" && id) capsuleFilter="all";
   if (tab === "question") { window.__nc21SelectedQuestionDate=null;knowingCategory="today"; }
   if (tab === "memories" && id)
