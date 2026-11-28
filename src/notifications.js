@@ -145,6 +145,7 @@ async function openNotificationTarget(id, tab) {
   if(notification?.event_type === "knowing_answered") return openKnowingFromQuestion();
   if(notification?.event_type?.startsWith("capsule_")){await advLoadAll(["capsules"]);tab="capsulas";}
   if(notification?.event_type?.startsWith("music_")){await advLoadAll(["music"]);tab="musica";}
+  if(notification?.event_type==='wedding_updated'){await advLoadAll(['wedding','weddingItems']);tab='matrimonio';}
   navigateToItem(
     tab,
     notification?.target_id,

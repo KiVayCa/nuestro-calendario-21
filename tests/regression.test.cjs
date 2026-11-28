@@ -23,7 +23,8 @@ test("personalization normalizes lists and preserves required modules", () => {
   const c=context("src/personalization.js");
   const p=c.normalizePersonalPreferences({module_order:["fe","fe","unknown"],hidden_modules:["home","calendar","settings","letters","unknown"],shortcuts:["fe","calendar","story","goals","budget","places","letters"],home_sections:[],density:"compact",text_size:"large",motion:"reduced"});
   assert.equal(p.module_order[0],"fe");
-  assert.equal(new Set(p.module_order).size,22);
+  assert.equal(new Set(p.module_order).size,23);
+  assert.ok(p.module_order.includes("matrimonio"));
   assert.ok(p.module_order.includes("musica"));
   assert.ok(p.module_order.includes("capsulas"));
   assert.ok(p.module_order.includes("juegos"));
@@ -49,6 +50,11 @@ test("Spotify links accept only the intended Spotify resource and Jam hosts",()=
  assert.equal(c.musicSpotifyId('http://open.spotify.com/track/'+id),null);
  assert.equal(c.musicJamUrl('https://spotify.link/abc123'),'https://spotify.link/abc123');
  assert.equal(c.musicJamUrl('https://spotify.link.evil.invalid/abc123'),null);
+});
+test("wedding totals count actual expenses once, exclude declined guests and use linked dates",()=>{
+ const c=context('src/wedding.js',{advCache:{dates:[{id:'date',event_date:'2028-04-21'}],futureProjects:[{id:'project',target_date:'2028-03-21'}]},countdownToday:()=>"2026-11-28"});
+ const totals=c.weddingTotals([{kind:'guest',party_size:2,status:'confirmed'},{kind:'guest',party_size:3,status:'declined'},{kind:'guest',party_size:1,status:'pending'},{kind:'budget',amount:200},{kind:'vendor',amount:200},{kind:'task',status:'done'},{kind:'faith',status:'pending'}],[{category:'matrimonio',entry_type:'expense',amount:100},{category:'matrimonio',entry_type:'income',amount:50},{category:'otros',amount:200}],1000);
+ assert.equal(totals.guests,3);assert.equal(totals.confirmed,2);assert.equal(totals.estimates,200);assert.equal(totals.paid,100);assert.equal(totals.remaining,900);assert.equal(totals.done,1);assert.equal(c.weddingDate({date_id:'date',project_id:'project',wedding_date:'2028-01-01'}),'2028-04-21');assert.equal(c.weddingDayCount('2028-02-29','2028-02-28'),1);
 });
 test("photo framing clamps metadata and keeps the default centered composition",()=>{
   const c=context("src/photo-frame.js");

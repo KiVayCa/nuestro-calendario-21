@@ -23,6 +23,7 @@ const sources = [
   "capsules",
   "soundtrack",
   "spotify-connect",
+  "wedding",
   "faith-readings",
   "faith",
   "future",

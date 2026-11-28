@@ -95,6 +95,7 @@ function renderAdvanced({ preserveInputs = false } = {}) {
     juegos: renderGamesModule,
     fe: renderAdvFaith,
     futuro: renderAdvFuture,
+    matrimonio: renderWedding,
     home: renderAdvHome,
     story: renderAdvStory,
     memories: renderAdvMemories,

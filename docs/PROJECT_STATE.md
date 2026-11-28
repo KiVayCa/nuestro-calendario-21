@@ -629,6 +629,24 @@ DOM de navegación a Calendario y Recuerdos sin pausa, cierre y reapertura
 con vínculo conservado; 54 pruebas aprobadas. Sin APK nuevo; pendiente
 aceptación de audio real en dispositivos.
 
+## Nuestro matrimonio · fase 12
+
+Pestaña independiente configurable. Cuenta regresiva (fecha elegida por los
+dos, o vínculo vivo a fecha importante/proyecto de matrimonio existente),
+invitados con acompañantes y confirmación, cotizaciones/proveedores,
+estimaciones de presupuesto, preparativos con responsable y plan opcional,
+cronograma de ceremonia/recepción, luna de miel y preparación espiritual
+con sugerencias. Configuración vincula meta de ahorro y proyectos existentes;
+pagos reales se calculan desde Presupuesto categoría Matrimonio sin duplicar
+transacciones; música reutiliza la categoría Boda de Nuestra banda sonora.
+RLS por pareja y referencias del mismo espacio, Realtime y avisos por
+actualización con ruta compatible a Nuestro futuro. Migración TEST y
+producción; prueba SQL de tipos, permisos, referencias y aislamiento aprobada.
+55 pruebas web aprobadas, incluido flujo de configuración, invitados,
+preparativos, categoría de gastos y cálculo de totales. No se fijó fecha ni
+presupuesto sin decisión de la pareja. Sin nueva APK; pendiente aceptación
+visual en teléfonos.
+
 ## Próximas fases
 
 9 Juegos de pareja; 10 Cápsulas del tiempo; 11 Nuestra banda sonora;

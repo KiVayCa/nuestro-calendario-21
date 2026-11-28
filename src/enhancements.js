@@ -145,6 +145,8 @@ function reminderOccurrenceDate(note) {
 
 function navigateToItem(tab, id, date) {
   if (!validAdvancedTabs.has(tab)) tab = "notifications";
+  if (tab==='futuro'&&id&&[...(advCache.wedding||[]),...(advCache.weddingItems||[])].some(r=>r.id===id))tab='matrimonio';
+  if(tab==='matrimonio'){weddingFilter=(advCache.weddingItems||[]).find(r=>r.id===id)?.kind||'overview';if((advCache.wedding||[]).some(r=>r.id===id))id=null;}
   if (tab === "letters" && id && (advCache.capsules||[]).some(c=>c.id===id)) tab="capsulas";
   if (tab === "letters" && id && (advCache.music||[]).some(c=>c.id===id)) tab="musica";
   if (tab === "musica" && id) musicFilter="all";

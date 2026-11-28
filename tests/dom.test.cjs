@@ -73,6 +73,7 @@ const wait = () => new Promise((r) => setTimeout(r, 400));
     "juegos",
     "fe",
     "futuro",
+    "matrimonio",
     "places",
     "analysis",
     "achievements",
@@ -251,6 +252,15 @@ const wait = () => new Promise((r) => setTimeout(r, 400));
   await w.toggleFutureStep("future-step-0");
   assert.equal(w.__db.couple_future_steps[0].done,true);
   assert.match(w.document.querySelector('[data-advanced-id="future-one"]').textContent,/20%/);
+  w.showAdvancedTab('matrimonio');w.openWeddingSettings();
+  w.document.getElementById('adv_wedding_project').value='future-one';w.document.getElementById('adv_wedding_goal').value='goal-one';w.document.getElementById('adv_wedding_budget').value='7000000';await w.saveWeddingSettings();
+  assert.equal(w.__db.couple_wedding[0].project_id,'future-one');assert.equal(w.weddingDate(),'2028-04-21');
+  w.openWeddingItem('guest');w.document.getElementById('adv_wedding_title').value='Invitado de prueba';w.document.getElementById('adv_wedding_party').value='2';w.document.getElementById('adv_wedding_status').value='confirmed';await w.saveWeddingItem('guest','');
+  assert.equal(w.weddingTotals().confirmed,2);assert.match(w.document.querySelector('.weddingList').textContent,/Invitado de prueba/);
+  w.weddingSetFilter('task');await w.weddingAddSuggestions('task');assert.equal(w.weddingTotals().tasks,6);const weddingTask=w.__db.couple_wedding_items.find(x=>x.kind==='task');await w.weddingToggle(weddingTask.id);assert.equal(w.weddingTotals().done,1);
+  w.weddingSetFilter('budget');w.weddingOpenExpense();assert.equal(w.document.getElementById('adv_category').value,'matrimonio');w.closeAdvModal();
+  w.navigateToItem('futuro',weddingTask.id);assert.ok(w.document.querySelector('.weddingModule'));
+  w.showAdvancedTab('futuro');
   w.scheduleFutureStep("future-step-1");
   assert.equal(w.document.getElementById("date").value,"2028-04-21");
   await w.savePlan();

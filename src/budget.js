@@ -216,6 +216,7 @@ function openExpenseForm() {
         ["comida", "Comida"],
         ["transporte", "Transporte"],
         ["viajes", "Viajes"],
+        ["matrimonio", "Matrimonio"],
         ["hogar", "Hogar"],
         ["servicios", "Servicios"],
         ["regalos", "Regalos"],

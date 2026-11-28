@@ -1,0 +1,24 @@
+begin;
+insert into auth.users(id,email) values ('11000000-0000-4000-8000-000000000111','wedding-a@example.invalid'),('11000000-0000-4000-8000-000000000112','wedding-b@example.invalid'),('11000000-0000-4000-8000-000000000113','wedding-c@example.invalid');
+insert into public.couples(id,name,created_by) values ('21000000-0000-4000-8000-000000000111','Wedding test','11000000-0000-4000-8000-000000000111'),('21000000-0000-4000-8000-000000000113','Other test','11000000-0000-4000-8000-000000000113');
+insert into public.couple_members(couple_id,user_id) values ('21000000-0000-4000-8000-000000000111','11000000-0000-4000-8000-000000000111'),('21000000-0000-4000-8000-000000000111','11000000-0000-4000-8000-000000000112'),('21000000-0000-4000-8000-000000000113','11000000-0000-4000-8000-000000000113');
+insert into public.goals(id,couple_id,created_by,title,target_amount) values ('31000000-0000-4000-8000-000000000111','21000000-0000-4000-8000-000000000111','11000000-0000-4000-8000-000000000111','Own savings',200),('31000000-0000-4000-8000-000000000113','21000000-0000-4000-8000-000000000113','11000000-0000-4000-8000-000000000113','Other savings',300);
+insert into public.plans(id,couple_id,created_by,title,plan_date) values ('41000000-0000-4000-8000-000000000111','21000000-0000-4000-8000-000000000111','11000000-0000-4000-8000-000000000111','Own plan',current_date),('41000000-0000-4000-8000-000000000113','21000000-0000-4000-8000-000000000113','11000000-0000-4000-8000-000000000113','Other plan',current_date);
+set local role authenticated;
+select set_config('request.jwt.claim.sub','11000000-0000-4000-8000-000000000111',true);
+insert into public.couple_wedding(couple_id,created_by,wedding_date,budget,goal_id) values ('21000000-0000-4000-8000-000000000111',auth.uid(),current_date+30,1000000,'31000000-0000-4000-8000-000000000111');
+insert into public.couple_wedding_items(couple_id,created_by,kind,title,category,status,amount,party_size) select '21000000-0000-4000-8000-000000000111',auth.uid(),kind,kind,'test',status,amount,party_size from (values ('guest','confirmed',0,2),('vendor','quoted',100,1),('budget','pending',100,1),('task','pending',0,1),('schedule','pending',0,1),('honeymoon','pending',100,1),('faith','pending',0,1)) x(kind,status,amount,party_size);
+update public.couple_wedding_items set assignee_id='11000000-0000-4000-8000-000000000112',plan_id='41000000-0000-4000-8000-000000000111' where kind='task' and couple_id='21000000-0000-4000-8000-000000000111';
+do $$ begin
+ begin update public.couple_wedding set goal_id='31000000-0000-4000-8000-000000000113' where couple_id='21000000-0000-4000-8000-000000000111';raise exception 'Other goal allowed';exception when insufficient_privilege then null;end;
+ begin update public.couple_wedding_items set plan_id='41000000-0000-4000-8000-000000000113' where kind='task' and couple_id='21000000-0000-4000-8000-000000000111';raise exception 'Other plan allowed';exception when insufficient_privilege then null;end;
+ begin update public.couple_wedding_items set assignee_id='11000000-0000-4000-8000-000000000113' where kind='task' and couple_id='21000000-0000-4000-8000-000000000111';raise exception 'Other assignee allowed';exception when insufficient_privilege then null;end;
+ begin update public.couple_wedding_items set status='booked' where kind='guest' and couple_id='21000000-0000-4000-8000-000000000111';raise exception 'Wrong status allowed';exception when check_violation then null;end;
+end $$;
+select set_config('request.jwt.claim.sub','11000000-0000-4000-8000-000000000112',true);
+do $$ begin if (select count(*) from public.couple_wedding_items where couple_id='21000000-0000-4000-8000-000000000111')<>7 then raise exception 'Partner visibility failed';end if;update public.couple_wedding_items set status='done' where kind='task' and couple_id='21000000-0000-4000-8000-000000000111';if not found then raise exception 'Partner update failed';end if;end $$;
+select set_config('request.jwt.claim.sub','11000000-0000-4000-8000-000000000113',true);
+do $$ begin if exists(select 1 from public.couple_wedding where couple_id='21000000-0000-4000-8000-000000000111') or exists(select 1 from public.couple_wedding_items where couple_id='21000000-0000-4000-8000-000000000111') then raise exception 'Outside access';end if;end $$;
+reset role;
+rollback;
+select 'Wedding planner kinds, collaborative edits, references and isolation passed' as result;

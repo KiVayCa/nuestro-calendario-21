@@ -131,6 +131,8 @@ async function setupAdvancedRealtime(force = false) {
     "couple_adventures",
     "couple_faith",
     "couple_future_projects",
+    "couple_wedding",
+    "couple_wedding_items",
     "couple_future_steps",
     "couple_personalization",
     "memories",
@@ -171,6 +173,7 @@ async function setupAdvancedRealtime(force = false) {
             scheduleRealtimeRefresh(false, ["letters","capsules","music"]);
           if (note.event_type === "knowing_answered")
             scheduleRealtimeRefresh(false, ["knowing"]);
+          if (note.event_type === "wedding_updated") scheduleRealtimeRefresh(false,["wedding","weddingItems"]);
           if (document.visibilityState === "visible")
             showAppToast(note.title || "Nueva notificación de tu pareja ❤️");
           if (

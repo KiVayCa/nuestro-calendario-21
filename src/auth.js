@@ -167,6 +167,7 @@ async function init() {
         extraSelected=null;
         dreamsGoalsView = "dreams";
         futureFilter = "all";
+        weddingFilter = "overview";
         storyFilters = {month:"",kind:"all",query:"",favorites:false,view:"timeline",order:"newest"};
         personalDraft = null;
         photoFrameDraft = null;
