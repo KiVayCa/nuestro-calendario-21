@@ -453,6 +453,7 @@ setInterval(() => {
   if (advancedTab === "story" && $("storyToday")?.dataset.date !== countdownToday()) renderAdvanced();
   if (advancedTab === "capsulas" && $("capsuleToday")?.dataset.date !== countdownToday()) renderAdvanced();
   if (advancedTab === "matrimonio" && $("weddingToday")?.dataset.date !== countdownToday()) renderAdvanced();
+  if (advancedTab === "memories" && $("smartMemoriesToday")?.dataset.date !== countdownToday()) renderAdvanced();
   if (advancedTab === "question" && !window.__nc21SelectedQuestionDate) {
     const shownDate = $("dailyQuestionDate")?.dataset.date;
     if (shownDate && shownDate !== todayQuestion().date) renderAdvanced();

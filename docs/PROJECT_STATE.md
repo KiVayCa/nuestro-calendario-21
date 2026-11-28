@@ -647,6 +647,20 @@ preparativos, categoría de gastos y cálculo de totales. No se fijó fecha ni
 presupuesto sin decisión de la pareja. Sin nueva APK; pendiente aceptación
 visual en teléfonos.
 
+## Recuerdos inteligentes · fase 13
+
+Se amplía Recuerdos sin copiar registros ni modificar las fotografías:
+recuerdo destacado diario (aniversario de fecha, mismo día del mes, favorito
+o selección determinista), sorpresa aleatoria, colecciones automáticas por
+mes/categoría/lugar/favoritos/foto/canción, búsqueda sin distinción de tildes
+y filtros combinables. Alternan lista, galería y presentación manual de
+fotos originales. Sugerencias de planes/aventuras completados sin recuerdo
+vinculado, por ocurrencia, excluyendo cancelados/omitidos y evitando
+duplicados; abren el formulario original con fecha y vínculo. Las fotos
+se resuelven por el mecanismo privado existente, sin análisis externo.
+56 pruebas web aprobadas, incluidos filtros, presentación, agrupación y
+deduplicación. Sin esquema nuevo ni APK; pendiente aceptación visual.
+
 ## Próximas fases
 
 9 Juegos de pareja; 10 Cápsulas del tiempo; 11 Nuestra banda sonora;

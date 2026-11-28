@@ -83,18 +83,22 @@ function validateMemoryFile(file) {
 }
 
 function filteredMemories() {
-  const query = memoryFilters.query.trim().toLocaleLowerCase("es");
-  return advCache.memories.filter(
+  const normalize=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('es');
+  const query = normalize(memoryFilters.query).trim();
+  const rows=advCache.memories.filter(
     (memory) =>
       (!memoryFilters.favorites || memory.favorite) &&
       (!memoryFilters.year ||
         memory.memory_date?.startsWith(memoryFilters.year)) &&
+      (!memoryFilters.month || memory.memory_date?.startsWith(memoryFilters.month)) &&
+      (!memoryFilters.category || memory.category===memoryFilters.category) &&
+      (!memoryFilters.place || (memory.place_id||memory.location)===memoryFilters.place) &&
+      (!memoryFilters.photo || (memoryFilters.photo==='yes'?!!memory.photo_url:!memory.photo_url)) &&
+      (!memoryFilters.music || (advCache.music||[]).some(r=>r.kind==='memory'&&r.memory_id===memory.id)) &&
       (!query ||
-        [memory.title, memory.description, memory.location]
-          .join(" ")
-          .toLocaleLowerCase("es")
-          .includes(query)),
+        normalize([memory.title, memory.description, memory.location,(advCache.places||[]).find(p=>p.id===memory.place_id)?.name,memory.category].join(' ')).includes(query)),
   );
+  return rows.slice().sort((a,b)=>memoryFilters.order==='oldest'?String(a.memory_date||'').localeCompare(String(b.memory_date||'')):String(b.memory_date||'').localeCompare(String(a.memory_date||'')));
 }
 
 function memoryFilterToolbar() {
@@ -107,10 +111,19 @@ function memoryFilterToolbar() {
   ]
     .sort()
     .reverse();
-  return `<form class="memoryFilters" onsubmit="event.preventDefault();applyMemoryFilters()">
+  const months=[...new Set([...advCache.memories.map(m=>m.memory_date?.slice(0,7)).filter(Boolean),memoryFilters.month].filter(Boolean))].sort().reverse(),categories=[...new Set(advCache.memories.map(m=>m.category).filter(Boolean))].sort();
+  const places=[...new Map(advCache.memories.map(m=>[m.place_id||m.location,(advCache.places||[]).find(p=>p.id===m.place_id)?.name||m.location]).filter(([key,label])=>key&&label)).entries()];
+  const opts=(items,key)=>`<option value="">Todos</option>${items.map(([v,label])=>`<option value="${esc(v)}" ${memoryFilters[key]===v?'selected':''}>${esc(label)}</option>`).join('')}`;
+  return `<form class="memoryFilters smartMemoryFilters" onsubmit="event.preventDefault();applyMemoryFilters()">
     <label>Buscar recuerdos<input id="memorySearch" type="search" value="${esc(memoryFilters.query)}" placeholder="Título, historia o lugar"></label>
     <label>Año<select id="memoryYear"><option value="">Todos</option>${years.map((year) => `<option ${year === memoryFilters.year ? "selected" : ""}>${esc(year)}</option>`).join("")}</select></label>
+    <label>Mes<select id="memoryMonth">${opts(months.map(m=>[m,storyMonthTitle(m)]),'month')}</select></label>
+    <label>Categoría<select id="memoryCategory">${opts(categories.map(c=>[c,c]),'category')}</select></label>
+    <label>Lugar<select id="memoryPlace">${opts(places,'place')}</select></label>
+    <label>Fotografía<select id="memoryPhoto">${opts([['yes','Con foto'],['no','Sin foto']],'photo')}</select></label>
+    <label>Orden<select id="memoryOrder"><option value="newest">Más recientes</option><option value="oldest" ${memoryFilters.order==='oldest'?'selected':''}>Más antiguos</option></select></label>
     <label class="filterCheck"><input id="memoryFavorites" type="checkbox" ${memoryFilters.favorites ? "checked" : ""}> Solo favoritos</label>
+    <label class="filterCheck"><input id="memoryMusic" type="checkbox" ${memoryFilters.music?'checked':''}> Con canción</label>
     <button class="btn" type="submit">Buscar</button>
     <button class="btn" type="button" onclick="clearMemoryFilters()">Limpiar</button>
     <span role="status">${filteredMemories().length} de ${advCache.memories.length}</span>
@@ -122,6 +135,7 @@ function applyMemoryFilters() {
     query: $("memorySearch").value,
     year: $("memoryYear").value,
     favorites: $("memoryFavorites").checked,
+    month: $("memoryMonth").value,category: $("memoryCategory").value,place: $("memoryPlace").value,photo: $("memoryPhoto").value,music: $("memoryMusic").checked,order: $("memoryOrder").value,
   };
   renderAdvanced();
 }
@@ -152,8 +166,9 @@ function navigateToItem(tab, id, date) {
   if (tab === "musica" && id) musicFilter="all";
   if (tab === "capsulas" && id) capsuleFilter="all";
   if (tab === "question") { window.__nc21SelectedQuestionDate=null;knowingCategory="today"; }
-  if (tab === "memories" && id)
-    memoryFilters = { query: "", year: "", favorites: false };
+  if (tab === "memories" && id){
+    memoryFilters = { query: "", year: "", favorites: false };smartMemoryView='list';
+  }
   if (tab === "futuro" && id) futureFilter = "all";
   if ((tab === "aventuras" || tab === "juegos") && id) {
     const match=(advCache.gameMatches||[]).find(m=>m.id===id);

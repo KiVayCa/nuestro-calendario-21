@@ -10,8 +10,8 @@ function renderAdvMemories() {
       "📸 Nuevo recuerdo",
       "openMemoryForm()",
     ) +
-    memoryFilterToolbar() + '<button type="button" class="btn" onclick="openAlbumExport()">Exportar álbum o collage</button>' +
-    `<div class="advList">${
+    renderSmartMemories() + memoryFilterToolbar() + smartMemoryViewControls() + '<button type="button" class="btn" onclick="openAlbumExport()">Exportar álbum o collage</button>' +
+    (smartMemoryView==='gallery'?renderSmartGallery(filteredMemories()):`<div class="advList">${
       filteredMemories().length
         ? filteredMemories()
             .map(
@@ -20,7 +20,7 @@ function renderAdvMemories() {
             )
             .join("")
         : `<div class="advEmpty">${advCache.memories.length ? "No hay recuerdos que coincidan con los filtros." : "📸 Todavía no hay recuerdos. El primero puede ser uno muy especial."}</div>`
-    }</div>`
+    }</div>`)
   );
 }
 

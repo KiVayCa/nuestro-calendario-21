@@ -392,6 +392,12 @@ test("memory search combines text, year and favorites", () => {
   );
   assert.equal(c.filteredMemories().length, 1);
 });
+test('smart memory collections, spotlight and suggestions use existing records without duplicate plan occurrences',()=>{
+ const c=context('src/smart-memories.js',{countdownToday:()=>"2026-11-28",storyDate:v=>v?.slice(0,10)||''});
+ const memories=[{id:'m1',memory_date:'2025-11-28',favorite:true,photo_url:'private/path',category:'cita',place_id:'p',source_plan_id:'plan',source_occurrence_date:'2025-11-28'},{id:'m2',memory_date:'2026-11-01',category:'viaje',location:'Salento'}];
+ const collections=c.smartMemoryCollections(memories,[{id:'p',name:'Café'}],[{kind:'memory',memory_id:'m1'}]);assert.equal(collections.photos,1);assert.equal(collections.withoutPhoto,1);assert.equal(collections.music,1);assert.equal(collections.places.length,2);assert.equal(c.smartMemorySpotlight(memories).memory.id,'m1');
+ const rows=c.smartMemorySuggestions({memories,adventures:[{id:'a',status:'done',kind:'experience',plan_id:'plan',target_date:'2026-11-21',title:'Paseo'},{id:'b',status:'done',kind:'experience',memory_id:'m2',plan_id:'other',target_date:'2026-11-01'}]},[{id:'plan',title:'Plan',recurrence_enabled:true,completed_occurrences:['2025-11-28','2026-11-21','2026-11-25','2026-11-26'],cancelled_occurrences:['2026-11-26']},{id:'other',title:'Other',completed:true,plan_date:'2026-11-01'}]);assert.deepEqual(Array.from(rows,x=>x.kind+':'+x.date),['plan:2026-11-25','adventure:2026-11-21']);
+});
 test("data refreshes are serialized and skip a signed-out session", async () => {
   const user = { id: "one" },
     couple = { id: "pair" };

@@ -173,7 +173,7 @@ function closeAdvModal() {
   window.setTimeout(() => {
     if (modal.classList.contains("is-closing")) {
       modal.classList.remove("show", "is-closing");
-      if ($("capsuleDraft") || $("capsuleRead") || $("musicDraft") || modal.querySelector('.musicPlayer')) $("advModalBody").replaceChildren();
+      if ($("capsuleDraft") || $("capsuleRead") || $("musicDraft") || modal.querySelector('.musicPlayer,.smartSlideshow,.smartSuggestionList')) $("advModalBody").replaceChildren();
     }
   }, 210);
 }
